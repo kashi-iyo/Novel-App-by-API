@@ -22,7 +22,7 @@ class UsersController < ApplicationController
         @user = User.new(user_params)
         if @user.save
             login!
-            render json: { status: created, user: @user }
+            render json: { status: :created, user: @user }
         else
             render json: { status: 500, errors: @user.errors.full_messages }
         end
