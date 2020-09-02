@@ -1,10 +1,10 @@
 Rails.application.routes.draw do
   
-  root 'series#home'
+  root to: 'api/v1/novel_series#index'
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      resources :novel_series, only: [:index, :show, :create, :update, :destroy]
+      resources :novel_series, only: [:index, :show, :edit, :create, :update, :destroy]
     end
   end
 
