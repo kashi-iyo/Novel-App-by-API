@@ -13,4 +13,9 @@ class User < ApplicationRecord
     validates :email, {presence: true, format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }}
 
     validates :profile, length: { maximum: 200 }
+
+
+    # 紐付け====================================
+    has_many :novel_series, dependent: :destroy
+
 end
