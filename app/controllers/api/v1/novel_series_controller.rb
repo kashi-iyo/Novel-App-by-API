@@ -41,11 +41,24 @@ class Api::V1::NovelSeriesController < ApplicationController
     end
 
     def update
-        
+        if authorized?
+            if @novel_series.update(novel_series_params)
+                render json: { status: :ok, location: api_v1_novel_series_path(@novel_series) }
+            else
+                render json: { errors: @novel_series.errors.full_messages, status: :unprocessable_entity }
+            end
+        else
+            handle_unauthorized
+        end
     end
 
     def destroy
-        
+        if authorized?
+            @novel_series.destroy
+            render json: { head: :no_content, location: users_path(@current_user) }
+        else
+            handle_unauthorized
+        end
     end
 
     private
