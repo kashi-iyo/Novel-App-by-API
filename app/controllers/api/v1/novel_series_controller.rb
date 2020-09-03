@@ -5,6 +5,9 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def index
         @all_novel_series = NovelSeries.all
+        @all_novel_series.map do |series|
+            series.user.id === series.user_id ? series.author = series.user.nickname : null
+        end
         render json: { status: 200, novel_series: @all_novel_series }
     end
 
