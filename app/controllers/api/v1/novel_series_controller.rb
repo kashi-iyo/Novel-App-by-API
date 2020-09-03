@@ -5,7 +5,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def index
         @all_novel_series = NovelSeries.all
-        render json: { status: 200, novel_series: @all_novel_series}
+        render json: { status: 200, novel_series: @all_novel_series }
     end
 
     def show
@@ -66,6 +66,7 @@ class Api::V1::NovelSeriesController < ApplicationController
         # シリーズを取得
         def set_novel_series
             @novel_series = NovelSeries.find(params[:id])
+            @user_nickname = @novel_series.user.nickname
         end
 
         # ログイン中のユーザーと、今見ているシリーズの作成者が一致するかをbool値で返す
