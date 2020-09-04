@@ -1,6 +1,6 @@
 class Api::V1::NovelSeriesController < ApplicationController
 
-    before_action :logged_in_user , only: [:create, :edit, :update, :destroy]
+    before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
     before_action :set_novel_series, only: [:show, :edit, :update, :destroy]
 
     def index
@@ -30,7 +30,8 @@ class Api::V1::NovelSeriesController < ApplicationController
                 render json: {
                     status: :created,
                     novel_series: @novel_series,
-                    location: api_v1_novel_series_path(@novel_series)
+                    location: edit_api_v1_novel_series_path(@novel_series),
+                    success_messages: ["正常に保存されました。"]
                 }
             else
                 render json: {
@@ -85,7 +86,7 @@ class Api::V1::NovelSeriesController < ApplicationController
         end
 
         def novel_series_params
-            params.require(:novel_series).permit(:series_title, :series_description)
+            params.require(:novel_series).permit(:series_title, :series_description, :author)
         end
 
 end
