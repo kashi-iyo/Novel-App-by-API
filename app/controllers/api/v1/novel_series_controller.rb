@@ -30,7 +30,7 @@ class Api::V1::NovelSeriesController < ApplicationController
                 render json: {
                     status: :created,
                     novel_series: @novel_series,
-                    location: edit_api_v1_novel_series_path(@novel_series),
+                    location: api_v1_novel_series_path(@novel_series),
                     success_messages: ["正常に保存されました。"]
                 }
             else
@@ -47,9 +47,9 @@ class Api::V1::NovelSeriesController < ApplicationController
     def update
         if authorized?
             if @novel_series.update(novel_series_params)
-                render json: { status: :ok, location: api_v1_novel_series_path(@novel_series) }
+                render json: { status: :ok, location: api_v1_novel_series_path(@novel_series), successful: ["編集が完了しました。"] }
             else
-                render json: { errors: @novel_series.errors.full_messages, status: :unprocessable_entity }
+                render json: { errors: ["入力された値が不正でした。"], status: :unprocessable_entity }
             end
         else
             handle_unauthorized
