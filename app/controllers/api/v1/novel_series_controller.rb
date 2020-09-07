@@ -6,13 +6,20 @@ class Api::V1::NovelSeriesController < ApplicationController
     def index
         @all_novel_series = NovelSeries.all
         @all_novel_series.map do |series|
-            series.user.id === series.user_id ? series.author = series.user.nickname : null
+            series.user.id === series.user_id ?
+            series.author = series.user.nickname :
+            null
         end
         render json: { status: 200, novel_series: @all_novel_series }
     end
 
     def show
-        render json: { status: 200, novel_series: @novel_series }
+        if release_series?
+            id = @novel_series.id.to_s
+            render json: { status: 200, novel_series: @novel_series, id: id}
+        else
+            handle_unrelease
+        end
     end
 
     def edit
@@ -27,9 +34,11 @@ class Api::V1::NovelSeriesController < ApplicationController
         @novel_series = current_user.novel_series.new(novel_series_params)
         if authorized?
             if @novel_series.save
+                series_id = @novel_series.id.to_s
                 render json: {
                     status: :created,
                     novel_series: @novel_series,
+                    series_id: series_id,
                     location: api_v1_novel_series_path(@novel_series),
                     success_messages: ["正常に保存されました。"]
                 }
@@ -67,6 +76,23 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     private
 
+        # シリーズのStrong Parameters
+        def novel_series_params
+            params.require(:novel_series).permit(:series_title, :series_description, :author, :release)
+        end
+
+        # releaseが真かどうか確認
+        def release_series?
+            !!@novel_series.release
+        end
+
+        # 非公開の場合には以下のデータをレンダーする
+        def handle_unrelease
+            unless release_series?
+                render json: { messages:"アクセス権限がありません。", status: 400 }
+            end
+        end
+
         # シリーズを取得
         def set_novel_series
             @novel_series = NovelSeries.find(params[:id])
@@ -83,10 +109,6 @@ class Api::V1::NovelSeriesController < ApplicationController
             unless authorized?
                 render json: { messages: "アクセス権限がありません。", status: 401 }
             end
-        end
-
-        def novel_series_params
-            params.require(:novel_series).permit(:series_title, :series_description, :author)
         end
 
 end
