@@ -1,5 +1,6 @@
 class Api::V1::NovelSeriesController < ApplicationController
 
+    # ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
     before_action :set_novel_series, only: [:show, :edit, :update, :destroy]
 
@@ -19,14 +20,6 @@ class Api::V1::NovelSeriesController < ApplicationController
             render json: { status: 200, novel_series: @novel_series, id: id}
         else
             handle_unrelease
-        end
-    end
-
-    def edit
-        if authorized?
-            render json: { status: 200, novel_series: @novel_series }
-        else
-            handle_unauthorized
         end
     end
 
@@ -53,12 +46,20 @@ class Api::V1::NovelSeriesController < ApplicationController
         end
     end
 
+    def edit
+        if authorized?
+            render json: { status: 200, novel_series: @novel_series }
+        else
+            handle_unauthorized
+        end
+    end
+
     def update
         if authorized?
             if @novel_series.update(novel_series_params)
                 render json: { status: :ok, location: api_v1_novel_series_path(@novel_series), successful: ["編集が完了しました。"] }
             else
-                render json: { errors: ["入力された値が不正でした。"], status: :unprocessable_entity }
+                render json: { errors: ["入力内容に誤りがあります。"], status: :unprocessable_entity }
             end
         else
             handle_unauthorized
@@ -89,7 +90,7 @@ class Api::V1::NovelSeriesController < ApplicationController
         # 非公開の場合には以下のデータをレンダーする
         def handle_unrelease
             unless release_series?
-                render json: { messages:"アクセス権限がありません。", status: 400 }
+                render json: { messages:"このシリーズは公開されていません。", status: 400 }
             end
         end
 
@@ -104,7 +105,7 @@ class Api::V1::NovelSeriesController < ApplicationController
             @novel_series.user == current_user
         end
 
-        # ユーザー同士が不一致な場合の処理
+        # シリーズの作者とログインユーザーが不一致な場合の処理
         def handle_unauthorized
             unless authorized?
                 render json: { messages: "アクセス権限がありません。", status: 401 }
