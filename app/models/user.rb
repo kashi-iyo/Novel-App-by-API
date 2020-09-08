@@ -1,6 +1,11 @@
 class User < ApplicationRecord
     has_secure_password
 
+    # 紐付け
+    has_many :novel_series, dependent: :destroy
+    has_many :novels, dependency: :destroy
+
+    # バリデーション
     validates :nickname, presence: true
     validates :nickname, uniqueness: true
     validates :nickname, length: { maximum: 30 }
@@ -13,9 +18,5 @@ class User < ApplicationRecord
     validates :email, {presence: true, format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }}
 
     validates :profile, length: { maximum: 200 }
-
-
-    # 紐付け====================================
-    has_many :novel_series, dependent: :destroy
 
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_06_091419) do
+ActiveRecord::Schema.define(version: 2020_09_08_081437) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,6 +26,20 @@ ActiveRecord::Schema.define(version: 2020_09_06_091419) do
     t.index ["user_id"], name: "index_novel_series_on_user_id"
   end
 
+  create_table "novels", force: :cascade do |t|
+    t.string "novel_title", null: false
+    t.text "novel_description"
+    t.text "novel_content", null: false
+    t.string "author", null: false
+    t.boolean "release", default: false, null: false
+    t.bigint "user_id", null: false
+    t.bigint "novel_series_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["novel_series_id"], name: "index_novels_on_novel_series_id"
+    t.index ["user_id"], name: "index_novels_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "nickname", null: false
     t.string "account_id", null: false
@@ -38,4 +52,6 @@ ActiveRecord::Schema.define(version: 2020_09_06_091419) do
   end
 
   add_foreign_key "novel_series", "users"
+  add_foreign_key "novels", "novel_series"
+  add_foreign_key "novels", "users"
 end
