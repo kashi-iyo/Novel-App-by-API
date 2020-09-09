@@ -3,7 +3,7 @@ class User < ApplicationRecord
 
     # 紐付け
     has_many :novel_series, dependent: :destroy
-    has_many :novels, dependency: :destroy
+    has_many :novels, dependent: :destroy
 
     # バリデーション
     validates :nickname, presence: true
