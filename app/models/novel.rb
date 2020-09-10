@@ -6,8 +6,7 @@ class Novel < ApplicationRecord
   # バリデーション
   validates :novel_title, presence: true
   validates :novel_title, length: { maximum: 50 }
-  validates :series_description, length: { maximum: 300 }
+  validates :novel_description, length: { maximum: 300 }
   validates :novel_content, presence: true
   validates :author, presence: true
-  validates :release, presence: true
 end
