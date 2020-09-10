@@ -2,7 +2,7 @@ class SessionsController < ApplicationController
 
     def login
         @user = User.find_by(email: session_params[:email])
-        if current_user.email === @user.email
+        if logged_in? && current_user
             render json: { status: 401, errors: "不正なアクセスです。" }
         else
             if @user && @user.authenticate(session_params[:password])
