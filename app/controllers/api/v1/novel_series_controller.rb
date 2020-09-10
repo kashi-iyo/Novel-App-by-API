@@ -15,7 +15,10 @@ class Api::V1::NovelSeriesController < ApplicationController
     end
 
     def show
-        if release_series?
+        if current_user.id === @novel_series.user_id
+            id = @novel_series.id.to_s
+            render json: { status: 200, novel_series: @novel_series, id: id}
+        elsif release?(@novel_series)
             id = @novel_series.id.to_s
             render json: { status: 200, novel_series: @novel_series, id: id}
         else
@@ -25,7 +28,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def create
         @novel_series = current_user.novel_series.new(novel_series_params)
-        if authorized?
+        if authorized?(@novel_series)
             if @novel_series.save
                 series_id = @novel_series.id.to_s
                 render json: {
@@ -47,7 +50,7 @@ class Api::V1::NovelSeriesController < ApplicationController
     end
 
     def edit
-        if authorized?
+        if authorized?(@novel_series)
             render json: { status: 200, novel_series: @novel_series }
         else
             handle_unauthorized
@@ -55,7 +58,7 @@ class Api::V1::NovelSeriesController < ApplicationController
     end
 
     def update
-        if authorized?
+        if authorized?(@novel_series)
             if @novel_series.update(novel_series_params)
                 render json: { status: :ok, location: api_v1_novel_series_path(@novel_series), successful: ["編集が完了しました。"] }
             else
@@ -67,7 +70,7 @@ class Api::V1::NovelSeriesController < ApplicationController
     end
 
     def destroy
-        if authorized?
+        if authorized?(@novel_series)
             @novel_series.destroy
             render json: { head: :no_content, location: users_path(@current_user) }
         else
@@ -82,34 +85,9 @@ class Api::V1::NovelSeriesController < ApplicationController
             params.require(:novel_series).permit(:series_title, :series_description, :author, :release)
         end
 
-        # releaseが真かどうか確認
-        def release_series?
-            !!@novel_series.release
-        end
-
-        # 非公開の場合には以下のデータをレンダーする
-        def handle_unrelease
-            unless release_series?
-                render json: { messages:"このシリーズは公開されていません。", status: 400 }
-            end
-        end
-
         # シリーズを取得
         def set_novel_series
             @novel_series = NovelSeries.find(params[:id])
-            @user_nickname = @novel_series.user.nickname
-        end
-
-        # ログイン中のユーザーと、今見ているシリーズの作成者が一致するかをbool値で返す
-        def authorized?
-            @novel_series.user == current_user
-        end
-
-        # シリーズの作者とログインユーザーが不一致な場合の処理
-        def handle_unauthorized
-            unless authorized?
-                render json: { messages: "アクセス権限がありません。", status: 401 }
-            end
         end
 
 end
