@@ -4,7 +4,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :novel_series, only: [:index, :show, :edit, :create, :update, :destroy]
+      resources :novel_series, only: [:index, :show, :edit, :create, :update, :destroy] do
+        resources :novels, only: [:index, :show, :edit, :create, :update, :destroy]
+      end
     end
   end
 
