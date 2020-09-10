@@ -15,10 +15,12 @@ class Api::V1::NovelSeriesController < ApplicationController
     end
 
     def show
-        if current_user.id === @novel_series.user_id
+        # 公開時には全員が閲覧可能
+        if release?(@novel_series)
             id = @novel_series.id.to_s
             render json: { status: 200, novel_series: @novel_series, id: id}
-        elsif release?(@novel_series)
+        # 非公開時には作者だけが閲覧可能
+        elsif !release?(@novel_series) && authorized?(@novel_series)
             id = @novel_series.id.to_s
             render json: { status: 200, novel_series: @novel_series, id: id}
         else

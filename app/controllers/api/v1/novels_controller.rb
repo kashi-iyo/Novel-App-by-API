@@ -6,8 +6,8 @@ class Api::V1::NovelsController < ApplicationController
     before_action :set_novel_series
 
     def index
-        @all_novels_in_series = @novel_series.novels.all
-        render json: { status: 200, all_novels_in_series: @all_novels_in_series }
+        @novels_in_series = @novel_series.novels.all
+        render json: { status: 200, novels_in_series: @novels_in_series }
     end
 
     def show
