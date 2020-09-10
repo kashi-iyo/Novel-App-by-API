@@ -1,18 +1,17 @@
 class SessionsController < ApplicationController
 
     def login
-        if logged_in?
+        @user = User.find_by(email: session_params[:email])
+        if current_user.email === @user.email
             render json: { status: 401, errors: "不正なアクセスです。" }
         else
-            @user = User.find_by(email: session_params[:email])
             if @user && @user.authenticate(session_params[:password])
                 login!
                 render json: { logged_in: true, user: @user }
             else
-                render json: { status: 401, errors: ["入力された内容に誤りがあります。"] }
+                render json: { status: 401, errors: "入力された内容に誤りがあります。" }
             end
         end
-        
     end
 
     def is_logged_in?
@@ -24,13 +23,13 @@ class SessionsController < ApplicationController
     end
 
     def logout
-        if logged_in?
+        if current_user
             reset_session
             render json: { status: 200, logged_out: true }
         else
             render json: { status: 401, errors: "不正なアクセスです。" }
         end
-        
+
     end
 
     private
