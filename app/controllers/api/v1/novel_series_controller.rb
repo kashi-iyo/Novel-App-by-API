@@ -22,7 +22,7 @@ class Api::V1::NovelSeriesController < ApplicationController
             id = @novel_series.id.to_s
             render json: { status: 200, novel_series: @novel_series, id: id}
         else
-            handle_unrelease
+            handle_unrelease(@novel_series)
         end
     end
 

@@ -49,8 +49,8 @@ class ApplicationController < ActionController::Base
         end
 
         # 非公開の場合には以下のデータをレンダーする
-        def handle_unrelease
-            unless release_series?
+        def handle_unrelease(data)
+            unless release?(data)
                 render json: { messages:"非公開中。", status: 400 }
             end
         end
