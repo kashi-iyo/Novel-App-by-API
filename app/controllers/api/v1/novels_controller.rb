@@ -12,7 +12,7 @@ class Api::V1::NovelsController < ApplicationController
 
     def show
         if current_user.id === @novel_in_series.user_id
-            render json: { status: 200, novel_in_series: @novel_in_series}
+            render json: { status: 200, novel_in_series: @novel_in_series, novel_series: @novel_series}
         elsif release?(@novel_in_series)
             render json: { status: 200, novel_series: @novel_in_series}
         else
