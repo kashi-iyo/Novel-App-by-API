@@ -22,13 +22,18 @@ class Api::V1::NovelsController < ApplicationController
 
     def create
         @novel_in_series = @novel_series.novels.new(novel_in_series_params)
-        @novel_in_series.user_id = @novel_series.user_id
-        @novel_in_series.author = @novel_series.author
+        @novel_in_series.user_id = @novel_series.user_id    # ユーザーID
+        @novel_in_series.author = @novel_series.author  # 作者
+        @series_id = @novel_series.id.to_s  #シリーズのIDを文字列で取得（Reactでページ遷移に使用する）
+        
         if authorized?(@novel_in_series)
             if @novel_in_series.save
+                @novels_id = @novel_in_series.id.to_s   #小説のIDで取得（Reactでページ遷移に使用する）
                 render json: {
                     status: :created,
                     novel_in_series: @novel_in_series,
+                    series_id: @series_id,
+                    novels_id: @novels_id,
                     success_messages: ["正常に保存されました。"]
                 }
             else
