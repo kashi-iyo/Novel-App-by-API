@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
         def login!
             session[:user_id] = @user.id
         end
-        
+
         # ログインしているかどうかをbool値で返す
         def logged_in?
             !!session[:user_id]
