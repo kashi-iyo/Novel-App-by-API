@@ -12,9 +12,16 @@ class Api::V1::NovelsController < ApplicationController
 
     def show
         if current_user.id === @novel_in_series.user_id
-            render json: { status: 200, novel_in_series: @novel_in_series, novel_series: @novel_series}
+            @novel_id = @novel_in_series.id.to_s
+            render json: {
+                status: 200,
+                novel_in_series: @novel_in_series,
+                novel_series: @novel_series,
+                novel_id: @novel_id,
+                keyword: "novels"
+            }
         elsif release?(@novel_in_series)
-            render json: { status: 200, novel_series: @novel_in_series}
+            render json: { status: 200, novel_series: @novel_in_series, keyword: "novels"}
         else
             handle_unrelease
         end
@@ -25,7 +32,6 @@ class Api::V1::NovelsController < ApplicationController
         @novel_in_series.user_id = @novel_series.user_id    # ユーザーID
         @novel_in_series.author = @novel_series.author  # 作者
         @series_id = @novel_series.id.to_s  #シリーズのIDを文字列で取得（Reactでページ遷移に使用する）
-        
         if authorized?(@novel_in_series)
             if @novel_in_series.save
                 @novels_id = @novel_in_series.id.to_s   #小説のIDで取得（Reactでページ遷移に使用する）
@@ -48,8 +54,8 @@ class Api::V1::NovelsController < ApplicationController
     end
 
     def edit
-        if authorized?
-            render json: { status: 200, novel_in_series: @novel_in_series }
+        if authorized?(@novel_in_series)
+            render json: { status: 200, novel_in_series: @novel_in_series, keyword: "novels" }
         else
             handle_unauthorized
         end
