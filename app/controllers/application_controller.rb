@@ -37,9 +37,9 @@ class ApplicationController < ActionController::Base
         end
 
         # シリーズの作者とログインユーザーが不一致な場合の処理
-        def handle_unauthorized
-            unless authorized?
-                render json: { messages: "不正なアクセスです。", status: 401 }
+        def handle_unauthorized(data)
+            unless authorized?(data)
+                render json: { messages: "アクセス権限がありません。", status: 401 }
             end
         end
 
@@ -51,7 +51,7 @@ class ApplicationController < ActionController::Base
         # 非公開の場合には以下のデータをレンダーする
         def handle_unrelease(data)
             unless release?(data)
-                render json: { messages:"現在この作品は非公開となっています。", status: 400 }
+                render json: { messages:"現在この作品は非公開となっています。", status: 400, keyword: "unrelease" }
             end
         end
     #==========================================================================
