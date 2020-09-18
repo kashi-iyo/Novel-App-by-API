@@ -11,18 +11,31 @@ class Api::V1::NovelSeriesController < ApplicationController
             series.author = series.user.nickname :
             null
         end
-        render json: { status: 200, novel_series: @all_novel_series }
+        render json: { status: 200, novel_series: @all_novel_series, keyword: "index_of_series" }
     end
 
     def show
+        @novel_in_series = @novel_series.novels.all
         # 公開時には全員が閲覧可能
         if release?(@novel_series)
             id = @novel_series.id.to_s
-            render json: { status: 200, novel_series: @novel_series, id: id, keyword: "series"}
+            render json: {
+                status: 200,
+                novel_series: @novel_series,
+                novel_in_series: @novel_in_series,
+                id: id,
+                keyword: "show_of_series"
+            }
         # 非公開時には作者だけが閲覧可能
         elsif !release?(@novel_series) && authorized?(@novel_series)
             id = @novel_series.id.to_s
-            render json: { status: 200, novel_series: @novel_series, id: id, keyword: "series"}
+            render json: {
+                status: 200,
+                novel_series: @novel_series,
+                novel_in_series: @novel_in_series,
+                id: id,
+                keyword: "show_of_series"
+            }
         else
             handle_unrelease(@novel_series)
         end
@@ -37,8 +50,8 @@ class Api::V1::NovelSeriesController < ApplicationController
                     status: :created,
                     novel_series: @novel_series,
                     series_id: series_id,
-                    location: api_v1_novel_series_path(@novel_series),
-                    success_messages: ["正常に保存されました。"]
+                    successful: ["正常に保存されました。"],
+                    keyword: "create_of_series"
                 }
             else
                 render json: {
@@ -53,9 +66,9 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def edit
         if authorized?(@novel_series)
-            render json: { status: 200, novel_series: @novel_series, keyword: "series" }
+            render json: { status: 200, novel_series: @novel_series, keyword: "edit_of_series" }
         else
-            handle_unauthorized
+            handle_unauthorized(@novel_series)
         end
     end
 
@@ -66,8 +79,8 @@ class Api::V1::NovelSeriesController < ApplicationController
                 render json: {
                     status: :ok,
                     series_id: @series_id,
-                    location: api_v1_novel_series_path(@novel_series),
-                    successful: ["編集が完了しました。"]
+                    successful: ["編集が完了しました。"],
+                    keyword: "update_of_series"
                 }
             else
                 render json: { errors: ["入力内容に誤りがあります。"], status: :unprocessable_entity }
