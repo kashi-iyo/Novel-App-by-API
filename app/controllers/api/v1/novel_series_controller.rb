@@ -6,12 +6,25 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def index
         @all_novel_series = NovelSeries.all
-        @all_novel_series.map do |series|
-            series.user.id === series.user_id ?
-            series.author = series.user.nickname :
-            null
+        # @all_novel_series.map do |series|
+        #     series.user.id === series.user_id ?
+        #     series.author = series.user.nickname :
+        #     null
+        # end
+        # @all_novels = Novels.all
+        # @series_id = ""
+        @all_novels = @all_novel_series.map do |series|
+            series.novels
         end
-        render json: { status: 200, novel_series: @all_novel_series, keyword: "index_of_series" }
+        @novels = @all_novels.flatten
+        @novel_id = @novels.map do |novel|
+            novel.novel_series_id
+        end
+        render json: { status: 200,
+            novel_series: @all_novel_series,
+            novel_id: @novel_id,
+            keyword: "index_of_series"
+        }
     end
 
     def show
