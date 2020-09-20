@@ -16,12 +16,9 @@ class Api::V1::NovelsController < ApplicationController
     def show
         # シリーズのタイトルだけ欲しい
         @series_title = @novel_series.series_title
-        @series_id = @novel_in_series.novel_series_id.to_s
+        series_and_novels_id(@novel_series, @novel_in_series)
         # ログインユーザーと小説の作者が一致する場合
         if current_user === @novel_in_series.user
-            # 編集リンク作成用のパラメータ
-            @novel_id = @novel_in_series.id.to_s
-            
             render json: {
                 status: 200,
                 novel_in_series: @novel_in_series,
@@ -48,10 +45,9 @@ class Api::V1::NovelsController < ApplicationController
         @novel_in_series = @novel_series.novels.new(novel_in_series_params)
         @novel_in_series.user_id = @novel_series.user_id    # ユーザーID
         @novel_in_series.author = @novel_series.author  # 作者
-        @series_id = @novel_series.id.to_s  #シリーズのIDを文字列で取得（Reactでページ遷移に使用する）
         if authorized?(@novel_in_series)
             if @novel_in_series.save
-                @novels_id = @novel_in_series.id.to_s   #小説のIDで取得（Reactでページ遷移に使用する）
+                series_and_novels_id(@novel_in_series, @novel_series)
                 render json: {
                     status: :created,
                     novel_in_series: @novel_in_series,
@@ -73,10 +69,11 @@ class Api::V1::NovelsController < ApplicationController
 
     def edit
         if authorized?(@novel_in_series)
-            @series_id = @novel_series.id.to_s
+            series_and_novels_id(@novel_in_series, @novel_series)
             render json: {
                 status: 200,
                 series_id: @series_id,
+                novels_id: @novels_id,
                 novel_in_series: @novel_in_series,
                 keyword: "edit_of_novels"
             }
@@ -87,11 +84,12 @@ class Api::V1::NovelsController < ApplicationController
 
     def update
         if authorized?(@novel_in_series)
-            @series_id = @novel_series.id.to_s
+            series_and_novels_id(@novel_series, @novel_in_series)
             if @novel_in_series.update(novel_in_series_params)
                 render json: {
                     status: :ok,
                     series_id: @series_id,
+                    novels_id: @novels_id,
                     successful: ["編集が完了しました。"],
                     keyword: "update_of_novels"
                 }

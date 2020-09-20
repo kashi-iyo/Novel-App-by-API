@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
     # =========================================================================
 
     # 小説系機能===============================================================
-        helper_method :authorized?, :handle_unauthorized, :release?, :handle_unrelease
+        helper_method :authorized?, :handle_unauthorized, :release?, :handle_unrelease, :series_and_novels_id
 
         # ログイン中のユーザーと、今見ているシリーズの作成者が一致するかをbool値で返す
         def authorized?(data)
@@ -53,6 +53,11 @@ class ApplicationController < ActionController::Base
             unless release?(data)
                 render json: { messages:"現在この作品は非公開となっています。", status: 400, keyword: "unrelease" }
             end
+        end
+
+        def series_and_novels_id(series, novels)
+            @series_id = series.id.to_s
+            @novels_id = novels.id.to_s
         end
     #==========================================================================
 end
