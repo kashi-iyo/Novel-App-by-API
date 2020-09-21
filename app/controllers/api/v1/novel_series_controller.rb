@@ -2,29 +2,21 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     # ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
-    before_action :set_novel_series, only: [:show, :edit, :update, :destroy]
+    before_action :set_novel_series, only: [:novel_count, :show, :edit, :update, :destroy]
 
     def index
         @all_novel_series = NovelSeries.all
-        # @all_novel_series.map do |series|
-        #     series.user.id === series.user_id ?
-        #     series.author = series.user.nickname :
-        #     null
-        # end
-        # @all_novels = Novels.all
-        # @series_id = ""
-        @all_novels = @all_novel_series.map do |series|
-            series.novels
-        end
-        @novels = @all_novels.flatten
-        @novel_id = @novels.map do |novel|
-            novel.novel_series_id
-        end
         render json: { status: 200,
+            series: @all_series,
             novel_series: @all_novel_series,
-            novel_id: @novel_id,
             keyword: "index_of_series"
         }
+    end
+
+    def novel_count
+        @novel_in_series = @novel_series.novels.all
+        @novel = @novel_in_series.count
+        render json: {status: 200, novel_count: @novel, keyword: 'novel_count'}
     end
 
     def show
