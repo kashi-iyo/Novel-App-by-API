@@ -37,7 +37,7 @@ class Api::V1::NovelsController < ApplicationController
                 keyword: "index_of_novels"
             }
         else
-            handle_unrelease
+            handle_unrelease(@novel_in_series)
         end
     end
 
@@ -78,7 +78,7 @@ class Api::V1::NovelsController < ApplicationController
                 keyword: "edit_of_novels"
             }
         else
-            handle_unauthorized
+            handle_unauthorized(@novel_in_series)
         end
     end
 
