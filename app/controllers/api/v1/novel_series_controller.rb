@@ -98,9 +98,9 @@ class Api::V1::NovelSeriesController < ApplicationController
     def destroy
         if authorized?(@novel_series)
             @novel_series.destroy
-            render json: { head: :no_content, location: users_path(@current_user) }
+            render json: { head: :no_content, success: "正常に削除されました。" }
         else
-            handle_unauthorized
+            handle_unauthorized(@novel_series)
         end
     end
 
