@@ -22,7 +22,7 @@ class Api::V1::NovelsController < ApplicationController
             render json: {
                 status: 200,
                 novel_in_series: @novel_in_series,
-                novel_id: @novel_id,
+                novel_id: @novels_id,
                 series_title: @series_title,
                 series_id: @series_id,
                 keyword: "index_of_novels"
@@ -47,7 +47,7 @@ class Api::V1::NovelsController < ApplicationController
         @novel_in_series.author = @novel_series.author  # 作者
         if authorized?(@novel_in_series)
             if @novel_in_series.save
-                series_and_novels_id(@novel_in_series, @novel_series)
+                series_and_novels_id(@novel_series, @novel_in_series)
                 render json: {
                     status: :created,
                     novel_in_series: @novel_in_series,
@@ -69,7 +69,7 @@ class Api::V1::NovelsController < ApplicationController
 
     def edit
         if authorized?(@novel_in_series)
-            series_and_novels_id(@novel_in_series, @novel_series)
+            series_and_novels_id(@novel_series, @novel_in_series)
             render json: {
                 status: 200,
                 series_id: @series_id,
@@ -104,9 +104,9 @@ class Api::V1::NovelsController < ApplicationController
     def destroy
         if authorized?(@novel_in_series)
             @novel_in_series.destroy
-            render json: { head: :no_content, location: users_path(@current_user) }
+            render json: { head: :no_content, success: "正常に削除されました。" }
         else
-            handle_unauthorized
+            handle_unauthorized(@novel_in_series)
         end
     end
 
