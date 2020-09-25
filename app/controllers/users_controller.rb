@@ -11,11 +11,27 @@ class UsersController < ApplicationController
 
     def show
         @user = User.find(params[:id])
+        @users_series = @user.novel_series.all
+        @series_count = @user.novel_series.count.to_s
         if @user
-            render json: { user: @user }
+            render json: {
+                status: 200,
+                user: @user,
+                users_series: @users_series,
+                series_count: @series_count,
+                keyword: "show_of_user"
+            }
         else
             render json: { status: 500, errors: ['ユーザーが見つかりません'] }
         end
+    end
+
+    def edit
+
+    end
+
+    def update
+
     end
 
     def create
