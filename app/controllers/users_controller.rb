@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
 
+    before_action :set_user, only: [:show, :edit, :update]
+
     def index
         @users = User.all
         if @users
@@ -10,7 +12,6 @@ class UsersController < ApplicationController
     end
 
     def show
-        @user = User.find(params[:id])
         @users_series = @user.novel_series.all
         @series_count = @user.novel_series.count.to_s
         if @user
@@ -27,11 +28,33 @@ class UsersController < ApplicationController
     end
 
     def edit
-
+        if @user === current_user
+            render json: {
+                status: 200,
+                user: @user,
+                keyword: "edit_of_user"
+            }
+        else
+            render json: { status: 401, errors: "不正なアクセスです。" }
+        end
     end
 
     def update
-
+        if @user === current_user
+            if @user.update(update_user_params)
+                @user_id = @user.id.to_s
+                render json: {
+                    status: :ok,
+                    user_id: @user_id,
+                    successful: ["編集が完了しました。"],
+                    keyword: "update_of_user"
+                }
+            else
+                render json: { errors: ["入力内容に誤りがあります。"], status: :unprocessable_entity }
+            end
+        else
+            render json: { status: 401, errors: "不正なアクセスです。" }
+        end
     end
 
     def create
@@ -48,5 +71,13 @@ class UsersController < ApplicationController
 
         def user_params
             params.require(:user).permit(:nickname, :account_id, :email, :password, :password_confirmation)
+        end
+
+        def update_user_params
+            params.require(:user).permit(:nickname, :profile)
+        end
+
+        def set_user
+            @user = User.find(params[:id])
         end
 end

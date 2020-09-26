@@ -97,7 +97,7 @@ class Api::V1::NovelsController < ApplicationController
                 render json: { errors: ["入力内容に誤りがあります。"], status: :unprocessable_entity }
             end
         else
-            handle_unauthorized
+            handle_unauthorized(@novel_in_series)
         end
     end
 
