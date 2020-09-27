@@ -2,15 +2,21 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     # ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
-    before_action :set_novel_series, only: [:novel_count, :show, :edit, :update, :destroy]
+    before_action :set_novel_series, only: [:tags_in_series, :novel_count, :show, :edit, :update, :destroy]
 
     def index
         @all_novel_series = NovelSeries.all
+        @tags = NovelTag.all
         render json: { status: 200,
-            series: @all_series,
             novel_series: @all_novel_series,
+            tags: @tags,
             keyword: "index_of_series"
         }
+    end
+
+    def tags_in_series
+        @tags_in_series = @novel_series.novel_tags.all
+        render json: {status: 200, tags_in_series: @tags_in_series, keyword: 'tags_in_series'}
     end
 
     def novel_count
@@ -21,6 +27,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def show
         @novel_in_series = @novel_series.novels.all
+        @series_tags = @novel_series.novel_tags
         # 公開時には全員が閲覧可能
         if release?(@novel_series)
             id = @novel_series.id.to_s
@@ -29,6 +36,7 @@ class Api::V1::NovelSeriesController < ApplicationController
                 novel_series: @novel_series,
                 novel_in_series: @novel_in_series,
                 id: id,
+                tags: @series_tags,
                 keyword: "show_of_series"
             }
         # 非公開時には作者だけが閲覧可能
@@ -39,6 +47,7 @@ class Api::V1::NovelSeriesController < ApplicationController
                 novel_series: @novel_series,
                 novel_in_series: @novel_in_series,
                 id: id,
+                tags: @series_tags,
                 keyword: "show_of_series"
             }
         else
@@ -48,8 +57,10 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def create
         @novel_series = current_user.novel_series.new(novel_series_params)
+        novel_tags = params[:novel_series][:novel_tag_name].strip.split(",")
         if authorized?(@novel_series)
             if @novel_series.save
+                @novel_series.save_tag(novel_tags)
                 series_id = @novel_series.id.to_s
                 render json: {
                     status: :created,
