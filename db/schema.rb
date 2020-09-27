@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_08_081437) do
+ActiveRecord::Schema.define(version: 2020_09_27_031842) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,21 @@ ActiveRecord::Schema.define(version: 2020_09_08_081437) do
     t.string "author"
     t.boolean "release", default: false, null: false
     t.index ["user_id"], name: "index_novel_series_on_user_id"
+  end
+
+  create_table "novel_tag_maps", force: :cascade do |t|
+    t.bigint "novel_series_id"
+    t.bigint "novel_tag_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["novel_series_id"], name: "index_novel_tag_maps_on_novel_series_id"
+    t.index ["novel_tag_id"], name: "index_novel_tag_maps_on_novel_tag_id"
+  end
+
+  create_table "novel_tags", force: :cascade do |t|
+    t.string "novel_tag_name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "novels", force: :cascade do |t|
@@ -40,18 +55,37 @@ ActiveRecord::Schema.define(version: 2020_09_08_081437) do
     t.index ["user_id"], name: "index_novels_on_user_id"
   end
 
+  create_table "user_tag_maps", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "user_tag_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_tag_maps_on_user_id"
+    t.index ["user_tag_id"], name: "index_user_tag_maps_on_user_tag_id"
+  end
+
+  create_table "user_tags", force: :cascade do |t|
+    t.string "user_tag_name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "nickname", null: false
     t.string "account_id", null: false
     t.string "email", null: false
     t.string "password_digest"
     t.boolean "admin", default: false, null: false
-    t.text "profile"
+    t.string "profile", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   add_foreign_key "novel_series", "users"
+  add_foreign_key "novel_tag_maps", "novel_series"
+  add_foreign_key "novel_tag_maps", "novel_tags"
   add_foreign_key "novels", "novel_series"
   add_foreign_key "novels", "users"
+  add_foreign_key "user_tag_maps", "user_tags"
+  add_foreign_key "user_tag_maps", "users"
 end
