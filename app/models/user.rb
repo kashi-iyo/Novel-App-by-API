@@ -4,6 +4,8 @@ class User < ApplicationRecord
     # 紐付け
     has_many :novel_series, dependent: :destroy
     has_many :novels, through: :novel_series, dependent: :destroy
+    has_many :user_tag_maps, dependent: :destroy
+    has_many :user_tags, through: :user_tag_maps
 
     # バリデーション
     validates :nickname, presence: true
