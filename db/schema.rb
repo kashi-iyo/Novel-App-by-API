@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_27_031842) do
+ActiveRecord::Schema.define(version: 2020_09_27_122628) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 2020_09_27_031842) do
     t.datetime "updated_at", null: false
     t.string "author"
     t.boolean "release", default: false, null: false
+    t.string "count"
     t.index ["user_id"], name: "index_novel_series_on_user_id"
   end
 
