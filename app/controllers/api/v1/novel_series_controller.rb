@@ -2,20 +2,34 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     # ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
-    before_action :set_novel_series, only: [:tags_in_series, :show, :edit, :update, :destroy]
+    before_action :set_novel_series, only: [:series_tags, :show, :edit, :update, :destroy]
 
     def index
         @tags = NovelTag.all
         @all_novel_series = NovelSeries.all
         @all_novel_series.count_in_series(@all_novel_series)
-        @tags_in_series = @all_novel_series.tags_in_series(@all_novel_series)
+        # @tags_in_series = @all_novel_series.tags_in_series(@all_novel_series)
+        @series_count = @all_novel_series.count.to_s
+        # @tags_in_series = @all_novel_series.map{ |series|
+        #     [series.id, series.novel_tags.all]
+        # }.to_h
         render json: {
             status: 200,
             tags: @tags,
-            tags_in_series: @tags_in_series,
+            # tags_in_series: @tags_in_series,
             novel_series: @all_novel_series,
+            series_count: @series_count,
             keyword: "index_of_series"
         }
+    end
+
+    def series_tags
+        @series_tags = @novel_series.novel_tags.all.map do |tag|
+            unless tag === []
+                ["tag_name": tag["novel_tag_name"]]
+            end
+        end
+        render json: {status: 200, series_tags: @series_tags.flatten, keyword: "series_tags"}
     end
 
     def show
