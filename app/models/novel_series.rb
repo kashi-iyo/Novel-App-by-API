@@ -34,7 +34,7 @@ class NovelSeries < ApplicationRecord
 
   # シリーズが所有するタグを取得
   def self.tags_in_series(all_series)
-    all_series.map{ |series|
+    @tags = all_series.map{ |series|
       [series.id, series.novel_tags.all]
     }.to_h
   end
