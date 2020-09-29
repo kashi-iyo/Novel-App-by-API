@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       end
     end
   end
+  get '/series_tags/:id', to: 'api/v1/novel_series#series_tags'
 
   resources :users, only: [:create, :show, :edit, :update,  :index]
   post '/login', to: 'sessions#login'
