@@ -1,2 +1,3 @@
 class NovelTag < ApplicationRecord
+    
 end
