@@ -7,35 +7,24 @@ class Api::V1::NovelSeriesController < ApplicationController
     def index
         @tags = NovelTag.all
         @all_novel_series = NovelSeries.all
-        @all_novel_series.count_in_series(@all_novel_series)
-        # @tags_in_series = @all_novel_series.tags_in_series(@all_novel_series)
-        @series_count = @all_novel_series.count.to_s
-        # tags_in_series = @all_novel_series.map{ |series|
-        #     [series.id, series.novel_tags.all]
-        # }.to_h
-        # @tags_in_series = tags_in_series.map{ |key, tags|
-        #     ["series_id": key, "tags": tags]
-        # }
+        @all_novel_series.count_in_series(@all_novel_series)    #シリーズの総数
+        @series_count = @all_novel_series.count.to_s    #シリーズが持つ小説の総数
         render json: {
             status: 200,
-            series_count: @series_count,
             tags: @tags,
-            # tags_in_series: @tags_in_series.flatten,
+            series_count: @series_count,
             novel_series: @all_novel_series,
             keyword: "index_of_series"
         }
     end
 
     def series_tags
-        series_tags = @novel_series.novel_tags
-        @series_tags = series_tags.map{ |tags|
-            [tags]
-        }
-        @id = @novel_series.id
+        @id = @novel_series.id.to_s
+        @tags = @novel_series.tags_in_series
         render json: {
             status: 200,
-            series_id: @id.to_s,
-            series_tags: @series_tags.flatten,
+            series_id: @id,
+            series_tags: @tags,
             keyword: "series_tags"
         }
     end
@@ -72,13 +61,14 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def create
         @novel_series = current_user.novel_series.new(novel_series_params)
-        novel_tags = params[:novel_series][:novel_tag_name].strip.split(",")
+        @novel_tags = params[:novel_series][:novel_tag_name].split(",")
         if authorized?(@novel_series)
             if @novel_series.save
-                @novel_series.save_tag(novel_tags)
+                @novel_series.save_tag(@novel_tags)
                 series_id = @novel_series.id.to_s
                 render json: {
                     status: :created,
+                    novel_tags: @novel_tags,
                     novel_series: @novel_series,
                     series_id: series_id,
                     successful: ["正常に保存されました。"],
