@@ -29,6 +29,13 @@ class Api::V1::NovelSeriesController < ApplicationController
         }
     end
 
+    # タグに関連付けられているシリーズ
+    def series_in_tag
+        @tags = NovelTag.find_by(id: params[:id])
+        @series = @tags.novel_series
+        render json: {status: 200, series_in_tag: @series, keyword: "series_in_tag"}
+    end
+
     def show
         @novel_in_series = @novel_series.novels.all
         @series_tags = @novel_series.novel_tags
@@ -87,7 +94,12 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def edit
         if authorized?(@novel_series)
-            render json: { status: 200, novel_series: @novel_series, keyword: "edit_of_series" }
+            @series_tags = @novel_series.edit_tags
+            render json: {
+                status: 200,
+                novel_series: @novel_series,
+                series_tags: @series_tags,
+                keyword: "edit_of_series" }
         else
             handle_unauthorized(@novel_series)
         end
