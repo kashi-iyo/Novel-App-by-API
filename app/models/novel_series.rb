@@ -31,7 +31,6 @@ class NovelSeries < ApplicationRecord
     end
   end
 
-
   # シリーズが所有するタグを取得
   def tags_in_series
     series_tags = self.novel_tags
@@ -52,6 +51,17 @@ class NovelSeries < ApplicationRecord
           end
       end
     end
+  end
+
+  # 編集用のタグデータを取得
+  def edit_tags
+    tags = self.tags_in_series
+    @tags = tags.map do |tag|
+        [tag.novel_tag_name]
+    end
+    series_tags = []
+    series_tags.push(@tags)
+    series_tags.flatten!
   end
 
 end
