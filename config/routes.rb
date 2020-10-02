@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     end
   end
   get '/api/v1/series_tags/:id', to: 'api/v1/novel_series#series_tags'
+  get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_series#series_in_tag'
 
   resources :users, only: [:create, :show, :edit, :update,  :index]
   post '/login', to: 'sessions#login'
