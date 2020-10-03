@@ -2,10 +2,16 @@ class User < ApplicationRecord
     has_secure_password
 
     # 紐付け
+    # シリーズ
     has_many :novel_series, dependent: :destroy
+    # 小説
     has_many :novels, through: :novel_series, dependent: :destroy
+    # タグ
     has_many :user_tag_maps, dependent: :destroy
     has_many :user_tags, through: :user_tag_maps
+    # お気に入り
+    has_many :novel_favorites
+    has_many :favorited_novels, through: :novel_favorites, source: :novel
 
     # バリデーション
     validates :nickname, presence: true
