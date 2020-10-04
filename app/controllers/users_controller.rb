@@ -14,12 +14,14 @@ class UsersController < ApplicationController
     def show
         @users_series = @user.novel_series.all
         @series_count = @user.novel_series.count.to_s
+        @favorite_series = @user.user_favorites_series
         if @user
             render json: {
                 status: 200,
                 user: @user,
                 users_series: @users_series,
                 series_count: @series_count,
+                favorite_series: @favorite_series,
                 keyword: "show_of_user"
             }
         else
