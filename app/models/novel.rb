@@ -12,6 +12,6 @@ class Novel < ApplicationRecord
   validates :author, presence: true
 
   def favorited_by?(current_user)
-    favorites.where(user_id: current_user.id).exists?
+    self.novel_favorites.where(user_id: current_user.id).exists?
   end
 end
