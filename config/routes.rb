@@ -9,6 +9,12 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  # お気に入り
+  get '/api/v1/novel_favorites/:id', to: 'api/v1/novels#favorites_status'
+  post '/api/v1/novel_favorites/:id', to: 'api/v1/novels#favorites'
+  delete '/api/v1/novel_favorites/:id', to: 'api/v1/novels#unfavorites'
+  # タグ
   get '/api/v1/series_tags/:id', to: 'api/v1/novel_series#series_tags'
   get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_series#series_in_tag'
 
