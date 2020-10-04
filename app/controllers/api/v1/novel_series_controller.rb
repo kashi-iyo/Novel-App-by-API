@@ -7,8 +7,8 @@ class Api::V1::NovelSeriesController < ApplicationController
     def index
         @tags = NovelTag.all
         @all_novel_series = NovelSeries.all
-        @all_novel_series.count_in_series(@all_novel_series)    #シリーズの総数
-        @series_count = @all_novel_series.count.to_s    #シリーズが持つ小説の総数
+        @all_novel_series.count_in_series(@all_novel_series)    #シリーズが持つ小説の総数
+        @series_count = @all_novel_series.count.to_s   #シリーズの総数
         render json: {
             status: 200,
             tags: @tags,
@@ -31,9 +31,17 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     # タグに関連付けられているシリーズ
     def series_in_tag
-        @tags = NovelTag.find_by(id: params[:id])
-        @series = @tags.novel_series
-        render json: {status: 200, series_in_tag: @series, keyword: "series_in_tag"}
+        @tag = NovelTag.find_by(id: params[:id])  # タグ
+        @series = @tag.novel_series # そのタグを持つシリーズ
+        @series.count_in_series(@series)     # シリーズ内にある小説のカウント
+        @series_count = @series.count.to_s  # シリーズのカウント
+        render json: {
+            status: 200,
+            tag: @tag,
+            series_count: @series_count,
+            series_in_tag: @series,
+            keyword: "series_in_tag"
+        }
     end
 
     def show
