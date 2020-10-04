@@ -27,4 +27,18 @@ class User < ApplicationRecord
 
     validates :profile, length: { maximum: 200 }
 
+
+    # ユーザーがお気に入りしたシリーズを取得
+    def user_favorites_series
+        novel_favorite = self.novel_favorites
+        series_id = novel_favorite.map {|favorite|
+            ["novel_series_id", favorite.novel["novel_series_id"]]
+        }.to_h
+        # series_id.map { |id|
+        #     ["favorited_series", NovelSeries.find_by(id: id)]
+        # }.to_h
+        series_id.map do |id|
+            NovelSeries.find_by(id: id)
+        end
+    end
 end
