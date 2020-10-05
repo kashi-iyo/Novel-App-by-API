@@ -18,6 +18,7 @@ class Api::V1::NovelSeriesController < ApplicationController
         }
     end
 
+    # シリーズが所有するタグのデータ
     def series_tags
         @id = @novel_series.id.to_s
         @tags = @novel_series.tags_in_series
@@ -96,7 +97,7 @@ class Api::V1::NovelSeriesController < ApplicationController
                 }
             end
         else
-            handle_unauthorized
+            handle_unauthorized(@novel_series)
         end
     end
 
@@ -114,8 +115,10 @@ class Api::V1::NovelSeriesController < ApplicationController
     end
 
     def update
+        @novel_tags = params[:novel_series][:novel_tag_name].split(",")
         if authorized?(@novel_series)
             if @novel_series.update(novel_series_params)
+                @novel_series.save_tag(@novel_tags)
                 @series_id = @novel_series.id.to_s
                 render json: {
                     status: :ok,
@@ -127,7 +130,7 @@ class Api::V1::NovelSeriesController < ApplicationController
                 render json: { errors: ["入力内容に誤りがあります。"], status: :unprocessable_entity }
             end
         else
-            handle_unauthorized
+            handle_unauthorized(@novel_series)
         end
     end
 
