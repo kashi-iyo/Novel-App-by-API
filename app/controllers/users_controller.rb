@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
 
-    before_action :set_user, only: [:show, :edit, :update]
+    before_action :logged_in_user, only: [:edit, :update]
+    before_action :set_user, only: [:show, :edit, :update, :user_has_tags]
 
     def index
         @users = User.all
@@ -15,13 +16,17 @@ class UsersController < ApplicationController
         @users_series = @user.novel_series.all
         @series_count = @user.novel_series.count.to_s
         @favorite_series = @user.user_favorites_series
+        @favorite_series_count = @favorite_series.count.to_s
+        @user_tags = @user.user_tags
         if @user
             render json: {
                 status: 200,
                 user: @user,
+                user_tags: @user_tags,
                 users_series: @users_series,
                 series_count: @series_count,
                 favorite_series: @favorite_series,
+                favorite_series_count: @favorite_series_count,
                 keyword: "show_of_user"
             }
         else
@@ -29,11 +34,29 @@ class UsersController < ApplicationController
         end
     end
 
+    def tag_has_users
+        @tags = UserTag.find_by(id: params[:id])
+        @users = @tags.users
+        render json: {
+            status: 200,
+            tags: @tags,
+            users: @users,
+            keyword: "tag_has_users"
+        }
+    end
+
+    def tags_feed
+        @tags = UserTag.all
+        render json: {status: 200, tags: @tags, keyword: "tags_feed"}
+    end
+
     def edit
         if @user === current_user
+            @tags = @user.edit_user_tags
             render json: {
                 status: 200,
                 user: @user,
+                user_tags: @tags,
                 keyword: "edit_of_user"
             }
         else
@@ -43,7 +66,9 @@ class UsersController < ApplicationController
 
     def update
         if @user === current_user
+            @user_tags = params[:user][:user_tag_name].split(",")
             if @user.update(update_user_params)
+                @user.save_user_tag(@user_tags)
                 @user_id = @user.id.to_s
                 render json: {
                     status: :ok,
