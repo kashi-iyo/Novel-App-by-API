@@ -19,6 +19,10 @@ Rails.application.routes.draw do
   get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_series#series_in_tag'
 
   resources :users, only: [:create, :show, :edit, :update,  :index]
+  # そのタグを持つユーザー
+  get '/tag_has_users/:id', to: 'users#tag_has_users'
+  get '/tags_feed', to: 'users#tags_feed'
+
   post '/login', to: 'sessions#login'
   delete '/logout', to: 'sessions#logout'
   get '/logged_in', to: 'sessions#is_logged_in?'
