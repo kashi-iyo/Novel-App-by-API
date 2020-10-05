@@ -34,11 +34,35 @@ class User < ApplicationRecord
         series_id = novel_favorite.map {|favorite|
             ["novel_series_id", favorite.novel["novel_series_id"]]
         }.to_h
-        # series_id.map { |id|
-        #     ["favorited_series", NovelSeries.find_by(id: id)]
-        # }.to_h
         series_id.map do |id|
             NovelSeries.find_by(id: id)
         end
+    end
+
+    # タグを作成
+    def save_user_tag(sent_tags)
+        current_tags = self.user_tags.pluck(:user_tag_name) unless self.user_tags.nil?
+        old_tags = current_tags - sent_tags
+        new_tags = sent_tags - current_tags
+
+        old_tags.each do |old|
+        self.user_tags.delete UserTag.find_by(user_tag_name: old)
+        end
+
+        new_tags.each do |new|
+        new_user_tag = UserTag.find_or_create_by(user_tag_name: new)
+            self.user_tags << new_user_tag
+        end
+    end
+
+    # 編集用のタグデータを取得
+    def edit_user_tags
+        tags = self.user_tags
+        @tags = tags.map do |tag|
+            [tag.user_tag_name]
+        end
+        user_tags = []
+        user_tags.push(@tags)
+        user_tags.flatten!
     end
 end
