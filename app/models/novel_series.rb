@@ -31,14 +31,6 @@ class NovelSeries < ApplicationRecord
     end
   end
 
-  # シリーズが所有するタグを取得
-  def tags_in_series
-    series_tags = self.novel_tags
-    return series_tags.map{ |tags|
-        [tags]
-    }.flatten
-  end
-
   # シリーズが所有する小説のカウント
   def self.count_in_series(all_series)
     @novels_count = all_series.map{ |series|
@@ -51,6 +43,14 @@ class NovelSeries < ApplicationRecord
           end
       end
     end
+  end
+
+  # シリーズが所有するタグを取得
+  def tags_in_series
+    series_tags = self.novel_tags
+    return series_tags.map{ |tags|
+        [tags]
+    }.flatten
   end
 
   # 編集用のタグデータを取得
