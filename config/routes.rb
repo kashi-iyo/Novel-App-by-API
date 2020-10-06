@@ -10,20 +10,37 @@ Rails.application.routes.draw do
     end
   end
 
-  # お気に入り
+  # お気に入り==========================
+  # 小説のお気に入り総数
+  get '/api/v1/series_has_favorites/:id', to: 'api/v1/novel_series#series_has_favorites'
+  # 小説のお気に入りの数
   get '/api/v1/novel_favorites/:id', to: 'api/v1/novels#favorites_status'
+  # 小説をお気に入りする
   post '/api/v1/novel_favorites/:id', to: 'api/v1/novels#favorites'
+  # 小説のお気に入りを解除する
   delete '/api/v1/novel_favorites/:id', to: 'api/v1/novels#unfavorites'
-  # タグ
-  get '/api/v1/series_tags/:id', to: 'api/v1/novel_series#series_tags'
-  get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_series#series_in_tag'
+  #======================================
 
+  # 小説タグ=====================================
+  # シリーズが所有するタグ
+  get '/api/v1/series_tags/:id', to: 'api/v1/novel_series#series_tags'
+  # タグに関連づけられているシリーズ
+  get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_series#series_in_tag'
+  # タグフィード
+  get '/api/v1/series_tags_feed', to: 'api/v1/novel_series#tags_feed'
+  #==========================================
+
+  #ユーザー系====================================
   resources :users, only: [:create, :show, :edit, :update,  :index]
   # そのタグを持つユーザー
   get '/tag_has_users/:id', to: 'users#tag_has_users'
+  # 趣味タグフィード
   get '/tags_feed', to: 'users#tags_feed'
+  #=============================================
 
+  # 認証============================================
   post '/login', to: 'sessions#login'
   delete '/logout', to: 'sessions#logout'
   get '/logged_in', to: 'sessions#is_logged_in?'
+  #=================================================
 end
