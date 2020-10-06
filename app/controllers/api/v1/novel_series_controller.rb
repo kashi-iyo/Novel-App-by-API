@@ -2,20 +2,37 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     # ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
-    before_action :set_novel_series, only: [:series_tags, :show, :edit, :update, :destroy]
+    before_action :set_novel_series, only: [:series_has_favorites, :series_tags, :show, :edit, :update, :destroy]
 
     def index
-        @tags = NovelTag.all
         @all_novel_series = NovelSeries.all
         @all_novel_series.count_in_series(@all_novel_series)    #シリーズが持つ小説の総数
         @series_count = @all_novel_series.count.to_s   #シリーズの総数
         render json: {
             status: 200,
-            tags: @tags,
             series_count: @series_count,
             novel_series: @all_novel_series,
             keyword: "index_of_series"
         }
+    end
+
+    # 小説の総お気に入り数
+    def series_has_favorites
+        @count = @novel_series.count_favorites(@novel_series)
+        render json: {
+            status: 200,
+            count: @count,
+            keyword: "series_has_favorites"
+        }
+    end
+
+    def tags_feed
+        @tags = NovelTag.all
+        @tags.tag_has_series_count(@tags)
+        render json: {
+            status: 200,
+            tags: @tags,
+            keyword: "tags_feed"}
     end
 
     # シリーズが所有するタグのデータ
