@@ -34,6 +34,7 @@ class UsersController < ApplicationController
         end
     end
 
+    # 取得したタグに関連づけられているユーザーを取得
     def tag_has_users
         @tags = UserTag.find_by(id: params[:id])
         @users = @tags.users
@@ -45,9 +46,15 @@ class UsersController < ApplicationController
         }
     end
 
+    # 趣味タグフィード
     def tags_feed
         @tags = UserTag.all
-        render json: {status: 200, tags: @tags, keyword: "tags_feed"}
+        @tags.tag_has_users_count(@tags) # タグを登録しているユーザー数
+        render json: {
+            status: 200,
+            tags: @tags,
+            keyword: "tags_feed"
+        }
     end
 
     def edit
