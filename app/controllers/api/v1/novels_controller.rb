@@ -111,6 +111,7 @@ class Api::V1::NovelsController < ApplicationController
         end
     end
 
+    # 1つの小説の持つお気に入り数
     def favorites_status
         favorites_count = @novel_in_series.novel_favorites.count.to_s
         if @novel_favorite
@@ -120,6 +121,7 @@ class Api::V1::NovelsController < ApplicationController
         end
     end
 
+    # お気に入りON
     def favorites
         # お気に入り済み→エラー／お気に入りしてない→成功
         if @novel_in_series.favorited_by?(current_user)
@@ -135,6 +137,7 @@ class Api::V1::NovelsController < ApplicationController
         end
     end
 
+    # お気に入りOFF
     def unfavorites
         @novel_favorite.destroy
         favorites_count = @novel_in_series.novel_favorites.count.to_s
