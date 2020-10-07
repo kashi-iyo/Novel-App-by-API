@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
     # =========================================================================
 
     # 小説系機能===============================================================
-        helper_method :authorized?, :handle_unauthorized, :release?, :handle_unrelease, :series_and_novels_id
+        helper_method :authorized?, :handle_unauthorized, :release?, :handle_unrelease, :series_and_novels_id,:count_in_series
 
         # ログイン中のユーザーと、今見ているシリーズの作成者が一致するかをbool値で返す
         def authorized?(data)
@@ -55,9 +55,25 @@ class ApplicationController < ActionController::Base
             end
         end
 
+        # シリーズ渡される：シリーズID
+        # 小説が渡される：小説ID
         def series_and_novels_id(series, novels)
             @series_id = series.id.to_s
             @novels_id = novels.id.to_s
+        end
+
+        # シリーズが所有する小説総数を取得
+        def count_in_series(all_series)
+            @novels_count = all_series.map{ |series|
+                [series.id, series.novels.count.to_s]
+            }.to_h
+            @novels_count.each do |k, v|
+                all_series.each do |series|
+                    if series.id === k
+                        series["count"] = v
+                    end
+                end
+            end
         end
     #==========================================================================
 

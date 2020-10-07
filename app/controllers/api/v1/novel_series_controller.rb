@@ -6,7 +6,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     def index
         @all_novel_series = NovelSeries.all
-        @all_novel_series.count_in_series(@all_novel_series)    #シリーズが持つ小説の総数
+        count_in_series(@all_novel_series)    #シリーズが持つ小説の総数
         @series_count = @all_novel_series.count.to_s   #シリーズの総数
         render json: {
             status: 200,
