@@ -34,12 +34,12 @@ class User < ApplicationRecord
         series_id = novel_favorite.map {|favorite|
             ["novel_series_id", favorite.novel["novel_series_id"]]
         }.to_h
-        series_id.map do |id|
-            NovelSeries.find_by(id: id)
-        end
+        series_id.map { |id|
+            NovelSeries.where(id: id)
+        }.flatten
     end
 
-    # タグを作成
+    # 趣味タグを作成
     def save_user_tag(sent_tags)
         current_tags = self.user_tags.pluck(:user_tag_name) unless self.user_tags.nil?
         old_tags = current_tags - sent_tags
@@ -55,7 +55,7 @@ class User < ApplicationRecord
         end
     end
 
-    # 編集用のタグデータを取得
+    # 編集用の趣味タグデータを取得
     def edit_user_tags
         tags = self.user_tags
         @tags = tags.map do |tag|
