@@ -13,11 +13,14 @@ class UsersController < ApplicationController
     end
 
     def show
-        @users_series = @user.novel_series.all
-        @series_count = @user.novel_series.count.to_s
-        @favorite_series = @user.user_favorites_series
-        @favorite_series_count = @favorite_series.count.to_s
-        @user_tags = @user.user_tags
+        @users_series = @user.novel_series.all  # ユーザーのシリーズ
+        @series_count = @user.novel_series.count.to_s   # シリーズ総数
+        count_in_series(@users_series)    # シリーズが持つ小説総数
+        @favorite_series = @user.user_favorites_series  # お気に入りにしたシリーズ
+        @favorite_series = @favorite_series.to_a    # お気に入りしたシリーズをArray化
+        count_in_series(@favorite_series)   # お気に入りしたシリーズが持つ小説総数
+        @favorite_series_count = @favorite_series.count.to_s    # お気に入りシリーズの総数
+        @user_tags = @user.user_tags    #趣味タグ全件
         if @user
             render json: {
                 status: 200,
