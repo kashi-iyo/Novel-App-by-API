@@ -11,6 +11,7 @@ class Novel < ApplicationRecord
   validates :novel_content, presence: true
   validates :author, presence: true
 
+  # ユーザーがその小説をお気に入りしているかどうかをチェック
   def favorited_by?(current_user)
     self.novel_favorites.where(user_id: current_user.id).exists?
   end
