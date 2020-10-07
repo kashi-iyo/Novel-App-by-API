@@ -15,7 +15,7 @@ class NovelSeries < ApplicationRecord
   validates :series_description, length: { maximum: 300 }
   validates :author, presence: true
 
-  # タグを作成
+  # シリーズタグを作成
   def save_tag(sent_tags)
     current_tags = self.novel_tags.pluck(:novel_tag_name) unless self.novel_tags.nil?
     old_tags = current_tags - sent_tags
@@ -44,20 +44,6 @@ class NovelSeries < ApplicationRecord
     series_favorites.sum {|hash| hash[:favorites_count]}
   end
 
-  # シリーズが所有する小説のカウント
-  def self.count_in_series(all_series)
-    @novels_count = all_series.map{ |series|
-      [series.id, series.novels.count.to_s]
-    }.to_h
-    @novels_count.each do |k, v|
-      all_series.each do |series|
-          if series.id === k
-              series["count"] = v
-          end
-      end
-    end
-  end
-
   # シリーズが所有するタグを取得
   def tags_in_series
     series_tags = self.novel_tags
@@ -66,7 +52,7 @@ class NovelSeries < ApplicationRecord
     }.flatten
   end
 
-  # 編集用のタグデータを取得
+  # 編集用のシリーズタグデータを取得
   def edit_tags
     tags = self.tags_in_series
     @tags = tags.map do |tag|
