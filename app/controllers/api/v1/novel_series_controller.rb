@@ -5,7 +5,14 @@ class Api::V1::NovelSeriesController < ApplicationController
     before_action :set_novel_series, only: [:series_has_favorites, :series_tags, :show, :edit, :update, :destroy]
 
     def index
-        @all_novel_series = NovelSeries.all
+        all_novel_series = NovelSeries.all.map do |series|
+            if !!series.release
+                [series]
+            else
+                []
+            end
+        end
+        @all_novel_series = all_novel_series.flatten
         count_in_series(@all_novel_series)    #シリーズが持つ小説の総数
         @series_count = @all_novel_series.count.to_s   #シリーズの総数
         render json: {
