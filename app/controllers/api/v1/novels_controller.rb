@@ -2,9 +2,11 @@ class Api::V1::NovelsController < ApplicationController
 
     # ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy, :favorites, :unfavorites]
+    # 小説を取得
     before_action :set_novel, only: [:show, :edit, :update, :destroy, :favorites_status, :favorites, :unfavorites]
+    # シリーズ取得
     before_action :set_novel_series
-    before_action :set_favorites, only: [:favorites_status, :unfavorites]
+
 
     def index
         @novels_in_series = @novel_series.novels.all
@@ -23,6 +25,7 @@ class Api::V1::NovelsController < ApplicationController
             render json: {
                 status: 200,
                 novel_in_series: @novel_in_series,
+                comments: @novel_in_series.comments,
                 novel_id: @novels_id,
                 series_title: @series_title,
                 series_id: @series_id,
@@ -95,7 +98,10 @@ class Api::V1::NovelsController < ApplicationController
                     keyword: "update_of_novels"
                 }
             else
-                render json: { errors: ["入力内容に誤りがあります。"], status: :unprocessable_entity }
+                render json: {
+                    errors: ["入力内容に誤りがあります。"],
+                    status: :unprocessable_entity
+                }
             end
         else
             handle_unauthorized(@novel_in_series)
@@ -113,12 +119,16 @@ class Api::V1::NovelsController < ApplicationController
 
     # 1つの小説の持つお気に入り数
     def favorites_status
-        favorites_count = @novel_in_series.novel_favorites.count.to_s
-        if @novel_favorite
-            render json: {status: 200, favorites_count: favorites_count}
-        else
-            render json: {head: :no_content, favorites_count: favorites_count}
+        favorites = @novel_in_series.novel_favorites
+        favorites = favorites.map do |favorite|
+            ["user_id": favorite.user_id, "favoriter": favorite.favoriter]
         end
+        favorites_count = @novel_in_series.novel_favorites.count.to_s
+        render json: {
+            status: 200,
+            favorites: favorites.flatten,
+            favorites_count: favorites_count
+        }
     end
 
     # お気に入りON
@@ -133,12 +143,16 @@ class Api::V1::NovelsController < ApplicationController
             @novel_favorite = current_user.novel_favorites.new(favorite_params)
             @novel_favorite.save
             favorites_count = @novel_in_series.novel_favorites.count.to_s
-            render json: {status: :created, favorites_count: favorites_count}
+            render json: {
+                status: :created,
+                favorites_count: favorites_count
+            }
         end
     end
 
     # お気に入りOFF
     def unfavorites
+        @novel_favorite = NovelFavorite.find_by(novel_id: params[:id], user_id: params[:user_id])
         @novel_favorite.destroy
         favorites_count = @novel_in_series.novel_favorites.count.to_s
         render json: {head: :no_content, favorites_count: favorites_count}
@@ -155,12 +169,9 @@ class Api::V1::NovelsController < ApplicationController
             @novel_series = NovelSeries.find_by(id: params[:novel_series_id])
         end
 
-        def set_favorites
-            @novel_favorite = current_user.novel_favorites.find_by(novel_id: params[:id])
-        end
-
+        # お気に入りのStrong Parameters
         def favorite_params
-            params.require(:novel_favorite).permit(:novel_id, :user_id)
+            params.require(:novel_favorite).permit(:novel_id, :user_id, :favoriter)
         end
 
         # 小説のStrong Parameters
