@@ -10,15 +10,23 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :api do
+    namespace :v1 do
+      resources :novels do
+        resources :comments, only: [:index, :create, :edit, :update, :destroy]
+      end
+    end
+  end
+
   # お気に入り==========================
-  # 小説のお気に入り総数
+  # 小説全件のお気に入り総数
   get '/api/v1/series_has_favorites/:id', to: 'api/v1/novel_series#series_has_favorites'
   # 小説のお気に入りの数
   get '/api/v1/novel_favorites/:id', to: 'api/v1/novels#favorites_status'
   # 小説をお気に入りする
   post '/api/v1/novel_favorites/:id', to: 'api/v1/novels#favorites'
   # 小説のお気に入りを解除する
-  delete '/api/v1/novel_favorites/:id', to: 'api/v1/novels#unfavorites'
+  delete '/api/v1/novel_favorites/:id/:user_id', to: 'api/v1/novels#unfavorites'
   #======================================
 
   # 小説タグ=====================================
