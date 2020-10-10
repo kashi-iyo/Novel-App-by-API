@@ -2,6 +2,10 @@ class UserTagMap < ApplicationRecord
   belongs_to :user
   belongs_to :user_tag
 
+  # バリデーション
+  validates :user_id, presence: true
+  validates :user_tag_id, presence: true
+
   MAX_TAGS_COUNT = 5
   validate :tags_count_limit
   private

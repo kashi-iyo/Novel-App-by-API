@@ -10,16 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_06_041623) do
+ActiveRecord::Schema.define(version: 2020_10_10_130331) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "comments", force: :cascade do |t|
+    t.text "content", null: false
+    t.bigint "user_id"
+    t.bigint "novel_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "commenter"
+    t.index ["novel_id"], name: "index_comments_on_novel_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
 
   create_table "novel_favorites", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "novel_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "favoriter"
     t.index ["novel_id"], name: "index_novel_favorites_on_novel_id"
     t.index ["user_id"], name: "index_novel_favorites_on_user_id"
   end
@@ -93,6 +105,8 @@ ActiveRecord::Schema.define(version: 2020_10_06_041623) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "comments", "novels"
+  add_foreign_key "comments", "users"
   add_foreign_key "novel_favorites", "novels"
   add_foreign_key "novel_favorites", "users"
   add_foreign_key "novel_series", "users"

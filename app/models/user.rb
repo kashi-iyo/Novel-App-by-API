@@ -10,8 +10,10 @@ class User < ApplicationRecord
     has_many :user_tag_maps, dependent: :destroy
     has_many :user_tags, through: :user_tag_maps
     # お気に入り
-    has_many :novel_favorites
+    has_many :novel_favorites, dependent: :destroy
     has_many :favorited_novels, through: :novel_favorites, source: :novel
+    # コメント
+    has_many :comments, dependent: :destroy
 
     # バリデーション
     validates :nickname, presence: true

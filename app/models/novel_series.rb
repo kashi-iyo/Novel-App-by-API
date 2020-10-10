@@ -14,6 +14,7 @@ class NovelSeries < ApplicationRecord
   validates :series_title, length: { maximum: 50 }
   validates :series_description, length: { maximum: 300 }
   validates :author, presence: true
+  validates :user_id, presence: true
 
   # シリーズタグを作成
   def save_tag(sent_tags)
