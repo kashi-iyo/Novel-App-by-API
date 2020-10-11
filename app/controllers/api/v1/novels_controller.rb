@@ -24,8 +24,9 @@ class Api::V1::NovelsController < ApplicationController
         if current_user === @novel_in_series.user
             render json: {
                 status: 200,
-                novel_in_series: @novel_in_series,
-                comments: @novel_in_series.comments,
+                novel_in_series: @novel_in_series,  # 小説
+                comment_count: @novel_in_series.comments.count.to_s,    # コメント数
+                favorites_count: @novel_in_series.novel_favorites.count.to_s,   # お気に入り数
                 novel_id: @novels_id,
                 series_title: @series_title,
                 series_id: @series_id,
