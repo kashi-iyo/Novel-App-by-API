@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :novels do
-        resources :comments, only: [:index, :create, :edit, :update, :destroy]
+        resources :comments, only: [:index, :create, :destroy]
       end
     end
   end
