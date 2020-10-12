@@ -2,101 +2,30 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     # ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
-    before_action :set_novel_series, only: [:series_has_favorites, :series_tags, :show, :edit, :update, :destroy]
+    # パラメータの基づいたシリーズ取得
+    before_action :set_novel_series, only: [:show, :edit, :update, :destroy]
 
     def index
-        all_novel_series = NovelSeries.all.map do |series|
-            if !!series.release
-                [series]
-            else
-                []
-            end
-        end
-        @all_novel_series = all_novel_series.flatten
-        count_in_series(@all_novel_series)    #シリーズが持つ小説の総数
-        @series_count = @all_novel_series.count.to_s   #シリーズの総数
+        series = NovelSeries.all
+        all_series = new_series_data(series)    # ホームに表示させたいシリーズデータを作成
+        @all_series = check_data_whether_release(all_series, false)  # 公開しているシリーズのみを取得
+        @series_count = @all_series.count   #シリーズの総数
         render json: {
             status: 200,
             series_count: @series_count,
-            novel_series: @all_novel_series,
+            all_series: @all_series,
             keyword: "index_of_series"
         }
     end
 
-    # 小説の総お気に入り数
-    def series_has_favorites
-        @count = @novel_series.count_favorites(@novel_series)
-        render json: {
-            status: 200,
-            count: @count,
-            keyword: "series_has_favorites"
-        }
-    end
-
-    def tags_feed
-        @tags = NovelTag.all
-        @tags.tag_has_series_count(@tags)
-        render json: {
-            status: 200,
-            tags: @tags,
-            keyword: "tags_feed"}
-    end
-
-    # シリーズが所有するタグのデータ
-    def series_tags
-        @id = @novel_series.id.to_s
-        @tags = @novel_series.tags_in_series
-        render json: {
-            status: 200,
-            series_id: @id,
-            series_tags: @tags,
-            keyword: "series_tags"
-        }
-    end
-
-    # タグに関連付けられているシリーズ
-    def series_in_tag
-        @tag = NovelTag.find_by(id: params[:id])  # タグ
-        @series = @tag.novel_series # そのタグを持つシリーズ
-        @series.count_in_series(@series)     # シリーズ内にある小説のカウント
-        @series_count = @series.count.to_s  # シリーズのカウント
-        render json: {
-            status: 200,
-            tag: @tag,
-            series_count: @series_count,
-            series_in_tag: @series,
-            keyword: "series_in_tag"
-        }
-    end
-
     def show
-        @novel_in_series = @novel_series.novels.all
-        @series_tags = @novel_series.novel_tags
-        # 公開時には全員が閲覧可能
-        if release?(@novel_series)
-            id = @novel_series.id.to_s
-            render json: {
-                status: 200,
-                novel_series: @novel_series,
-                novel_in_series: @novel_in_series,
-                id: id,
-                tags: @series_tags,
-                keyword: "show_of_series"
-            }
-        # 非公開時には作者だけが閲覧可能
-        elsif !release?(@novel_series) && authorized?(@novel_series)
-            id = @novel_series.id.to_s
-            render json: {
-                status: 200,
-                novel_series: @novel_series,
-                novel_in_series: @novel_in_series,
-                id: id,
-                tags: @series_tags,
-                keyword: "show_of_series"
-            }
-        else
-            handle_unrelease(@novel_series)
-        end
+        series = new_data(@novel_series, true)
+        @series = check_data_whether_release(series, true)
+        render json: {
+            status: 200,
+            series: @series,
+            keyword: "show_of_series"
+        }
     end
 
     def create
