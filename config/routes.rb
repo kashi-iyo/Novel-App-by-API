@@ -6,36 +6,36 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :novel_series, only: [:index, :show, :edit, :create, :update, :destroy] do
         resources :novels, only: [:index, :show, :edit, :create, :update, :destroy]
+        resources :novel_tags, only: [:index]
       end
     end
   end
+  # タグに関連付けされたシリーズ
+  get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_tags#series_in_tag'
+  # タグフィード
+  get '/api/v1/series_tags_feed', to: 'api/v1/novel_tags#tags_feed'
 
   namespace :api do
     namespace :v1 do
       resources :novels do
+        # コメント
         resources :comments, only: [:index, :create, :destroy]
+        # お気に入り
+        resources :novel_favorites, only: [:index, :create, :destroy]
       end
     end
   end
-
-  # お気に入り==========================
   # 小説全件のお気に入り総数
-  get '/api/v1/series_has_favorites/:id', to: 'api/v1/novel_series#series_has_favorites'
-  # 小説のお気に入りの数
-  get '/api/v1/novel_favorites/:id', to: 'api/v1/novels#favorites_status'
-  # 小説をお気に入りする
-  post '/api/v1/novel_favorites/:id', to: 'api/v1/novels#favorites'
-  # 小説のお気に入りを解除する
-  delete '/api/v1/novel_favorites/:id/:user_id', to: 'api/v1/novels#unfavorites'
-  #======================================
+  get '/api/v1/series_has_favorites/:novel_series_id',
+  to: 'api/v1/novel_favorites#series_has_favorites'
 
   # 小説タグ=====================================
   # シリーズが所有するタグ
-  get '/api/v1/series_tags/:id', to: 'api/v1/novel_series#series_tags'
-  # タグに関連づけられているシリーズ
-  get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_series#series_in_tag'
-  # タグフィード
-  get '/api/v1/series_tags_feed', to: 'api/v1/novel_series#tags_feed'
+  # get '/api/v1/series_tags/:id', to: 'api/v1/novel_series#series_tags'
+  # # タグに関連づけられているシリーズ
+  # get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_series#series_in_tag'
+  # # タグフィード
+  # get '/api/v1/series_tags_feed', to: 'api/v1/novel_series#tags_feed'
   #==========================================
 
   #ユーザー系====================================
