@@ -1,6 +1,6 @@
 class NovelSeries < ApplicationRecord
   # 並び替え
-  default_scope { order(created_at: :desc) }
+  default_scope { order(updated_at: :desc) }
 
   # 紐付け
   belongs_to :user

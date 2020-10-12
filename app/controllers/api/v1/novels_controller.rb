@@ -1,13 +1,14 @@
 class Api::V1::NovelsController < ApplicationController
 
     # ログインしているかどうかの確認
-    before_action :logged_in_user, only: [:create, :edit, :update, :destroy, :favorites, :unfavorites]
+    before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
     # 小説を取得
-    before_action :set_novel, only: [:show, :edit, :update, :destroy, :favorites_status, :favorites, :unfavorites]
+    before_action :set_novel
     # シリーズ取得
     before_action :set_novel_series
 
 
+    # 小説全件
     def index
         @novels_in_series = @novel_series.novels.all
         render json: {
@@ -16,6 +17,7 @@ class Api::V1::NovelsController < ApplicationController
         }
     end
 
+    # 小説1話分
     def show
         # シリーズのタイトルだけ欲しい
         @series_title = @novel_series.series_title
@@ -26,11 +28,10 @@ class Api::V1::NovelsController < ApplicationController
                 status: 200,
                 novel_in_series: @novel_in_series,  # 小説
                 comment_count: @novel_in_series.comments.count.to_s,    # コメント数
-                favorites_count: @novel_in_series.novel_favorites.count.to_s,   # お気に入り数
                 novel_id: @novels_id,
                 series_title: @series_title,
                 series_id: @series_id,
-                keyword: "index_of_novels"
+                keyword: "show_of_novels"
             }
         # 公開されている場合
         elsif release?(@novel_in_series)
@@ -39,13 +40,15 @@ class Api::V1::NovelsController < ApplicationController
                 novel_in_series: @novel_in_series,
                 series_title: @series_title,
                 series_id: @series_id,
-                keyword: "index_of_novels"
+                keyword: "show_of_novels"
             }
         else
             handle_unrelease(@novel_in_series)
         end
     end
 
+
+    # 小説1話作成
     def create
         @novel_in_series = @novel_series.novels.new(novel_in_series_params)
         @novel_in_series.user_id = @novel_series.user_id    # ユーザーID
@@ -72,6 +75,7 @@ class Api::V1::NovelsController < ApplicationController
         end
     end
 
+    # 小説1話編集
     def edit
         if authorized?(@novel_in_series)
             series_and_novels_id(@novel_series, @novel_in_series)
@@ -87,6 +91,7 @@ class Api::V1::NovelsController < ApplicationController
         end
     end
 
+    # 小説1話更新
     def update
         if authorized?(@novel_in_series)
             series_and_novels_id(@novel_series, @novel_in_series)
@@ -109,6 +114,7 @@ class Api::V1::NovelsController < ApplicationController
         end
     end
 
+    # 小説1話削除
     def destroy
         if authorized?(@novel_in_series)
             @novel_in_series.destroy
@@ -118,62 +124,67 @@ class Api::V1::NovelsController < ApplicationController
         end
     end
 
-    # 1つの小説の持つお気に入り数
-    def favorites_status
-        favorites = @novel_in_series.novel_favorites
-        favorites = favorites.map do |favorite|
-            ["user_id": favorite.user_id, "favoriter": favorite.favoriter]
-        end
-        favorites_count = @novel_in_series.novel_favorites.count.to_s
-        render json: {
-            status: 200,
-            favorites: favorites.flatten,
-            favorites_count: favorites_count
-        }
-    end
+    # # 1つの小説の持つお気に入り数
+    # def favorites_status
+    #     favorites = @novel_in_series.novel_favorites
+    #     favorites = favorites.map do |favorite|
+    #         ["user_id": favorite.user_id, "favoriter": favorite.favoriter]
+    #     end
+    #     favorites_count = @novel_in_series.novel_favorites.count.to_s
+    #     render json: {
+    #         status: 200,
+    #         favorites: favorites.flatten,
+    #         favorites_count: favorites_count
+    #     }
+    # end
 
-    # お気に入りON
-    def favorites
-        # お気に入り済み→エラー／お気に入りしてない→成功
-        if @novel_in_series.favorited_by?(current_user)
-            render json: {
-                status: :unprocessable_entity,
-                errors: "すでにお気に入り済みです。"
-            }
-        else
-            @novel_favorite = current_user.novel_favorites.new(favorite_params)
-            @novel_favorite.save
-            favorites_count = @novel_in_series.novel_favorites.count.to_s
-            render json: {
-                status: :created,
-                favorites_count: favorites_count
-            }
-        end
-    end
+    # # お気に入りON
+    # def favorites
+    #     # お気に入り済み→エラー／お気に入りしてない→成功
+    #     if @novel_in_series.favorited_by?(current_user)
+    #         render json: {
+    #             status: :unprocessable_entity,
+    #             errors: "すでにお気に入り済みです。"
+    #         }
+    #     else
+    #         @novel_favorite = current_user.novel_favorites.new(favorite_params)
+    #         @novel_favorite.save
+    #         favorites_count = @novel_in_series.novel_favorites.count.to_s
+    #         render json: {
+    #             status: :created,
+    #             favorites_count: favorites_count
+    #         }
+    #     end
+    # end
 
-    # お気に入りOFF
-    def unfavorites
-        @novel_favorite = NovelFavorite.find_by(novel_id: params[:id], user_id: params[:user_id])
-        @novel_favorite.destroy
-        favorites_count = @novel_in_series.novel_favorites.count.to_s
-        render json: {head: :no_content, favorites_count: favorites_count}
-    end
+    # # お気に入りOFF
+    # def unfavorites
+    #     @novel_favorite = NovelFavorite.find_by(novel_id: params[:id], user_id: params[:user_id])
+    #     @novel_favorite.destroy
+    #     favorites_count = @novel_in_series.novel_favorites.count.to_s
+    #     render json: {head: :no_content, favorites_count: favorites_count}
+    # end
 
     private
 
-        # 小説を取得
+        # # 小説を取得
+        # def set_novel
+        #     @novel_in_series = Novel.find_by(id: params[:id])
+        # end
+        # # シリーズを取得
+        # def set_novel_series
+        #     @novel_series = NovelSeries.find_by(id: params[:novel_series_id])
+        # end
+
+        # シリーズが所有する小説1話分を取得
         def set_novel
             @novel_in_series = Novel.find_by(id: params[:id])
         end
-        # シリーズを取得
-        def set_novel_series
-            @novel_series = NovelSeries.find_by(id: params[:novel_series_id])
-        end
 
-        # お気に入りのStrong Parameters
-        def favorite_params
-            params.require(:novel_favorite).permit(:novel_id, :user_id, :favoriter)
-        end
+        # # お気に入りのStrong Parameters
+        # def favorite_params
+        #     params.require(:novel_favorite).permit(:novel_id, :user_id, :favoriter)
+        # end
 
         # 小説のStrong Parameters
         def novel_in_series_params
