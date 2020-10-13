@@ -5,27 +5,35 @@ class Api::V1::NovelSeriesController < ApplicationController
     # パラメータの基づいたシリーズ取得
     before_action :set_novel_series, only: [:show, :edit, :update, :destroy]
 
+    # シリーズ全件を取得
     def index
         series = NovelSeries.all
-        all_series = new_series_data(series)    # ホームに表示させたいシリーズデータを作成
-        @all_series = check_data_whether_release(all_series, false)  # 公開しているシリーズのみを取得
-        @series_count = @all_series.count   #シリーズの総数
+        all_series = all_of_series_data(series)    # ホームに表示させたいシリーズデータを作成
+        series_count = all_series.count   #シリーズの総数
         render json: {
             status: 200,
-            series_count: @series_count,
-            all_series: @all_series,
+            series_count: series_count,
+            all_series: all_series,
             keyword: "index_of_series"
         }
     end
 
+    # 1つのシリーズ／そのシリーズが持つ小説全件を取得
     def show
-        series = new_data(@novel_series, true)
-        @series = check_data_whether_release(series, true)
-        render json: {
-            status: 200,
-            series: @series,
-            keyword: "show_of_series"
-        }
+        if @novel_series.nil?
+            render json: {
+                status: 400,
+                errors: "この作品は存在しません。",
+                keyword: "not_present"
+            }
+        else
+            series = new_data(@novel_series, "one_of_series_data")
+            render json: {
+                status: 200,
+                series: series,
+                keyword: "show_of_series"
+            }
+        end
     end
 
     def create
@@ -105,7 +113,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
         # シリーズを取得
         def set_novel_series
-            @novel_series = NovelSeries.find(params[:id])
+            @novel_series = NovelSeries.find_by(id: params[:id])
         end
 
 end
