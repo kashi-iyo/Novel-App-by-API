@@ -16,7 +16,7 @@ class SessionsController < ApplicationController
 
     def is_logged_in?
         if logged_in? && current_user
-            @user_id = @current_user.id.to_s
+            @user_id = @current_user.id
             render json: { logged_in: true, user: @current_user, user_id: @user_id }
         else
             render json: { logged_in: false, message: "ユーザーが存在しません" }
