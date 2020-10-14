@@ -1,11 +1,11 @@
 Rails.application.routes.draw do
-  
+
   root to: 'api/v1/novel_series#index'
 
   namespace :api do
     namespace :v1 do
       resources :novel_series, only: [:index, :show, :edit, :create, :update, :destroy] do
-        resources :novels, only: [:index, :show, :edit, :create, :update, :destroy]
+        resources :novels, only: [:show, :edit, :create, :update, :destroy]
         resources :novel_tags, only: [:index]
       end
     end
