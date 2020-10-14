@@ -18,15 +18,20 @@ class NovelSeries < ApplicationRecord
 
   # シリーズタグを作成
   def save_tag(sent_tags)
+    # シリーズに紐付けられた現在存在するタグを取得する
     current_tags = self.novel_tags.pluck(:novel_tag_name) unless self.novel_tags.nil?
+    # 現在データベースに存在するデータを取得する
     old_tags = current_tags - sent_tags
+    # 現在データベースに存在しないデータだけを取り出す
     new_tags = sent_tags - current_tags
 
     old_tags.each do |old|
+      # すでに存在するタグは削除してしまう
       self.novel_tags.delete NovelTag.find_by(novel_tag_name: old)
     end
 
     new_tags.each do |new|
+      # 新しいタグは保存する
       new_novel_tag = NovelTag.find_or_create_by(novel_tag_name: new)
       self.novel_tags << new_novel_tag
     end
@@ -45,23 +50,13 @@ class NovelSeries < ApplicationRecord
     series_favorites.sum {|hash| hash[:favorites_count]}
   end
 
-  # シリーズが所有するタグを取得
-  def tags_in_series
+  # タグ編集用のシリーズが所有するタグを取得
+  # ["タグ1", "タグ2"]のような形で取得
+  def series_tags_for_edit
     series_tags = self.novel_tags
     return series_tags.map{ |tags|
-        [tags]
+        [tags.novel_tag_name]
     }.flatten
-  end
-
-  # 編集用のシリーズタグデータを取得
-  def edit_tags
-    tags = self.tags_in_series
-    @tags = tags.map do |tag|
-        [tag.novel_tag_name]
-    end
-    series_tags = []
-    series_tags.push(@tags)
-    series_tags.flatten!
   end
 
 end
