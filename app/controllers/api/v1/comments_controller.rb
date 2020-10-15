@@ -39,7 +39,7 @@ class Api::V1::CommentsController < ApplicationController
     def destroy
         if authorized?(@comment)
             @comment.destroy
-            render json: { head: :no_content, success: "正常に削除されました。" }
+            render json: { head: :no_content, comment: @comment, success: "正常に削除されました。" }
         else
             handle_unauthorized(@comment)
         end
@@ -56,7 +56,7 @@ class Api::V1::CommentsController < ApplicationController
     end
 
     def set_comment
-        @comment = Comment.find_by(id: params[:id])
+        @comment = Comment.find_by(id: params[:id], novel_id: params[:novel_id])
     end
 
 end
