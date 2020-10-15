@@ -29,14 +29,6 @@ Rails.application.routes.draw do
   get '/api/v1/series_has_favorites/:novel_series_id',
   to: 'api/v1/novel_favorites#series_has_favorites'
 
-  # 小説タグ=====================================
-  # シリーズが所有するタグ
-  # get '/api/v1/series_tags/:id', to: 'api/v1/novel_series#series_tags'
-  # # タグに関連づけられているシリーズ
-  # get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_series#series_in_tag'
-  # # タグフィード
-  # get '/api/v1/series_tags_feed', to: 'api/v1/novel_series#tags_feed'
-  #==========================================
 
   #ユーザー系====================================
   resources :users, only: [:create, :show, :edit, :update,  :index]

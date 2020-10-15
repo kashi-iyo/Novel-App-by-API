@@ -9,6 +9,7 @@ class Api::V1::NovelsController < ApplicationController
 
     # 小説1話分
     def show
+        # 1件の小説のデータを取得
         one_of_novel_data(@novel_series, @novel_in_series)
         render json: {
             status: 200,
@@ -97,37 +98,29 @@ class Api::V1::NovelsController < ApplicationController
 
     private
 
-        # # 小説を取得
-        # def set_novel
-        #     @novel_in_series = Novel.find_by(id: params[:id])
-        # end
-        # # シリーズを取得
-        # def set_novel_series
-        #     @novel_series = NovelSeries.find_by(id: params[:novel_series_id])
-        # end
-
         # シリーズが所有する小説1話分を取得
         def set_novel
-            @novel_in_series = Novel.find_by(id: params[:id])
+            # データが存在するかどうかをチェック
+            if Novel.find_by(id: params[:id]).nil?
+                return_not_present_data()
+            else
+                @novel_in_series = Novel.find_by(id: params[:id])
+            end
         end
-
-        # # お気に入りのStrong Parameters
-        # def favorite_params
-        #     params.require(:novel_favorite).permit(:novel_id, :user_id, :favoriter)
-        # end
 
         # パラメータに基づいたシリーズを取得
         def set_novel_series
-            @novel_series = NovelSeries.find_by(id: params[:novel_series_id])
+            # データが存在するかどうかをチェック
+            if NovelSeries.find_by(id: params[:novel_series_id]).nil?
+                return_not_present_data()
+            else
+                @novel_series = NovelSeries.find_by(id: params[:novel_series_id])
+            end
         end
 
         # 小説のStrong Parameters
         def novel_in_series_params
-            params.require(:novel).permit(
-                :novel_title,
-                :novel_description,
-                :novel_content,
-                :release)
+            params.require(:novel).permit( :novel_title, :novel_description, :novel_content, :release)
         end
 
 end

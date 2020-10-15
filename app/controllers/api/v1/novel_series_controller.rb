@@ -10,7 +10,7 @@ class Api::V1::NovelSeriesController < ApplicationController
     # シリーズ全件を取得
     def index
         series = NovelSeries.all
-        all_series = all_of_series_data(series)    # ホームに表示させたいシリーズデータを作成
+        all_series = return_all_of_series_data(series)    # ホームに表示させたいシリーズデータを作成
         series_count = all_series.count   #シリーズの総数
         render json: {
             status: 200,
@@ -22,7 +22,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     # 1つのシリーズ／そのシリーズが持つ小説全件を取得
     def show
-        series = new_data_of_series(@novel_series, "one_of_series_data")
+        series = make_new_data_of_series(@novel_series, "one_of_series_data")
         render json: {
             status: 200,
             series: series,
@@ -73,7 +73,9 @@ class Api::V1::NovelSeriesController < ApplicationController
     def update
         if authorized?(@novel_series)
             if @novel_series.update(novel_series_params)
+                # set_series_tagsメソッドに基づきシリーズにタグを登録
                 @novel_series.save_tag(@novel_tags)
+                # React側でリダイレクトに使うシリーズのID
                 @series_id = @novel_series.id.to_s
                 render json: {
                     status: :ok,
@@ -113,6 +115,7 @@ class Api::V1::NovelSeriesController < ApplicationController
         end
 
         # シリーズを取得
+        # 取得しようとした時点でデータが削除されている場合があるので、その場合はここで処理
         def set_novel_series
             # データが存在するかどうかをチェック
             if NovelSeries.find_by(id: params[:id]).nil?
