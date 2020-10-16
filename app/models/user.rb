@@ -67,4 +67,5 @@ class User < ApplicationRecord
         user_tags.push(@tags)
         user_tags.flatten!
     end
+
 end

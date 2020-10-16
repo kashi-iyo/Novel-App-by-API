@@ -2,40 +2,42 @@ Rails.application.routes.draw do
 
   root to: 'api/v1/novel_series#index'
 
-  namespace :api do
-    namespace :v1 do
-      resources :novel_series, only: [:index, :show, :edit, :create, :update, :destroy] do
-        resources :novels, only: [:show, :edit, :create, :update, :destroy]
-        resources :novel_tags, only: [:index]
+  # シリーズ/小説======================================
+    namespace :api do
+      namespace :v1 do
+        resources :novel_series, only: [:index, :show, :edit, :create, :update, :destroy] do
+          resources :novels, only: [:show, :edit, :create, :update, :destroy]
+        end
+        resources :novel_tags, only: [:show]
       end
     end
-  end
-  # タグに関連付けされたシリーズ
-  get '/api/v1/series_in_tag/:id', to: 'api/v1/novel_tags#series_in_tag'
-  # タグフィード
-  get '/api/v1/series_tags_feed', to: 'api/v1/novel_tags#tags_feed'
+  # ===================================================
 
-  namespace :api do
-    namespace :v1 do
-      resources :novels do
-        # コメント
-        resources :comments, only: [:index, :create, :destroy]
-        # お気に入り
-        resources :novel_favorites, only: [:index, :create, :destroy]
+  # タグ系=============================================
+    namespace :api do
+      namespace :v1 do
+        resources :user_tags, only: [:index, :show]
       end
     end
-  end
-  # 小説全件のお気に入り総数
-  get '/api/v1/series_has_favorites/:novel_series_id',
-  to: 'api/v1/novel_favorites#series_has_favorites'
+    # シリーズタグフィード
+    get '/api/v1/series_tags_feed', to: 'api/v1/novel_tags#tags_feed'
+  # ==================================================
 
+  # コメント/お気に入り================================
+    namespace :api do
+      namespace :v1 do
+        resources :novels do
+          # コメント
+          resources :comments, only: [:index, :create, :destroy]
+          # お気に入り
+          resources :novel_favorites, only: [:index, :create, :destroy]
+        end
+      end
+    end
+    # =================================================
 
   #ユーザー系====================================
   resources :users, only: [:create, :show, :edit, :update,  :index]
-  # そのタグを持つユーザー
-  get '/tag_has_users/:id', to: 'users#tag_has_users'
-  # 趣味タグフィード
-  get '/tags_feed', to: 'users#tags_feed'
   #=============================================
 
   # 認証============================================
