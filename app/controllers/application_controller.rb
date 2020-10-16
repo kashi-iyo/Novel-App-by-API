@@ -138,14 +138,14 @@ class ApplicationController < ActionController::Base
                     make_new_data_of_series(value, "all_of_series_data")
                 # シリーズが非公開の場合
                 elsif !value[:release]
-                    []
+                    {}
                 end
             end
         end
     # ==============================================================================
 
     # 小説のデータを取得するメソッド=================================================
-        helper_method :one_of_novel_data
+        helper_method :one_of_novel_data, :data_of_comments_in_novel
 
         # 新たな小説1件のデータ構造を作成
         # →NovelsControllerのshowアクションにて使用
@@ -255,6 +255,56 @@ class ApplicationController < ActionController::Base
                 keyword: "unrelease"
             }
         end
+    # ===============================================================================
+
+    # 新たにオブジェクトを生成するメソッド===========================================
+        helper_method :create_new_object
+
+        # 新たに作成したオブジェクトを返す
+        # → UserTagsコントローラ, NovelTagsコントローラにて使用
+        def create_new_object(data, data_type)
+            data.map do |d|
+                if data_type === "user_tag"
+                    # 趣味タグ
+                    return_new_tag_data(d, "users")
+                elsif data_type ==="series_tag"
+                    # シリーズタグ
+                    return_new_tag_data(d, "series")
+                elsif data_type === "user"
+                    # ユーザーデータ
+                    return_new_user_data(d)
+                end
+            end
+        end
+    # ===============================================================================
+
+    # タグ系機能=====================================================================
+        helper_method :return_new_tag_data
+
+        # タグ系の新たなオブジェクトを生成する
+        # →create_new_object()にて使用
+        def return_new_tag_data(tag, tags_type)
+            return {
+                tag_id: tag.id,
+                tag_name: tags_type === "users" ? tag.user_tag_name : tag.novel_tag_name,
+                count: tags_type === "users" ? tag.users.count : tag.novel_series.count,
+            }
+        end
+    # ===============================================================================
+
+    # ユーザー系機能=================================================================
+        helper_method :return_new_user_data
+
+        # ユーザーの新たなオブジェクトを生成する
+        # →create_new_object()にて使用
+        def return_new_user_data(user)
+            return {
+                user_id: user.id,
+                nickname: user.nickname,
+                profile: user.profile,
+            }
+        end
+
     # ===============================================================================
 
 #====================================================================================
