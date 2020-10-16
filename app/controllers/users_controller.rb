@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
 
     before_action :logged_in_user, only: [:edit, :update]
-    before_action :set_user, only: [:show, :edit, :update, :user_has_tags]
+    before_action :set_user, only: [:show, :edit, :update]
 
     def index
         @users = User.all
@@ -35,29 +35,6 @@ class UsersController < ApplicationController
         else
             render json: { status: 500, errors: ['ユーザーが見つかりません'] }
         end
-    end
-
-    # 取得したタグに関連づけられているユーザーを取得
-    def tag_has_users
-        @tags = UserTag.find_by(id: params[:id])
-        @users = @tags.users
-        render json: {
-            status: 200,
-            tags: @tags,
-            users: @users,
-            keyword: "tag_has_users"
-        }
-    end
-
-    # 趣味タグフィード
-    def tags_feed
-        @tags = UserTag.all
-        @tags.tag_has_users_count(@tags) # タグを登録しているユーザー数
-        render json: {
-            status: 200,
-            tags: @tags,
-            keyword: "tags_feed"
-        }
     end
 
     def edit
