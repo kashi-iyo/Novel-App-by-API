@@ -1,8 +1,7 @@
 class Api::V1::NovelFavoritesController < ApplicationController
 
     before_action :logged_in_user, only: [:create, :destroy]
-    before_action :set_novel
-    before_action :set_novel_series, only: [:series_has_favorites]
+    before_action :set_novel, only: [:create]
 
     # お気に入りON
     def create
