@@ -6,7 +6,7 @@ class Api::V1::UserTagsController < ApplicationController
     def index
         tags = UserTag.all
         # 趣味タグ用のデータを生成
-        @tags = create_new_object(tags, "user_tag")
+        @tags = remake_arr_to_new_object(tags, "user_tag")
         render json: {
             status: 200,
             tags: @tags,
