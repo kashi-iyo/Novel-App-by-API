@@ -6,7 +6,7 @@ class Api::V1::NovelTagsController < ApplicationController
     def tags_feed
         tags = NovelTag.all
         # 趣味タグ用のデータを生成
-        @tags = create_new_object(tags, "series_tag")
+        @tags = remake_arr_to_new_object(tags, "series_tag")
         render json: {
             status: 200,
             tags: @tags,
