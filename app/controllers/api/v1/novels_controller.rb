@@ -3,51 +3,54 @@ class Api::V1::NovelsController < ApplicationController
     # auth ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
     # novels Novelを1件取得（@novel_in_series）
-    before_action :set_novel, only: [:show, :edit, :update]
+    before_action :set_novel, only: [:show, :edit, :update, :destroy]
     # novels NovelSeriesを取得（@novel_series）
     before_action :set_novel_series, only: [:show, :create]
 
-    # novels Novelオブジェクトを1件取得
+    #Read Novelオブジェクトを1件取得
     def show
         # Applicationコントローラで生成した1件のNovelオブジェクトをJSONとしてレンダリング
-        create_new_novel_object(@novel_series, @novel_in_series)
+        helpers.create_new_novel_object(@novel_series, @novel_in_series)
     end
 
 
-    # novels Novelを1件作成
+    #Create 引数に渡されるデータに基づいて、新規のオブジェクトをCreate・Saveする
     def create
-        @novel = @novel_series.novels.new(novel_in_series_params)
-        # 引数に渡されるデータに基づいて、新規のオブジェクトをDBに保存する
-        save_new_object_to_db(
-            @novel,
-            @novel_series,
-            "novel",
+        @novel = current_user.novels.new(novel_in_series_params)
+        helpers.pass_object_to_crud(
+            @novel,         #object
+            {},             #params
+            @novel_series,  #association_data
+            "novel2",       #data_type
+            "create"        #crud_type
         )
     end
 
-    # 小説1話編集
+    #Edit 引数に渡されるデータに基づいて、Edit用のオブジェクトを返す
     def edit
-        get_edit_object(@novel_in_series, "novel")
-    end
-
-    # 小説1話更新
-    def update
-        update_object_to_db(
-            @novel_in_series,
-            novel_in_series_params,
-            {},
-            "novel",
+        helpers.pass_object_to_crud(
+            @novel_in_series,   #object
+            {},                 #params
+            {},                 #association_data
+            "novel",            #data_type
+            "edit"              #crud_type
         )
     end
 
-    # 小説1話削除
+    #Update 引数に渡されるデータに基づいて、オブジェクトをUpdateする
+    def update
+        helpers.pass_object_to_crud(
+            @novel_in_series,           #object
+            novel_in_series_params,     #params
+            {},                         #association_data
+            "novel",                    #data_type
+            "update"                    #crud_type
+        )
+    end
+
+    #Destroy 引数に渡されるデータに基づいて、オブジェクトをDestroyする
     def destroy
-        if authorized?(@novel_in_series)
-            @novel_in_series.destroy
-            render json: { head: :no_content, success: "正常に削除されました。" }
-        else
-            handle_unauthorized(@novel_in_series)
-        end
+        helpers.pass_object_to_crud(@novel_in_series, {}, {}, "novel", "destroy")
     end
 
 

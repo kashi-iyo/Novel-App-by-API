@@ -6,6 +6,7 @@ class User < ApplicationRecord
     has_many :novel_series, dependent: :destroy
     # 小説
     has_many :novels, through: :novel_series, dependent: :destroy
+    has_many :novels, dependent: :destroy
     # タグ
     has_many :user_tag_maps, dependent: :destroy
     has_many :user_tags, through: :user_tag_maps
