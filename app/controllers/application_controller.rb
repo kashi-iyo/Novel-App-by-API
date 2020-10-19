@@ -10,24 +10,27 @@ class ApplicationController < ActionController::Base
 # auth 認証系==================================================================================
         helper_method :login!, :logged_in?, :logged_in_user, :current_user
 
-        # /// ログインさせる
+        #! /// ログインさせる
         def login!
             session[:user_id] = @user.id
         end
 
-        # /// ログインしているかどうかをbool値で返す
+        #! /// ログインしているかどうかをbool値で返す
         def logged_in?
             !!session[:user_id]
         end
 
-        # /// ユーザーがログインしていない場合の処理
+        #! /// ユーザーがログインしていない場合の処理
         def logged_in_user
             unless logged_in?
-                render json: { messages: "ログインまたは、新規登録を行ってください。", status: 401 }
+                render json: {
+                    status: :unauthorized,
+                    messages: "ログインまたは、新規登録を行ってください。",
+                }
             end
         end
 
-        # /// 現在ログインしているユーザーを返す
+        #! /// 現在ログインしているユーザーを返す
         def current_user
             @current_user ||= User.find(session[:user_id]) if session[:user_id]
         end
@@ -36,69 +39,39 @@ class ApplicationController < ActionController::Base
 
 # validates 認可用メソッド=====================================================================
     helper_method :release?, :authorized?, :handle_unauthorized
-    # /// ログイン中のユーザーとdataのユーザーが一致するかをbool値で返す
+    #! /// ログイン中のユーザーとdataのユーザーが一致するかをbool値で返す
     def authorized?(data)
         data[:user_id] === current_user.id
     end
 
-    # /// dataのユーザーとログインユーザーが不一致な場合の処理
+    #! /// dataのユーザーとログインユーザーが不一致な場合の処理
     def handle_unauthorized(data)
         unless authorized?(data)
-            render json: { messages: "アクセス権限がありません。", status: 401 }
+            render json: {
+                status: :unauthorized,
+                messages: "アクセス権限がありません。",
+            }
         end
     end
 
-    # /// releaseが真かどうか確認
+    #! /// releaseが真かどうか確認
     def release?(data)
         !!data[:release] || !data[:release] && authorized?(data)
     end
 # validates ==================================================================================
 
 
-#render_json NovelSeries#index・show／Novels#index・showをJSONデータとしてレンダリング========
-    helper_method :render_series_object,
-    :return_new_one_novel_object,
+#render_json 各Controllers#index・showにて取得したいデータをJSONとして取得========
+    helper_method :read_object_to_render,
 
-    #render_json ホームにて表示させるNovelSeriesオブジェクト全件をJSONとしてレンダリング。
-    def render_series_object(series, nov_count, fav_count, com_count, tags, novels)
-        return {
-            id: series.id,    #! このNovelSeriesオブジェクトのID
-            user_id: series.user_id,  #! このNovelSeriesオブジェクトに紐付くユーザーのID
-            author: series.author,  #! このNovelSeriesの作者
-            release: series.release,    #! このNovelSeriesが公開か非公開か
-            series_title: series.series_title,   #! このNovelSeriesのタイトル
-            series_description: series.series_description,  #! このNovelSeriesのあらすじ
-            novels_count: nov_count,     #! このNovelSeriesが持つNovels全件の総数
-            favorites_count: fav_count,   #! Novels全件が獲得したNovelFavoritesの総数
-            comments_count: com_count,     #! Novels全件が獲得したCommentsの総数
-            tags: tags,      #! このNovelSeriesに登録されているNovelTags
-            novels: novels  #! NovelSeriesが持つNovels全件
-        }
-    end
-
-    #render_json シリーズが所有する小説データ1件をJSONとしてレンダリング。
-    def return_new_one_novel_object(series_data, novel_data, novels_count, favorites_data, favorites_count, comments_data, comments_count, keyword)
-        @novel = {}
-        @novel = {
-            series_id: series_data.id,
-            novel_id: novel_data.id,
-            user_id: series_data.user_id,
-            author: series_data.author,
-            release: novel_data.release,
-            series_title: series_data.series_title,
-            novel_title: novel_data.novel_title,
-            novel_description: novel_data.novel_description,
-            novel_content: novel_data.novel_content,
-            novels_count: novels_count,
-            favorites_data: favorites_data,
-            favorites_count: favorites_count,
-            comments_data: comments_data,
-            comments_count: comments_count,
-        }
+    #Read index／showにて取得させたいオブジェクトを
+    #render_json JSONとしてレンダリング。
+    def read_object_to_render(object, object2, data_type)
+        @object = helpers.return_object_by_data_type(object, object2, data_type)
         render json: {
             status: 200,
-            novel: @novel,
-            keyword: keyword,
+            read_object: @object,
+            keyword: data_type,
         }
     end
 #render_json==================================================================================
@@ -126,7 +99,7 @@ class ApplicationController < ActionController::Base
         end
         render json: {
             status: :created,
-            object: @object,
+            created_object: @object,
             successful: "正常に保存されました。",
             keyword: keyword,
         }
@@ -134,7 +107,7 @@ class ApplicationController < ActionController::Base
 
     #Edit用のオブジェクトを
     #render_json JSONデータとしてレンダリングする
-    def edit_object_to_render(object, series_tags, keyword)
+    def edit_object_to_render(object, object2, keyword)
         @object =
         #edit NovelsデータをEditする場合
         if keyword === "edit_of_novels"
@@ -148,20 +121,20 @@ class ApplicationController < ActionController::Base
             }
         #edit NovelSeriesデータをEditする場合
         elsif keyword === "edit_of_series"
+            @tags = helpers.generate_object_from_arr(object2,"edit_of_series")
             {
                 series_id: object.id,
                 user_id: object.user_id,
                 series_title: object.series_title,
                 series_description: object.series_description,
                 release: object.release,
-                # ["タグ1", "タグ2"]のような形で取得。(React側では配列として扱いたいため)
-                series_tags: remake_arr_to_new_object(series_tags, "edit_of_series")
+                series_tags: @tags
             }
         end
         # render_json この時点でJSONデータがレンダリングされる
         render json: {
             status: 200,
-            object: @object,
+            object_for_edit: @object,
             keyword: keyword
         }
     end
@@ -183,7 +156,7 @@ class ApplicationController < ActionController::Base
         # render_json この時点でJSONデータがレンダリングされる
         render json: {
             status: :ok,
-            object: @object,
+            updated_object: @object,
             successful: "編集が完了しました。",
             keyword: keyword
         }
@@ -202,8 +175,8 @@ class ApplicationController < ActionController::Base
 # object 新たにオブジェクトを生成するメソッド================================================
     helper_method :remake_arr_to_new_object
 
-    # /// 新たに作成したいオブジェクトを返す。ここでは"配列"データを各々のオブジェクト化するメソッドへ渡している。
-    # /// UserTagsコントローラ, NovelTagsコントローラ, series_and_novel_json_to_render()にて使用
+    #! /// 新たに作成したいオブジェクトを返す。ここでは"配列"データを各々のオブジェクト化するメソッドへ渡している。
+    #! /// UserTagsコントローラ, NovelTagsコントローラ, series_and_novel_json_to_render()にて使用
     def remake_arr_to_new_object(data, data_type)
         data.map do |d|
             # tags UserTagsオブジェクト全件返す
@@ -221,48 +194,34 @@ class ApplicationController < ActionController::Base
             end
         end
     end
-# object ==================================================================================
-
-# ユーザー系機能===========================================================================
-    helper_method :return_new_user_object
-
-    # /// ユーザーデータの新たなオブジェクトを生成する
-    # /// remake_arr_to_new_object()にてループ処理されたデータをここでオブジェクトへ変換。
-    def return_new_user_object(user)
-        return {
-            user_id: user.id,
-            nickname: user.nickname,
-            profile: user.profile,
-        }
-    end
-# =========================================================================================
+# ==================================================================================
 
 # tags タグ系機能==========================================================================
-    helper_method :return_new_tag_object
+    # helper_method :return_new_tag_object
 
-    # /// NovelTags/UserTagsの新たなオブジェクトを生成する
-    # /// 主にremake_arr_to_new_object()にてループ処理されたデータをここでオブジェクト化する。
-    def return_new_tag_object(tag, tags_type)
-        # UserTags
-        if tags_type === "user_tag"
-            return {
-                tag_id: tag.id,
-                tag_name: tag.user_tag_name,
-                count: tag.users.count,
-            }
-        # NovelTags
-        elsif tags_type ==="series_tag"
-            return {
-                tag_id: tag.id,
-                tag_name: tag.novel_tag_name,
-                count: tag.novel_series.count,
-            }
-        # NovelSeries編集用のNovelTags
-        # ["タグ1", "タグ2"]のような形で取得
-        elsif tags_type === 'edit_of_series'
-            tag.novel_tag_name
-        end
-    end
+    # #! /// NovelTags/UserTagsの新たなオブジェクトを生成する
+    # #! /// 主にremake_arr_to_new_object()にてループ処理されたデータをここでオブジェクト化する。
+    # def return_new_tag_object(tag, tags_type)
+    #     # UserTags
+    #     if tags_type === "user_tag"
+    #         return {
+    #             tag_id: tag.id,
+    #             tag_name: tag.user_tag_name,
+    #             count: tag.users.count,
+    #         }
+    #     # NovelTags
+    #     elsif tags_type ==="series_tag"
+    #         return {
+    #             tag_id: tag.id,
+    #             tag_name: tag.novel_tag_name,
+    #             count: tag.novel_series.count,
+    #         }
+    #     # NovelSeries編集用のNovelTags
+    #     # ["タグ1", "タグ2"]のような形で取得
+    #     elsif tags_type === 'edit_of_series'
+    #         tag.novel_tag_name
+    #     end
+    # end
 # tags ====================================================================================
 
 # error 不正なデータ取得をしてしまった際のレスポンス========================================
@@ -271,7 +230,7 @@ class ApplicationController < ActionController::Base
     #render_json データが存在しない場合に返すJSONレスポンス
     def return_not_present_data
         render json: {
-            status: 500,
+            head: :no_content,
             errors: "作品が存在しないため、アクセスできません。",
             keyword: "not_present"
         }
@@ -279,9 +238,8 @@ class ApplicationController < ActionController::Base
 
     #render_json データが非公開の場合に返すレスポンス
     def return_unrelease_data
-        # React側へ送信するJSONデータ
         render json: {
-            status: 200,
+            status: :forbidden,
             messages: "現在この作品は非公開となっています。",
             keyword: "unrelease"
         }

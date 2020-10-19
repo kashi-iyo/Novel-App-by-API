@@ -9,8 +9,7 @@ class Api::V1::NovelsController < ApplicationController
 
     #Read Novelオブジェクトを1件取得
     def show
-        # Applicationコントローラで生成した1件のNovelオブジェクトをJSONとしてレンダリング
-        helpers.create_new_novel_object(@novel_series, @novel_in_series)
+        read_object_to_render(@novel_series, @novel_in_series, "show_of_novels")
     end
 
 

@@ -10,19 +10,12 @@ class Api::V1::NovelSeriesController < ApplicationController
     #Read NovelSeriesオブジェクト全件をJSONとしてレンダリング
     def index
         series = NovelSeries.all
-        @series = helpers.return_all_series_object(series)
-        render json: {
-            status: 200,
-            series_count: @series.count,
-            series: @series,
-            keyword: "index_of_series"
-        }
+        read_object_to_render(series, {}, "index_of_series")
     end
 
     #read 1つのNovelSeries／そのNovelSeriesが持つNovels全件をJSONとしてレンダリング
     def show
-        # ApplicationControllerでNovelSeriesのオブジェクトを生成し、そのJSONデータをレンダリングする
-        helpers.create_new_series_object(@novel_series, "one_of_series_data")
+        read_object_to_render(@novel_series, {}, "show_of_series")
     end
 
     #Create 引数に渡されるデータに基づいて、新規のオブジェクトをCreate・Saveする

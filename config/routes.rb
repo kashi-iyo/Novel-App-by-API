@@ -8,7 +8,6 @@ Rails.application.routes.draw do
         resources :novel_series, only: [:index, :show, :edit, :create, :update, :destroy] do
           resources :novels, only: [:show, :edit, :create, :update, :destroy]
         end
-        resources :novel_tags, only: [:show]
       end
     end
   # ===================================================
@@ -17,10 +16,9 @@ Rails.application.routes.draw do
     namespace :api do
       namespace :v1 do
         resources :user_tags, only: [:index, :show]
+        resources :novel_tags, only: [:index, :show]
       end
     end
-    # シリーズタグフィード
-    get '/api/v1/series_tags_feed', to: 'api/v1/novel_tags#tags_feed'
   # ==================================================
 
   # コメント/お気に入り================================

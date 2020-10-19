@@ -9,167 +9,313 @@ module NovelSeriesHelper
     # render_json： JSONデータのレンダリングはhelperで行えないのでApplicationControllerにて行っている。
     # generate_original_object
 
-#! シリーズ全件／1件のシリーズを表示するために必要なオブジェクトを取得する=========================
+#generate_original_object React側で使用するために、オブジェクトを新たな形に構築する=========================
 
-        #read create_new_series_object()で作成したNovelSeriesオブジェクト全件を返す
-        #read NovelSeries#indexにて使用
-        def return_all_series_object(data)
-            data.map do |value|
-                # if data_type === "all_series"
-                    #validates シリーズが公開されている場合。ここではrelease?()メソッドは使用しない
-                    if !!value[:release]
-                        #generate_original_object 個々の新たなシリーズデータを生成
-                        create_new_series_object(value, "all_of_series_data")
-                    #validates シリーズが非公開の場合
-                    elsif !value[:release]
-                        {}
-                    end
-                # elsif data_type === "user_tag"
-                #     return_new_tag_object(value, "user_tag")
-                # elsif data_type ==="series_tag"
-                #     return_new_tag_object(value, "series_tag")
-                # elsif data_type === "user"
-                #     return_new_user_object(value)
-                # #! NovelSeries編集用のNovelTagsオブジェクトを返す
-                # elsif data_type === "edit_of_series"
-                #     return_new_tag_object(value, "edit_of_series")
-                # end
+        #generate_original_object data_typeによって生成するオブジェクトを条件分岐
+        def return_object_by_data_type(object, object2, data_type)
+            case data_type
+            # object = NovelSeries
+            when "index_of_series"
+                series = generate_object_from_arr(object, data_type)
+                {
+                    series_count: series.count,
+                    all_series: series,
+                }
+            when "show_of_users_in_tag", "show_of_series_in_tag"
+                objects = generate_object_from_arr(object, data_type)
+                tag = return_tag_object(object2, data_type)
+                {
+                    tag: tag,
+                    objects_count: objects.count,
+                    objects: objects,
+                }
+            when "index_of_series_tags", "index_of_user_tags"
+                generate_object_from_arr(object, data_type)
+            when "show_of_series"
+                create_new_series_object(object, data_type)
+            when "show_of_novels"
+                # object = series1件, novel1件
+                create_new_novel_object(object, object2, data_type)
             end
         end
 
-        #generate_original_object 渡されたdataに基づいて新たなNovelSeriesオブジェクトを生成、return_all_series_data(), NovelSeries#showにて使用
-        def create_new_series_object(series, data_type)
-            #! NovelSeriesオブジェクトの所有するNovels(@novels)/Novelsの総数(@novels_count)/登録されているNovelTags(@series_tags)を返す
-            return_novels_and_novels_count_and_tags(series, true)
-            # Novelオブジェクトが獲得したNovelFavorites(@favorites_count)/Comments(@comments_count)を返す
-            return_count_of_favorites_and_comments(@novels)
-            # #! novels NovelSeriesオブジェクトを全件取得したい場合
-            if data_type === "all_of_series_data"
-                #render_json JSONデータをレンダリング
-                render_series_object(
-                    series,
-                    @novels_count,
-                    @favorites_count,
-                    @comments_count,
-                    @series_tags,
-                    {},
-                    # "index_of_series"
-                )
-            #! novels NovelSeriesオブジェクトを1件取得したい場合
-            elsif data_type === "one_of_series_data"
+        #generate_original_object 配列データを新たなオブジェクト形式へ造り変える
+        def generate_object_from_arr(array, data_type)
+            array.map do |data|
+                case data_type
+                # ! NovelSeriesオブジェクトを返す
+                when "index_of_series", "show_of_series_in_tag"
+                    #validates シリーズが公開されている場合。ここではrelease?()メソッドは使用しない
+                    if !!data[:release]
+                        create_new_series_object(data, data_type)
+                    #validates シリーズが非公開の場合
+                    elsif !data[:release]
+                        {}
+                    end
+                # NovelFavoritesをカウントしたデータを返す
+                when "items_counter_in_favo", "items_counter_in_com"
+                    items_counter(data, data_type)
+                # NovelFavoritesオブジェクトを返す
+                when "call_create_favorites_object"
+                    create_favorites_object(data, data_type)
+                #! Novelsオブジェクトをお気に入りしたユーザーを返す
+                when "call_favorites_data"
+                    favorites_data(data, data_type)
+                # Commentsオブジェクトを返す
+                when "comments_in_series", "comments_in_novel"
+                    create_comments_object(data, data_type)
+                when "call_comments_data"
+                    comments_data(data, data_type)
+                # UserTags / NovelTagsオブジェクトを返す
+                when "index_of_series_tags", "edit_of_series", "index_of_user_tags"
+                    return_tag_object(data, data_type)
+                #! Novelsオブジェクトを返す
+                when "show_of_users_in_tag"
+                    return_user_object(data, data_type)
+                end
+            end
+        end
+
+        #generate_original_object NovelSeriesオブジェクトを生成
+        def create_new_series_object(object, data_type)
+            #! NovelSeriesデータの生成
+            @series = return_series_data(object, data_type)
+            #! Novelsデータ / NovelFavoritesデータ / Commentsデータ生成
+            @novels = return_novels_object(object, {}, data_type)
+            #! NovelTagsデータ生成
+            @tags = generate_object_from_arr(object.novel_tags, "index_of_series_tags")
+            case data_type
+            #! NovelSeries#index, NovelTags#showの場合
+            when "index_of_series", "show_of_series_in_tag"
+                return_series_object(@series, @novels, @tags)
+            #! NovelSeries#show / Novels#showの場合
+            when "show_of_series", "show_of_novels"
                 # validates 公開の場合／もしくは非公開でもログインユーザーと同じだった場合
-                if release?(series)
-                    render_series_object(
-                        series,
-                        @novels_count,
-                        @favorites_count,
-                        @comments_count,
-                        @series_tags,
-                        @novels,
-                        "show_of_series"
-                    )
+                if release?(object)
+                    case data_type
+                    when "show_of_series"
+                        return_series_object(@series, @novels, @tags)
+                    end
                 # validates 非公開の場合
-                elsif !release?(series)
+                elsif !release?(object)
                     #render_json JSONデータをレンダリング
                     return_unrelease_data()
                 end
             end
         end
 
-        #generate_original_object 1件のNovelSeriesが所有するNovels全件のデータ/Novelsの総数/NovelTagsを返す。create_new_series_object(), create_new_novel_object()にて使用
-        def return_novels_and_novels_count_and_tags(series_data, data_type)
-            #! 1つのNovelSeriesの持つNovels全件
-            @novels = Novel.where(novel_series_id: series_data.id)
-            #! Novels全件の総数
-            @novels_count = @novels.count
-            #! data_typeがtrueの場合はNovelTagsオブジェクトが欲しいので、NovelTagsオブジェクトを生成
-            if !!data_type
-                @series_tags = series_data.novel_tags.map { |tag|
-                    ["tag_id": tag.id, "tag_name": tag.novel_tag_name]
-                }.flatten
-            end
-        end
-
-        #generate_original_object NovelSeries1件が持つNovels全件が獲得したNovelFavoritesの数／Commentsの数を返す。create_new_series_object()にて使用
-        def return_count_of_favorites_and_comments(novels)
-            count = novels.map do |novel|
-                [
-                    "favorites_count": novel.novel_favorites.count,
-                    "comments_count": novel.comments.count
-                ]
-            end
-            @favorites_count = count.flatten.sum {|hash| hash[:favorites_count]}
-            @comments_count = count.flatten.sum{|hash| hash[:comments_count]}
-        end
-#=================================================================================================
-
-#! 1つのシリーズが所有する小説1件の内容を表示するために必要なオブジェクトを取得する================
-
-    #generate_original_object 新たに1件のNovelsオブジェクトを生成する。NovelsControllerのshowアクションにて使用
-    def create_new_novel_object(series_data, novel_data)
-        # validates 公開されている場合
-        if release?(novel_data)
-            #! Novels全件(@novels)／Novelsの総数(@novels_count)を取得
-            return_novels_and_novels_count_and_tags(series_data, false)
-            #! お気に入りをしたUsersのデータ(@favorites_data)／NovelFavoritesの数(@favorites_count)
-            data_of_favorites_in_novel(novel_data)
-            # コメントをしたUsersのデータ(@comments_data)／Commentsの数(@comments_count)
-            data_of_comments_in_novel(novel_data)
-            # render_json JSONデータを返す
-            return_new_one_novel_object(
-                series_data,
-                novel_data,
-                @novels_count,
-                @favorites_data,
-                @favorites_count,
-                @comments_data,
-                @comments_count,
-                "show_of_novels"
-            )
-        # validates 非公開の場合
-        elsif !release?(novel_data)
-            #render_json JSONデータをレンダリング
-            return_unrelease_data()
-        end
-    end
-
-    # generate_original_object 小説1件に対するお気に入りデータ。create_new_novel_object()メソッドにて使用
-    def data_of_favorites_in_novel(novel)
-        # もしお気に入りされていない場合は、空の配列を返す。これは、React側でfavorites_idによってお気に入りの有無を判別するため
-        if novel.novel_favorites === []
-            @favorites_data = [
-                favorites_id: "",
-            ]
-        # このお気に入りデータのID、お気に入りしたユーザー、そのユーザーのID、お気に入りされた小説のIDを返す
-        else
-            @favorites_data = novel.novel_favorites.map do |favorite|
-                {
-                    favorites_id: favorite.id,
-                    favorites_user_id: favorite.user_id,
-                    favorites_novel_id: favorite.novel_id,
-                    favoriter: favorite.favoriter,
+        def return_series_data(series, data_type)
+            case data_type
+            when "show_of_novels"
+                return {
+                    series_id: series.id,
+                    user_id: series.user_id,
+                    author: series.author,
+                    release: series.release,
+                    series_title: series.series_title,
+                    series_description: series.series_description,
                 }
             end
         end
-        # お気に入り数
-        @favorites_count = novel.novel_favorites.count
-    end
 
-    #generate_original_object 小説1件に対するコメントデータ。create_new_novel_object()メソッドにて使用
-    def data_of_comments_in_novel(novel)
-        # このコメントのID、コメントをしたユーザーとユーザーのID、コメントを残された小説のID、コメントの内容
-        @comments_data = novel.comments.map do |comment|
-            {
-                comment_id: comment.id,
-                comment_user_id: comment.user_id,
-                comment_novel_id: comment.novel_id,
-                content: comment.content,
-                commenter: comment.commenter,
+        #generate_original_object 新たな構造の1件のNovelsオブジェクトを生成する。
+        def create_new_novel_object(series_data, novel_data, data_type)
+            # validates 公開されている場合
+            if release?(novel_data)
+                series = return_series_data(series_data, data_type)
+                #! Novelsオブジェクト
+                novel = return_novels_object(novel_data, data_type)
+                # NovelFavoritesオブジェクト
+                favorites = create_favorites_object(novel_data, data_type)
+                # Commentsオブジェクト
+                comments = create_comments_object(novel_data, data_type)
+                #! Novelsオブジェクトを返す
+                return_new_one_novel_object(series, novel, favorites, comments)
+            # validates 非公開の場合
+            elsif !release?(novel_data)
+                #render_json JSONデータをレンダリング
+                return_unrelease_data()
+            end
+        end
+
+        #generate_original_object
+        #! Novelsオブジェクト / Novels総数 / NovelFavoritesオブジェクト / Commentsオブジェクト生成
+        def return_novels_object(novel_data, data_type)
+            # NovelFavorites総数
+            # favorites_object = create_favorites_object(@novels, "call_create_favorites_object")
+            # # Comments総数
+            # comments_object = create_comments_object(@novels, "comments_in_series")
+            case data_type
+            when "show_of_series", "index_of_series", "show_of_series_in_tag"
+                #! Novels全件
+                # @novels = series_data.novels
+                # return_novels_data(@novels, data_type)
+                    # {
+                    #!     novels_count: novels_count,
+                    #     favorites_count: favorites_object,
+                    #     comments_count: comments_object,
+                    # }
+                    # {
+                    #!     novels_count: novels_count,
+                    #     favorites_count: favorites_object,
+                    #     comments_count: comments_object,
+                    #!    novels: @novels,
+                    # }
+            when "show_of_novels"
+                return {
+                    novel_id: novel_data.id,
+                    release: novel_data.release,
+                    novel_title: novel_data.novel_title,
+                    novel_description: novel_data.novel_description,
+                    novel_content: novel_data.novel_content,
+
+                }
+                # {
+                #!     novels_count: novels_count,
+                #!     novels: @novels,
+                #     favorites_object: favorites_object,
+                #     commenst_object: comments_object,
+                # }
+
+            end
+        end
+
+        # NovelFavoritesの数 / Commentsの数
+        # それぞれの値の合計値を算出するには、一旦generate_object_from_arr()を介す必要がある。
+        # item = novel
+        def items_counter(item, data_type)
+            case data_type
+            when "items_counter_in_favo"
+                [favorites_count: item.novel_favorites.count]
+            when "items_counter_in_com"
+                [comments_count: item.comments.count]
+            end
+        end
+
+        #! NovelFavoritesオブジェクト
+        def create_favorites_object(novel_data, data_type)
+            case data_type
+            #! NovelSeriesから取得する場合
+            when "call_create_favorites_object"
+                # NovelFavoritesの総数
+                count = generate_object_from_arr(novel_data, "items_counter_in_favo")
+                count.flatten.sum {|hash| hash[:favorites_count]}
+            #! Novelから取得する場合
+            when "show_of_novels"
+                if novel_data.novel_favorites === []
+                    return {
+                        favorites_count: novel_data.novel_favorites.count,
+                        favorites_id: "",
+                    }
+                else
+                    return {
+                        favorites_count: novel_data.novel_favorites.count,
+                        favorites_data: generate_object_from_arr(novel_data.novel_favorites, "call_favorites_data"),
+                    }
+                end
+            end
+        end
+
+        #! Novelsにされたお気に入り1件のデータフォーマット
+        def favorites_data(favorites, data_type)
+            case data_type
+            when "call_favorites_data"
+                return {
+                    favorites_id: favorites.id,
+                    favorites_user_id: favorites.user_id,
+                    favorites_novel_id: favorites.novel_id,
+                    favoriter: favorites.favoriter,
+                }
+            end
+        end
+
+        # Commentsオブジェクト生成
+        def create_comments_object(novel_data, data_type)
+            case data_type
+            #! NovelSeriesから取得する場合
+            when "comments_in_series"
+                # Novelの持つコメント数
+                count = generate_object_from_arr(novel_data, "items_counter_in_com")
+                # コメント総の合計値
+                count.flatten.sum{|hash| hash[:comments_count]}
+            # Novelから取得する場合
+            when "show_of_novels"
+                return {
+                    comments_count: novel_data.comments.count,
+                    comments_data: generate_object_from_arr(novel_data.comments, "call_comments_data"),
+                }
+            end
+        end
+
+        #! Novelsにされたコメント1件のデータフォーマット
+        def comments_data(comment, data_type)
+            case data_type
+            when "call_comments_data"
+                return {
+                    comment_id: comment.id,
+                    comment_user_id: comment.user_id,
+                    comment_novel_id: comment.novel_id,
+                    comment_content: comment.content,
+                    comment_commenter: comment.commenter,
+                }
+            end
+        end
+
+        # NovelTags / UserTags
+        #generate_original_object タグ系のオブジェクト構造フォーマット
+        def return_tag_object(tag, tags_type)
+            case tags_type
+            #! NovelSeries#index, show, NovelTags#index, show
+            when "index_of_series_tags", "show_of_series_in_tag", "other_series_case"
+                return {
+                    tag_id: tag.id,
+                    tag_name: tag.novel_tag_name,
+                    count: tag.novel_series.count,
+                }
+            # UserTags#index, show
+            when "index_of_user_tags", "show_of_users_in_tag"
+                return {
+                    tag_id: tag.id,
+                    tag_name: tag.user_tag_name,
+                    count: tag.users.count,
+                }
+            #! NovelSeries#edit
+            # ["タグ1", "タグ2"]のような形で取得。(React側では配列として扱いたいため)
+            when 'edit_of_series'
+                tag.novel_tag_name
+            end
+        end
+
+        #generate_original_object ユーザーオブジェクト構造のフォーマット
+        def return_user_object(user, user_type)
+            if user_type === "show_of_users_in_tag"
+                return {
+                    user_id: user.id,
+                    nickname: user.nickname,
+                    profile: user.profile,
+                }
+            end
+        end
+
+        #generate_original_object NovelSeriesのオブジェクト構造のフォーマット
+        def return_series_object(series, novels, tags)
+            return {
+                series: series,
+                novels: novels,
+                tags: tags,
             }
         end
-        # コメント数
-        @comments_count = novel.comments.count
-    end
+
+
+        #generate_original_object 新たな構造のNovelsオブジェクトのフォーマット。
+        def return_new_one_novel_object(series, novel, favorites, comments)
+            return {
+                series: series,
+                novel: novel,
+                favorites: favorites,
+                comments: comments
+            }
+        end
 # =================================================================================================
 
 
@@ -270,6 +416,7 @@ module NovelSeriesHelper
         end
     end
 
+    #Destroy オブジェクトをDestroy
     def destroy_object(object, data_type)
         #validates データを削除
         if object.destroy
