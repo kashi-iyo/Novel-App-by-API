@@ -9,7 +9,7 @@ class Api::V1::NovelsController < ApplicationController
 
     #Read Novelオブジェクトを1件取得
     def show
-        read_object_to_render(@novel_series, @novel_in_series, "show_of_novels")
+        read_object_to_render(@novel_series, @novel_in_series, "Novels#show")
     end
 
 

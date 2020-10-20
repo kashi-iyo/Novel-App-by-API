@@ -5,13 +5,13 @@ class Api::V1::UserTagsController < ApplicationController
     #Read 趣味タグフィード
     def index
         tags = UserTag.all
-        read_object_to_render(tags, {}, "index_of_user_tags")
+        read_object_to_render(tags, {}, "UserTags#index")
     end
 
     # 取得したタグに関連づけられているユーザーを取得
     def show
         users = @tag.users
-        read_object_to_render(users, @tag, "show_of_users_in_tag")
+        read_object_to_render(users, @tag, "UserTags#show")
     end
 
 

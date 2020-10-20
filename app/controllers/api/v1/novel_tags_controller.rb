@@ -5,13 +5,13 @@ class Api::V1::NovelTagsController < ApplicationController
     #Read NovelTagsフィード
     def index
         tags = NovelTag.all
-        read_object_to_render(tags, {}, "index_of_series_tags")
+        read_object_to_render(tags, {}, "NovelTags#index")
     end
 
     #Read NovelTagsに関連付けられているNovelSeries
     def show
         novel_series = @tag.novel_series
-        read_object_to_render(novel_series, @tag, "show_of_series_in_tag")
+        read_object_to_render(novel_series, @tag, "NovelTags#show")
     end
 
     private
