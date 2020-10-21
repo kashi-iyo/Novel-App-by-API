@@ -13,25 +13,8 @@ class UsersController < ApplicationController
     end
 
     def show
-        @users_series = @user.novel_series.all  # ユーザーのシリーズ
-        @series_count = @user.novel_series.count.to_s   # シリーズ総数
-        count_in_series(@users_series)    # シリーズが持つ小説総数
-        @favorite_series = @user.user_favorites_series  # お気に入りにしたシリーズ
-        @favorite_series = @favorite_series.to_a    # お気に入りしたシリーズをArray化
-        count_in_series(@favorite_series)   # お気に入りしたシリーズが持つ小説総数
-        @favorite_series_count = @favorite_series.count.to_s    # お気に入りシリーズの総数
-        @user_tags = @user.user_tags    #趣味タグ全件
         if @user
-            render json: {
-                status: 200,
-                user: @user,
-                user_tags: @user_tags,
-                users_series: @users_series,
-                series_count: @series_count,
-                favorite_series: @favorite_series,
-                favorite_series_count: @favorite_series_count,
-                keyword: "show_of_user"
-            }
+            read_object_to_render(@user, {}, "Users#show")
         else
             render json: { status: 500, errors: ['ユーザーが見つかりません'] }
         end

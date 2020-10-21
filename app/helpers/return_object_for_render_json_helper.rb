@@ -1,7 +1,7 @@
 module ReturnObjectForRenderJsonHelper
 
 
-# Applicationコントローラへ渡すオブジェクト===============================================
+#! Applicationコントローラへ渡すオブジェクト
 
         #! 新たに生成したNovelSeriesオブジェクト全件を返す
         def return_all_series_object_for_render_json(series, tag, data_type)
@@ -46,6 +46,18 @@ module ReturnObjectForRenderJsonHelper
                 tag: tag,
                 users_count: users.count,
                 users: users,
+            }
+        end
+
+        # Userプロフィールページにて扱うオブジェクト
+        def return_users_page_object_for_render_json(user, tag, user_series, user_favorites_series)
+            return {
+                # user: user,
+                tags: tag,
+                # user_series: user_series,
+                # user_series_count: user_series.count,
+                # user_favorites_series: user_favorites_series,
+                # user_favorites_series_count: user_favorites_series.count,
             }
         end
 # =================================================================================================
