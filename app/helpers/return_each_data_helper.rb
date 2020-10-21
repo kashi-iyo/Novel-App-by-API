@@ -1,7 +1,5 @@
 module ReturnEachDataHelper
 
-    # include NovelSeriesHelper
-
 # 各オブジェクトのデータフォーマット============================================================
 
     #! NovelSeries1件のデータフォーマット
