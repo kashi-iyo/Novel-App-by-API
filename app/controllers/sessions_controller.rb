@@ -1,42 +1,29 @@
 class SessionsController < ApplicationController
 
+    before_action :logged_in?, only: [:login, :is_logged_in?, :logout]
+    before_action :set_user, only: [:login]
+    before_action :current_user, only: [:is_logged_in?, :logout]
+
     def login
-        @user = User.find_by(email: session_params[:email])
-        if logged_in? && current_user
-            render json: { status: 401, errors: "不正なアクセスです。" }
-        else
-            if @user && @user.authenticate(session_params[:password])
-                login!
-                render json: { logged_in: true, user: @user }
-            else
-                render json: { status: 401, errors: "入力された内容に誤りがあります。" }
-            end
-        end
+        helpers.pass_object_for_sessions(@user, session_params[:password], "login")
     end
 
     def is_logged_in?
-        if logged_in? && current_user
-            @user_id = @current_user.id
-            render json: { logged_in: true, user: @current_user, user_id: @user_id }
-        else
-            render json: { logged_in: false, message: "ユーザーが存在しません" }
-        end
+        helpers.pass_object_for_sessions(@current_user.id, {}, "is_logged_in?")
     end
 
     def logout
-        if current_user
-            reset_session
-            render json: { status: 200, logged_out: true }
-        else
-            render json: { status: 401, errors: "不正なアクセスです。" }
-        end
-
+        helpers.pass_object_for_sessions({}, {}, "logout")
     end
 
     private
 
         def session_params
             params.require(:user).permit(:email, :password)
+        end
+
+        def set_user
+            @user = User.find_by(email: session_params[:email])
         end
 
 end

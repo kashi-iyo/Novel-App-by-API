@@ -1,9 +1,10 @@
 module ApplicationHelper
 
-        include ReturnObjectForRenderJsonHelper
-        include ReturnEachDataHelper
-        include ReturnGeneratedObjectFromArrayHelper
-        include ReturnObjectForCrudHelper
+    include ReturnGeneratedObjectFromArrayHelper
+    include ReturnEachDataHelper
+    include GenerateOriginalObjectHelper
+    include ReturnObjectForCrudHelper
+    include ReturnObjectForRenderJsonHelper
 
 #! React側で使用するために、data_typeに基づいて取得したデータをオリジナルのオブジェクトに構築し直す。
 #! 構築したオブジェクトは、Applicationコントローラのメソッドへ渡しJSONデータをレンダリングする。
@@ -42,11 +43,11 @@ module ApplicationHelper
             end
         #! object = NovelSeries1件
         when "NovelSeries#show"
-            # Series1件（Novels全件・コメント合計値・お気に入り合計値などを持つ）を返す
+            # Series1オブジェクト件（Novels全件・コメント合計値・お気に入り合計値などを持つ）を返す
             generate_original_series_object(object, data_type)
         #! object = NovelSeries1件, object2 = Novel1件
         when "Novels#show"
-            # Novels1件（Series1件に紐付けされたオリジナルのオブジェクト）
+            # Novelsオブジェクト1件（Series1件に紐付けされたオリジナルのオブジェクト）
             generate_original_novel_content_object(object, object2, data_type)
         when "Users#show"
             # Userオブジェクト1件（ユーザーが投稿したSeries/お気に入りしたSeriesなど）
