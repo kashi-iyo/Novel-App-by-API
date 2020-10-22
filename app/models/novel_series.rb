@@ -37,26 +37,4 @@ class NovelSeries < ApplicationRecord
     end
   end
 
-  # 小説の総お気に入り数取得
-  def count_favorites(novel_series)
-    novel_series.tap do |series|
-      @novels =  [series.novels]
-    end
-    @novels = @novels.flatten
-    series_favorites = @novels.map do |novel|
-        ["favorites_count": novel.novel_favorites.count]
-    end
-    series_favorites = series_favorites.flatten
-    series_favorites.sum {|hash| hash[:favorites_count]}
-  end
-
-  # タグ編集用のシリーズが所有するタグを取得
-  # ["タグ1", "タグ2"]のような形で取得
-  def series_tags_for_edit
-    series_tags = self.novel_tags
-    return series_tags.map{ |tags|
-        [tags.novel_tag_name]
-    }.flatten
-  end
-
 end

@@ -30,18 +30,6 @@ class User < ApplicationRecord
 
     validates :profile, length: { maximum: 200 }
 
-
-    # ユーザーがお気に入りしたシリーズを取得
-    def user_favorites_series
-        novel_favorite = self.novel_favorites
-        series_id = novel_favorite.map {|favorite|
-            ["novel_series_id", favorite.novel["novel_series_id"]]
-        }.to_h
-        series_id.map { |id|
-            NovelSeries.where(id: id)
-        }.flatten
-    end
-
     # 趣味タグを作成
     def save_user_tag(sent_tags)
         current_tags = self.user_tags.pluck(:user_tag_name) unless self.user_tags.nil?
@@ -58,15 +46,15 @@ class User < ApplicationRecord
         end
     end
 
-    # 編集用の趣味タグデータを取得
-    def edit_user_tags
-        tags = self.user_tags
-        @tags = tags.map do |tag|
-            [tag.user_tag_name]
-        end
-        user_tags = []
-        user_tags.push(@tags)
-        user_tags.flatten!
-    end
+    # # 編集用の趣味タグデータを取得
+    # def edit_user_tags
+    #     tags = self.user_tags
+    #     @tags = tags.map do |tag|
+    #         [tag.user_tag_name]
+    #     end
+    #     user_tags = []
+    #     user_tags.push(@tags)
+    #     user_tags.flatten!
+    # end
 
 end

@@ -26,9 +26,9 @@ Rails.application.routes.draw do
       namespace :v1 do
         resources :novels do
           # コメント
-          resources :comments, only: [:index, :create, :destroy]
+          resources :comments, only: [:create, :destroy]
           # お気に入り
-          resources :novel_favorites, only: [:index, :create, :destroy]
+          resources :novel_favorites, only: [:create, :destroy]
         end
       end
     end
