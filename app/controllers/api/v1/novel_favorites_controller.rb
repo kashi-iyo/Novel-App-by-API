@@ -2,27 +2,26 @@ class Api::V1::NovelFavoritesController < ApplicationController
 
     before_action :logged_in_user, only: [:create, :destroy]
     before_action :set_novel, only: [:create]
+    before_action :set_favorites, only: [:destroy]
 
-    # お気に入りON
+    #Create お気に入りON
     def create
-        # お気に入り済み→エラー／お気に入りしてない→成功
+        #! お気に入り済み→エラー／お気に入りしてない→成功
         if @novel_in_series.favorited_by?(current_user)
-            render json: {
-                status: :unprocessable_entity,
-                errors: "すでにお気に入り済みです。"
-            }
+            already_existing_favorites()
         else
             @novel_favorite = current_user.novel_favorites.new(favorite_params)
-            @novel_favorite.save
-            render json: {status: :created}
+            helpers.create_and_save_object(
+                @novel_favorite,    #object
+                {},                 #association_data
+                "favorites",        #data_type
+            )
         end
     end
 
-    # お気に入りOFF
+    #Destroy お気に入りOFF
     def destroy
-        @novel_favorite = NovelFavorite.find_by(novel_id: params[:novel_id], user_id: params[:id])
-        @novel_favorite.destroy
-        render json: {head: :no_content}
+        helpers.pass_object_to_crud(@novel_favorite, {}, {}, "favorites", "destroy")
     end
 
     private
@@ -35,6 +34,10 @@ class Api::V1::NovelFavoritesController < ApplicationController
         # シリーズが所有する小説1話分を取得
         def set_novel
             @novel_in_series = Novel.find_by(id: params[:novel_id])
+        end
+
+        def set_favorites
+            @novel_favorite = NovelFavorite.find_by(novel_id: params[:novel_id], user_id: params[:id])
         end
 
 end

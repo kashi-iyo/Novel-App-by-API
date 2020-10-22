@@ -7,30 +7,23 @@ class Api::V1::CommentsController < ApplicationController
 
     def create
         @comment = current_user.comments.new(comment_params)
-        if @comment.save
-            # コメント用のデータフォーマット作成(@comments_data)
-            data_of_comments_in_novel(@novel)
-            render json: {
-                status: :created,
-                comment: @comments_data[0],
-                successful: ["正常に送信されました。"],
-                keyword: "create_comment"
-            }
-        else
-            render json: {
-                errors: ["入力内容に誤りがあります。"],
-                status: :unprocessable_entity
-            }
-        end
+        helpers.pass_object_to_crud(
+            @comment,   #object
+            {},         #params
+            @novel,     #association_data
+            "comment",  #data_type
+            "create"    #crud_type
+        )
     end
 
     def destroy
-        if authorized?(@comment)
-            @comment.destroy
-            render json: { head: :no_content, success: "正常に削除されました。" }
-        else
-            handle_unauthorized(@comment)
-        end
+        helpers.pass_object_to_crud(
+            @comment,   #object
+            {},         #params
+            {},         #association_data
+            "comment",  #data_type
+            "destroy"   #crud_type
+        )
     end
 
     private
@@ -40,11 +33,19 @@ class Api::V1::CommentsController < ApplicationController
     end
 
     def set_novel
-        @novel = Novel.find_by(id: params[:novel_id])
+        if Novel.find_by(id: params[:novel_id]).nil?
+            return_not_present_data()
+        else
+            @novel = Novel.find_by(id: params[:novel_id])
+        end
     end
 
     def set_comment
-        @comment = Comment.find_by(id: params[:id], novel_id: params[:novel_id])
+        if Comment.find_by(id: params[:id], novel_id: params[:novel_id]).nil?
+            return_not_present_data()
+        else
+            @comment = Comment.find_by(id: params[:id], novel_id: params[:novel_id])
+        end
     end
 
 end

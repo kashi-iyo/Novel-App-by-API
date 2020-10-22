@@ -4,11 +4,12 @@ module ReturnEachDataHelper
 
 #Series===============================================
 
-    #Series1件のデータフォーマット
+    #Seriesのデータフォーマット
     def return_series_data(data_for_series, data_type)
         case data_type
         #! data_for_series = Seriesデータ
         when "NovelSeries#index", "NovelSeries#show", "Novels#show", "NovelTags#show", "Users#show"
+            # Seriesのデータを返す
             return {
                 series_id: data_for_series.id,
                 user_id: data_for_series.user_id,
@@ -17,16 +18,14 @@ module ReturnEachDataHelper
                 series_title: data_for_series.series_title,
                 series_description: data_for_series.series_description,
             }
-        #! data_for_series = Favoritesデータ1件
-        when "call_user_favorites_series_id"
-            ["novel_series_id", data_for_series.novel.novel_series_id]
-        #! data_for_series = お気に入りデータが持つseries_id
-        when "call_user_favorites_series_data"
-            return NovelSeries.where(id: data_for_series)
+        #! data_for_series = お気に入りにしたSeriesのデータ
+        when "call_user_favorites_series"
+            # Seriesのidのみを返す
+            data_for_series.novel.novel_series_id
         end
     end
 
-    #Seriesを全件で取得する場合のオリジナルのNovelSeriesデータフォーマット
+    # Seriesのオリジナルのデータフォーマット
     def return_original_series_data(series, novel, tag, data_type)
         case data_type
         when "NovelSeries#index", "NovelTags#show", "Users#show"
@@ -93,7 +92,7 @@ module ReturnEachDataHelper
     #! Series1件／Novels1件を取得する際に得られるお気に入りデータ
     def return_original_favorites_data(data_for_favorites, data_type)
         case data_type
-        when "NovelSeries#index", "NovelTags#show", "NovelSeries#show"
+        when "NovelSeries#index", "NovelTags#show", "NovelSeries#show", "Users#show"
             # Favorite数の合計値
             return data_for_favorites.flatten.sum {|hash| hash[:favorites_count]}
         when "Novels#show"
@@ -136,7 +135,7 @@ module ReturnEachDataHelper
     #Comment全件のオリジナルデータ
     def return_original_comments_data(data_for_comments, data_type)
         case data_type
-        when "NovelSeries#index", "NovelTags#show", "NovelSeries#show"
+        when "NovelSeries#index", "NovelTags#show", "NovelSeries#show", "Users#show"
             #Comment コメント総の合計値
             data_for_comments.flatten.sum{|hash| hash[:comments_count]}
         when "Novels#show"
@@ -167,8 +166,8 @@ module ReturnEachDataHelper
 
 #Comment==============================================
 
-#Stags================================================
-#Utags================================================
+#Stags（SeriesTags）================================================
+#Utags（UserTags）================================================
 
     #STags SeriesTags1件のデータフォーマット
     #UTags UserTags1件のデータフォーマット
@@ -184,13 +183,13 @@ module ReturnEachDataHelper
             return {
                 tag_id: tag.id,
                 tag_name: tag.user_tag_name,
-                count: tag.users.count,
+                users_count: tag.users.count,
             }
-        #Stag ["タグ1", "タグ2"]のような形で取得。(React側では配列として扱いたいため)
+        #Stag SeriesTag編集用データ ["タグ1", "タグ2"]のような形で取得。(React側では配列として扱いたいため)
         when 'edit_of_series'
             tag.novel_tag_name
-        when "ユーザータグ編集"
-            # ユーザータグ編集用データ
+        #Utag UserTag編集用データ
+        when "User_edit"
             tag.user_tag_name
         end
     end
@@ -213,6 +212,5 @@ module ReturnEachDataHelper
     end
 
 #User=================================================
-# ========================================================================================
 
 end

@@ -49,7 +49,7 @@ class Api::V1::NovelsController < ApplicationController
 
     #Destroy 引数に渡されるデータに基づいて、オブジェクトをDestroyする
     def destroy
-        helpers.pass_object_to_crud(@novel_in_series, {}, {}, "novel", "destroy")
+        helpers.pass_object_to_crud(@novel_in_series, {}, {}, "series", "destroy")
     end
 
 

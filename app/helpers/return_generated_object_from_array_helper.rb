@@ -17,25 +17,27 @@ module ReturnGeneratedObjectFromArrayHelper
                 # Favoritesをカウントしたデータ or
                 # Commentsをカウントしたデータ
                 items_counter(data, data_type)
-            when "favorites_count", "call_user_favorites_series_id"
+            when "favorites_count", "call_user_favorites_series"
                 # Favorite（新規の構造）
                 generate_original_favorites_object(data, data_type)
             when "call_return_favorites_data"
+                # Favorite（Favoritesモデルの元の構造）を返す
                 return_favorites_data(data, data_type)
-            # Commentsオブジェクトを返す
             when "comments_count", "comments_in_novel"
+                # Commentsオブジェクトを返す
                 generate_original_comments_object(data, data_type)
             when "call_return_comments_data"
+                # Comment（Commentsモデルの元の構造）を返す
                 return_comments_data(data, data_type)
-            #UTags UserTagsオブジェクト or
-            #STags SeriesTagsオブジェクトを返す
-            when "call_return_tag_data", "edit_of_series", "UserTags#index", "NovelTags#index", "get_user_tags"
+            when "get_user_tags", "call_return_tag_data", "edit_of_series", "UserTags#index", "NovelTags#index", "User_edit"
+                #UTags UserTagsオブジェクト or
+                #STags SeriesTagsオブジェクトを返す
                 return_tag_data(data, data_type)
-            # Userオブジェクトを返す
             when "UserTags#show"
+                # Userオブジェクトを返す
                 return_user_data(data, data_type)
-            # Series全件を返す（ユーザーがお気に入りにした）
             when "call_user_favorites_series_data"
+                # Series全件を返す（ユーザーがお気に入りにした）
                 return_series_data(data, data_type)
             end
         end
