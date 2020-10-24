@@ -21,36 +21,32 @@ class UsersController < ApplicationController
 
     #Edit
     def edit
-        #! 引数に渡されるデータに基づいて、Edit用のオブジェクトを取得する
         helpers.pass_object_to_crud(
-            @user,              #object
-            {},                 #params
-            @user.user_tags,    #association_data
-            "user",             #data_type
-            "edit"              #crud_type
+            object: @user,
+            association_data: @user.user_tags,
+            data_type: "user",
+            crud_type: "edit"
         )
     end
 
     #Update
     def update
         helpers.pass_object_to_crud(
-            @user,                  #object
-            update_user_params,     #params
-            @user_tags,             #association_data
-            "user",                 #data_type
-            "update"                #crud_type
+            object: @user,
+            params: update_user_params,
+            association_data: @user_tags,
+            data_type: "user",
+            crud_type: "update"
         )
     end
 
     #Create
     def create
-        @user = User.new(user_params)
         helpers.crud_object(
-            @user,      #object
-            {},         #params
-            {},         #association_data
-            "user",     #data_type
-            "create"    #crud_type
+            object: User,
+            params: user_params,
+            data_type: "user",
+            crud_type: "create"
         )
     end
 

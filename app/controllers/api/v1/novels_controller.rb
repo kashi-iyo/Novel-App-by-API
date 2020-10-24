@@ -15,35 +15,31 @@ class Api::V1::NovelsController < ApplicationController
 
     #Create 引数に渡されるデータに基づいて、新規のオブジェクトをCreate・Saveする
     def create
-        @novel = current_user.novels.new(novel_in_series_params)
         helpers.pass_object_to_crud(
-            @novel,         #object
-            {},             #params
-            @novel_series,  #association_data
-            "novel2",       #data_type
-            "create"        #crud_type
+            object: current_user.novels,
+            params: novel_in_series_params,
+            association_data: @novel_series,
+            data_type: "novel_for_create",
+            crud_type: "create"
         )
     end
 
     #Edit 引数に渡されるデータに基づいて、Edit用のオブジェクトを返す
     def edit
         helpers.pass_object_to_crud(
-            @novel_in_series,   #object
-            {},                 #params
-            {},                 #association_data
-            "novel",            #data_type
-            "edit"              #crud_type
+            object: @novel_in_series,
+            data_type: "novel",
+            crud_type: "edit"
         )
     end
 
     #Update 引数に渡されるデータに基づいて、オブジェクトをUpdateする
     def update
         helpers.pass_object_to_crud(
-            @novel_in_series,           #object
-            novel_in_series_params,     #params
-            {},                         #association_data
-            "novel",                    #data_type
-            "update"                    #crud_type
+            object: @novel_in_series,
+            params: novel_in_series_params,
+            data_type: "novel",
+            crud_type: "update"
         )
     end
 

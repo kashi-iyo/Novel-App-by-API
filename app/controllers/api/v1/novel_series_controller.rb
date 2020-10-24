@@ -9,8 +9,13 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     #Read NovelSeriesオブジェクト全件をJSONとしてレンダリング
     def index
-        series = NovelSeries.all
-        read_object_to_render(series, {}, "NovelSeries#index")
+        # series = NovelSeries.all
+        # read_object_to_render(series, {}, "NovelSeries#index")
+        crud_object(
+            object: NovelSeries.all,
+            data_type: "series",
+            crud_type: "index"
+        )
     end
 
     #read 1つのNovelSeries／そのNovelSeriesが持つNovels全件をJSONとしてレンダリング
@@ -20,35 +25,33 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     #Create 引数に渡されるデータに基づいて、新規のオブジェクトをCreate・Saveする
     def create
-        @novel_series = current_user.novel_series.new(novel_series_params)
-        helpers.pass_object_to_crud(
-            @novel_series,  #object
-            {},             #params
-            @novel_tags,    #association_data
-            "series",       #data_type
-            "create"        #crud_type
+        helpers.crud_object(
+            object: current_user.novel_series,
+            params: novel_series_params,
+            association_data: @novel_tags,
+            data_type: "series",
+            crud_type: "create"
         )
     end
 
     #Edit 引数に渡されるデータに基づいて、Edit用のオブジェクトを取得する
     def edit
         helpers.pass_object_to_crud(
-            @novel_series,              #object
-            {},                         #params
-            @novel_series.novel_tags,   #association_data
-            "series",                   #data_type
-            "edit"                      #crud_type
+            object: @novel_series,
+            association_data: @novel_series.novel_tags,
+            data_type: "series",
+            crud_type: "edit",
         )
     end
 
     #Update 引数に渡されるデータに基づいて、オブジェクトをUpdateする
     def update
         helpers.pass_object_to_crud(
-            @novel_series,          #object
-            novel_series_params,    #params
-            @novel_tags,            #association_data
-            "series",               #data_type
-            "update"                #crud_type
+            object: @novel_series,
+            params: novel_series_params,
+            association_data: @novel_tags,
+            data_type: "series",
+            crud_type: "update"
         )
     end
 

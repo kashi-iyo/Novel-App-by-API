@@ -6,13 +6,12 @@ class Api::V1::CommentsController < ApplicationController
 
 
     def create
-        @comment = current_user.comments.new(comment_params)
-        helpers.pass_object_to_crud(
-            @comment,   #object
-            {},         #params
-            @novel,     #association_data
-            "comment",  #data_type
-            "create"    #crud_type
+        helpers.crud_object(
+            object: current_user.comments,
+            params: comment_params,
+            association_data: @novel,
+            data_type: "comment",
+            crud_type: "create"
         )
     end
 

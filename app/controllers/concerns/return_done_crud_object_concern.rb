@@ -2,14 +2,76 @@ module ReturnDoneCrudObjectConcern
     extend ActiveSupport::Concern
 
     included do
-        helper_method :return_edit_object, :create_and_save_object_to_render
+        helper_method :return_edit_object, :create_and_save_object_to_render, :return_updated_object, :return_all_series_object_for_render_json, :return_one_series_object_for_render_json, :return_one_novel_object_for_render_json, :return_users_object_for_render_json, :return_users_page_object_for_render_json
     end
 
+
+    #! index / showのために取得するオブジェクト
+
+    #! 新たに生成したNovelSeriesオブジェクト全件を返す
+    def return_all_series_object_for_render_json(series, tag, data_type)
+        case data_type
+        when "NovelSeries#index"
+            return {
+                series_count: series.count,
+                all_series: series,
+            }
+        when "NovelTags#show"
+            return {
+                tag: tag,
+                series_count: series.count,
+                all_series: series,
+            }
+        end
+    end
+
+    #! 新たに生成したNovelSeriesオブジェクト1件を返す
+    def return_one_series_object_for_render_json(series, novel, tag)
+        return {
+            series: series,
+            novels: novel,
+            tags: tag,
+        }
+    end
+
+    #! 新たに生成したNovelsオブジェクト1件を返す
+    #! generate_original_object_helper.rbにて呼び出し
+    def return_one_novel_object_for_render_json(series, novel, favorite, comment)
+        return {
+            series: series,
+            novel: novel,
+            favorites: favorite,
+            comments: comment,
+        }
+    end
+
+    #! 新たに生成したタグに関連付けされたUsersオブジェクト全件を返す
+    def return_users_object_for_render_json(tag, users)
+        return {
+            tag: tag,
+            users_count: users.count,
+            users: users,
+        }
+    end
+
+    # Userプロフィールページにて扱うオブジェクト
+    #! generate_original_object_helper.rbの「#User」にて呼び出し
+    def return_users_page_object_for_render_json(user, tag, user_series, user_favorites_series)
+        return {
+            user: user,
+            tags: tag,
+            user_series_count: user_series.count,
+            user_series: user_series,
+            user_favorites_series_count: user_favorites_series.count,
+            user_favorites_series: user_favorites_series,
+        }
+    end
+
+
     #Create・Saveされたオブジェクトを
-    #render_json JSONデータとしてレンダリングする
-    def return_created_object(created_data)
-        object = created_data[:object]
-        type = created_data[:data_type]
+    def return_created_object(created_object)
+        object = created_object[:object]
+        type = created_object[:data_type]
         case type
         when "user", "series"
             object.id
@@ -36,7 +98,7 @@ module ReturnDoneCrudObjectConcern
         end
     end
 
-    # Editオブジェクト
+    # Editしたいオブジェクト
     def return_edit_object(edit_data)
         object = edit_data[:object]
         association = edit_data[:association_data]
@@ -77,16 +139,17 @@ module ReturnDoneCrudObjectConcern
         end
     end
 
-    def return_updated_object(updated_data)
-        object = updated_data[:object]
-        type = updated_data[:data_type]
+    # Updateされたオブジェクト
+    def return_updated_object(updated_object)
+        object = updated_object[:object]
+        type = updated_object[:data_type]
         case type
-        when "update_of_novels"
+        when "novel"
             {
                 novel_id: object.id,
                 series_id: object.novel_series_id
             }
-        when "update_of_series", "User_update"
+        when "series", "user"
             object.id
         end
     end

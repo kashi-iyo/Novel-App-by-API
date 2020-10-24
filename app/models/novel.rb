@@ -18,8 +18,8 @@ class Novel < ApplicationRecord
   validates :user_id, presence: true
   validates :novel_series_id, presence: true
 
-  # ユーザーがその小説をお気に入りしているかどうかをチェック
-  def favorited_by?(current_user)
-    self.novel_favorites.where(user_id: current_user.id).exists?
-  end
+  # # ユーザーがその小説をお気に入りしているかどうかをチェック
+  # def favorited_by?(current_user)
+  #   self.novel_favorites.where(user_id: current_user.id).exists?
+  # end
 end

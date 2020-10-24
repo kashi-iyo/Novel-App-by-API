@@ -6,17 +6,12 @@ class Api::V1::NovelFavoritesController < ApplicationController
 
     #Create お気に入りON
     def create
-        #! お気に入り済み→エラー／お気に入りしてない→成功
-        if @novel_in_series.favorited_by?(current_user)
-            already_existing_favorites()
-        else
-            @novel_favorite = current_user.novel_favorites.new(favorite_params)
-            helpers.create_and_save_object(
-                @novel_favorite,    #object
-                {},                 #association_data
-                "favorites",        #data_type
-            )
-        end
+        helpers.create_and_save_object(
+            object: current_user.novel_favorites,
+            params: favorite_params,
+            association_data: @novel_in_series,
+            data_type: "favorites",
+        )
     end
 
     #Destroy お気に入りOFF
