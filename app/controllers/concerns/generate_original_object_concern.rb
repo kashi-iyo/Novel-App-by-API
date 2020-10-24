@@ -14,29 +14,47 @@ module GenerateOriginalObjectConcern
         #Seriesオブジェクト1件を生成
         #! NovelSeries#index, NovelTags#showで扱う
         #! one_series = NovelSeries1件
-        def generate_original_series_object(series_data, data_type)
+        def generate_original_series_object(series_data)
+            series = series_data[:object]
+            data_type = series_data[:data_type]
+            crud_type = series_data[:crud_type]
             # Series1件
-            @series = default_series_data(series_data)
+            @series = default_series_data(series, data_type)
             # Novels全件
-            @novels = series_data.novels
-            # @novels = generate_original_novels_object_for_series(series_data)
+            @novels = series.novels
             # Favorites数の合計値
-            @favorites = generate_original_favorites_object(novels: @novels, data_type: data_type)
+            @favorites = generate_original_favorites_object(@novels, data_type)
             # Comments数の合計値
-            @comments = generate_original_comments_object(novels: @novels, data_type: data_type)
+            @comments = generate_original_comments_object(@novels, data_type)
             # Stag NovelTags全件
-            @tags = generate_object_from_array(series_data.novel_tags, "call_return_tag_data")
+            @tags = loop_array_and_get_one_tag(
+                object: series.novel_tags,
+                data_type: data_type
+            )
             case data_type
             when "series","NovelTags#show", "Users#show"
-                # Series1件（新規のデータで構築）
-                return_original_series_data(@series, @novels, @tags, type)
-            when "NovelSeries#show"
-                if release?(series_data)
-                    # Series（新規の構造）
-                    return_one_series_object_for_render_json(@series, @novels, @tags)
-                elsif !release?(series_data)
-                    return return_unrelease_data()
+                case crud_type
+                when "show"
+                    if release?(series_data)
+                        {
+                            series: @series,
+                            novels_count: @novels.count,
+                            favorites_count: @favorites,
+                            comments_count: @comments,
+                            novels: @novels,
+                            tags: @tags,
+                        }
+                    else
+                        return return_unrelease_data()
+                    end
                 end
+                {
+                    series: @series,
+                    novels_count: @novels.count,
+                    favorites_count: @favorites,
+                    comments_count: @comments,
+                    tags: @tags,
+                }
             end
         end
 
@@ -93,19 +111,16 @@ module GenerateOriginalObjectConcern
     #Favorite
 
         # Favoritesオブジェクト
-        def generate_original_favorites_object(data_for_favorites)
-            case data_for_favorites[:data_type]
-            #! data_for_favorites = Novelデータ1件
-            when "series", "NovelTags#show", "NovelSeries#show", "Users#show"
-                # Favorite 各Novelsが持つお気に入りのカウント
-                count = loop_array_and_get_one_data(data_for_favorites[:novels], "count_favorites")
-                # Favoritesの合計値を算出
-                return_original_favorites_data(count, data_type)
-            #! data_for_favorites = Novelデータ1件
+        def generate_original_favorites_object(data_for_favorites, data_type)
+            case data_type
+            when "series", "NovelSeries#show", "Users#show"
+                # Favorite 各Novelsが持つお気に入り数
+                count = loop_array_and_get_one_data_count(data_for_favorites, "call_favorites_count")
+                # Favorite数の合計値
+                return count.flatten.sum {|hash| hash[:favorites_count]}
             when "Novels#show"
                 # Favoriteデータ（Novelsをお気に入りにしたユーザーのデータ）
                 return_original_favorites_data(data_for_favorites, data_type)
-            #! data_for_favrites = NovelFavoritesデータ全件
             when "call_user_favorites_series"
                 # SeriesのIDを取得（ユーザーがお気に入りしたSeriesのid）
                 series_id = return_series_data(data_for_favorites, data_type)
@@ -121,18 +136,18 @@ module GenerateOriginalObjectConcern
     #Comment
 
         # Commentsオブジェクト生成
-        def generate_original_comments_object(novel_data, data_type)
+        def generate_original_comments_object(data_for_comments, data_type)
             case data_type
             #! NovelSeriesから取得する場合
-            when "NovelSeries#index", "NovelTags#show", "NovelSeries#show", "Users#show"
+            when "series", "NovelSeries#show", "Users#show"
                 #Comment Novelの持つコメント数
-                count = generate_object_from_array(novel_data, "call_comments_count")
-                #Comment コメント数の合計値を算出
-                return_original_comments_data(count, data_type)
+                count = loop_array_and_get_one_data_count(data_for_comments, "call_comments_count")
+                #Comment コメント総の合計値
+                return count.flatten.sum{|hash| hash[:comments_count]}
             #! Novelから取得する場合
             when "Novels#show"
                 # Commentしたユーザーのデータ
-                return_original_comments_data(novel_data, data_type)
+                return_original_comments_data(data_for_comments)
             end
         end
 

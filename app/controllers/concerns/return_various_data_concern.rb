@@ -1,4 +1,4 @@
-module ReturnDefaultModelDataConcern
+module ReturnVariousDataConcern
 
     extend ActiveSupport::Concern
 
@@ -7,15 +7,16 @@ module ReturnDefaultModelDataConcern
         helper_method :default_series_data, :return_original_series_data, :return_one_novel_data, :return_original_novel_data_in_one_series, :items_counter, :return_original_favorites_data, :return_favorites_data, :return_original_comments_data, :return_comments_data, :return_tag_data, :return_user_data
     end
 
-    #Series===============================================
+
+    #Series
 
         #Seriesのデータフォーマット
         def default_series_data(data_for_series, data_type)
             case data_type
             #! data_for_series = Seriesデータ
-            when "series", "NovelSeries#show", "Novels#show", "NovelTags#show", "Users#show"
+            when "series", "Novels#show", "NovelTags#show", "Users#show"
                 # Seriesのデータを返す
-                return {
+                {
                     series_id: data_for_series.id,
                     user_id: data_for_series.user_id,
                     author: data_for_series.author,
@@ -33,8 +34,8 @@ module ReturnDefaultModelDataConcern
         # Seriesのオリジナルのデータフォーマット
         def return_original_series_data(series, novel, tag, data_type)
             case data_type
-            when "NovelSeries#index", "NovelTags#show", "Users#show"
-                return {
+            when "series", "NovelTags#show", "Users#show"
+                {
                     series: series,
                     novels: novel,
                     tags: tag,
@@ -42,10 +43,10 @@ module ReturnDefaultModelDataConcern
             end
         end
 
-    #Series===============================================
 
 
-    #Novels===============================================
+
+    #Novels
 
         #Novels1件のデータフォーマット
         def return_one_novel_data(novel)
@@ -77,12 +78,12 @@ module ReturnDefaultModelDataConcern
             end
         end
 
-    #Novels===============================================
 
+
+    #! それぞれのデータをカウントする
 
         #Favoritesのカウント
         #Commentsのカウント
-        #! それぞれの値の合計値を算出するには、一旦generate_object_from_arr()を介す必要がある。
         def items_counter(novel, data_type)
             case data_type
             when "call_favorites_count"
@@ -92,15 +93,12 @@ module ReturnDefaultModelDataConcern
             end
         end
 
-    #Favorite=============================================
+    #Favorite
 
         # Favorite全件のオリジナルデータ
         #! Series1件／Novels1件を取得する際に得られるお気に入りデータ
         def return_original_favorites_data(data_for_favorites, data_type)
             case data_type
-            when "NovelSeries#index", "NovelTags#show", "NovelSeries#show", "Users#show"
-                # Favorite数の合計値
-                return data_for_favorites.flatten.sum {|hash| hash[:favorites_count]}
             when "Novels#show"
                 favorites_count = data_for_favorites.novel_favorites.count
                     #! NovelFavoritesデータが存在しない場合にはfavorites_idだけ返す
@@ -134,17 +132,14 @@ module ReturnDefaultModelDataConcern
             end
         end
 
-    #Favorite=============================================
 
 
-    #Comment==============================================
+
+    #Comment
 
         #Comment全件のオリジナルデータ
         def return_original_comments_data(data_for_comments, data_type)
             case data_type
-            when "NovelSeries#index", "NovelTags#show", "NovelSeries#show", "Users#show"
-                #Comment コメント総の合計値
-                data_for_comments.flatten.sum{|hash| hash[:comments_count]}
             when "Novels#show"
                 return {
                     comments_count: data_for_comments.comments.count,
@@ -171,16 +166,16 @@ module ReturnDefaultModelDataConcern
             end
         end
 
-    #Comment==============================================
 
-    #Stags（SeriesTags）================================================
-    #Utags（UserTags）================================================
+
+    #Stags（SeriesTags）
+    #Utags（UserTags）
 
         #STags SeriesTags1件のデータフォーマット
         #UTags UserTags1件のデータフォーマット
         def return_tag_data(tag, tag_type)
             case tag_type
-            when "call_return_tag_data", "NovelTags#show", "NovelTags#index"
+            when "series", "series_tag"
                 return {
                     tag_id: tag.id,
                     tag_name: tag.novel_tag_name,
@@ -201,10 +196,9 @@ module ReturnDefaultModelDataConcern
             end
         end
 
-    #Stags================================================
-    #Utags================================================
 
-    #User=================================================
+
+    #User
 
         # Users1件のデータフォーマット
         def return_user_data(user, user_type)
@@ -218,6 +212,6 @@ module ReturnDefaultModelDataConcern
             end
         end
 
-    #User=================================================
+
 
 end

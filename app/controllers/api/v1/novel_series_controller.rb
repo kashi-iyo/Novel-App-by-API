@@ -20,12 +20,16 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     #read 1つのNovelSeries／そのNovelSeriesが持つNovels全件をJSONとしてレンダリング
     def show
-        read_object_to_render(@novel_series, {}, "NovelSeries#show")
+        crud_object(
+            object: @novel_series,
+            data_type: "series",
+            crud_type: "show"
+        )
     end
 
     #Create 引数に渡されるデータに基づいて、新規のオブジェクトをCreate・Saveする
     def create
-        helpers.crud_object(
+        crud_object(
             object: current_user.novel_series,
             params: novel_series_params,
             association_data: @novel_tags,
@@ -36,7 +40,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     #Edit 引数に渡されるデータに基づいて、Edit用のオブジェクトを取得する
     def edit
-        helpers.pass_object_to_crud(
+        pass_object_to_crud(
             object: @novel_series,
             association_data: @novel_series.novel_tags,
             data_type: "series",
@@ -46,7 +50,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     #Update 引数に渡されるデータに基づいて、オブジェクトをUpdateする
     def update
-        helpers.pass_object_to_crud(
+        pass_object_to_crud(
             object: @novel_series,
             params: novel_series_params,
             association_data: @novel_tags,
@@ -57,7 +61,11 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     #Destroy NovelSeriesを削除
     def destroy
-        helpers.pass_object_to_crud(@novel_series, {}, {}, "series", "destroy")
+        pass_object_to_crud(
+            object: @novel_series,
+            data_type: "series",
+            crud_type: "destroy"
+        )
     end
 
     private

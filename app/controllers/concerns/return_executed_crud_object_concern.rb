@@ -1,26 +1,39 @@
-module ReturnDoneCrudObjectConcern
+module ReturnExecutedCrudObjectConcern
     extend ActiveSupport::Concern
 
     included do
-        helper_method :return_edit_object, :create_and_save_object_to_render, :return_updated_object, :return_all_series_object_for_render_json, :return_one_series_object_for_render_json, :return_one_novel_object_for_render_json, :return_users_object_for_render_json, :return_users_page_object_for_render_json
+        helper_method :return_edit_object, :create_and_save_object_to_render, :return_updated_object, :return_index_object, :return_show_object
     end
 
 
-    #! index / showのために取得するオブジェクト
-
     #! 新たに生成したNovelSeriesオブジェクト全件を返す
-    def return_all_series_object_for_render_json(series, tag, data_type)
-        case data_type
-        when "NovelSeries#index"
+    def return_index_object(index_object)
+        object = index_object[:object]
+        case index_object[:data_type]
+        when "series"
             return {
-                series_count: series.count,
-                all_series: series,
+                series_count: object.count,
+                all_series: object,
             }
         when "NovelTags#show"
             return {
                 tag: tag,
                 series_count: series.count,
                 all_series: series,
+            }
+        when "series_tag"
+            return {
+                series_tag: object
+            }
+        end
+    end
+
+    def return_show_object(show_object)
+        object = show_object[:object]
+        case show_object[:data_type]
+        when "series"
+            return {
+                series: object,
             }
         end
     end

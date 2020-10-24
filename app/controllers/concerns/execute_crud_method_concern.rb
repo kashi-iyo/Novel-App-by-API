@@ -5,49 +5,42 @@ module ExecuteCrudMethodConcern
     #! 各コントローラのindex/show/editのオブジェクトの取得と、
     #! create/update/destroyを実行するメソッドをここに定義する。
     included do
-        helper_method :return_object_by_data_type, :pass_object_to_crud, :crud_object, :create_and_save_object, :update_object, :destroy_object, :return_index_object
+        helper_method :execute_get_index_object,:execute_get_show_object,:execute_create_and_save_object, :execute_update_object, :execute_destroy_object
     end
 
 
-    #validates 認可のチェックを行う
-    def pass_object_to_crud(**crud_data)
-        if authorized?(crud_data, crud_data[:data_type])
-            crud_object(crud_data)
-        else
-            return handle_unauthorized()
-        end
-    end
-
-    #! オブジェクトをCreate, Edit, Update, Destroyするそれぞれのメソッドへ渡す
-    def crud_object(crud_data)
-        case crud_data[:crud_type]
-        #Read
-        when "index"
-            return_index_object(crud_data)
-        #Read
-        when "show"
-        # Create・Save
-        when "create"
-            create_and_save_object(crud_data)
-        # Edit
-        when "edit"
-            edit_object_to_render(crud_data)
-        # Update
-        when "update"
-            update_object(crud_data)
-        # Destroy
-        when "destroy"
-            destroy_object(object)
-        end
-    end
-
-    def return_index_object(index_data)
-        type = index_data[:data_type]
-        case type
+    #Read index用のオブジェクトを取得
+    def execute_get_index_object(index_data)
+        data_type = index_data[:data_type]
+        case data_type
         when "series"
             # 配列なのでそこから1件のデータを取得
-            one_data = loop_array_and_get_one_data(index_data)
+            one_data = loop_array_and_get_one_series(index_data)
+        when "series_tag"
+            one_data = loop_array_and_get_one_tag(index_data)
         end
+        read_object_to_render(
+            object: one_data,
+            data_type: data_type,
+            crud_type: index_data[:crud_type],
+        )
+                # → render_json_crud_object_concern.rb
+    end
+
+    #Read show用のオブジェクトを取得
+    def execute_get_show_object(show_data)
+        data_type = show_data[:data_type]
+        crud_type = show_data[:crud_type]
+        case data_type
+        when "series"
+            one_data = generate_original_series_object(show_data)
+        end
+        read_object_to_render(
+            object: one_data,
+            data_type: data_type,
+            crud_type: crud_type,
+        )
+                # → render_json_crud_object_concern.rb
     end
 
     #! index/show
@@ -97,7 +90,7 @@ module ExecuteCrudMethodConcern
     end
 
     #Create オブジェクトをCreate・Save
-    def create_and_save_object(create_data)
+    def execute_create_and_save_object(create_data)
         type = create_data[:data_type]
         association = create_data[:association_data]
         #! ここでデータを生成する
@@ -123,6 +116,7 @@ module ExecuteCrudMethodConcern
             new_object.save_tag(association) if type === "series"
             #! 保存されたオブジェクトを渡す
             create_and_save_object_to_render(object: new_object, data_type: type)
+                    # → render_json_crud_object_concern.rb
         #validates 保存失敗
         else
             return failed_to_crud_object(new_object)
@@ -130,7 +124,7 @@ module ExecuteCrudMethodConcern
     end
 
     #Update オブジェクトをUpdate
-    def update_object(updated_data)
+    def execute_update_object(updated_data)
         new_object = updated_data[:object]
         association = updated_data[:association_data]
         #validates データを更新
@@ -142,6 +136,7 @@ module ExecuteCrudMethodConcern
                 object.save_user_tag(association)
             end
             update_object_to_render(updated_object: new_object, data_type: updated_data[:data_type])
+                    # → render_json_crud_object_concern.rb
         #validates 更新失敗
         else
             return failed_to_crud_object(object)
@@ -149,14 +144,14 @@ module ExecuteCrudMethodConcern
     end
 
     #Destroy オブジェクトをDestroy
-    def destroy_object(object)
+    def execute_destroy_object(object)
         #validates データを削除
         if object.destroy
             destroy_object_to_render()
+                    # → render_json_crud_object_concern.rb
         #validates 削除失敗
         else
             return failed_to_crud_object(object)
         end
     end
-
 end

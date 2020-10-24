@@ -1,4 +1,10 @@
-module SessionsHelper
+module SessionConcern
+
+    extend ActiveSupport::Concern
+
+    included do
+        helper_method :pass_object_for_sessions
+    end
 
     #! 認証機構
     def pass_object_for_sessions(user, params, session_type)

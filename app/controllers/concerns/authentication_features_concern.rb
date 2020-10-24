@@ -1,4 +1,5 @@
 module AuthenticationFeaturesConcern
+
     extend ActiveSupport::Concern
 
 # auth 認証系の処理を行うメソッド

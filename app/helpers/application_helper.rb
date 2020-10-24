@@ -1,4 +1,4 @@
-# module ApplicationHelper
+module ApplicationHelper
 
 #     # include ReturnGeneratedObjectFromArrayHelper
 #     # include ReturnEachDataHelper
@@ -59,4 +59,4 @@
 #         end
 #     end
 
-# end
+end

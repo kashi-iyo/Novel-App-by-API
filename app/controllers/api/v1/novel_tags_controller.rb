@@ -4,8 +4,11 @@ class Api::V1::NovelTagsController < ApplicationController
 
     #Read NovelTagsフィード
     def index
-        tags = NovelTag.all
-        read_object_to_render(tags, {}, "NovelTags#index")
+        crud_object(
+            object: NovelTag.all,
+            data_type: "series_tag",
+            crud_type: "index"
+        )
     end
 
     #Read NovelTagsに関連付けられているNovelSeries
