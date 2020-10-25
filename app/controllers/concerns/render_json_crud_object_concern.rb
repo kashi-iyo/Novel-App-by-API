@@ -15,10 +15,10 @@ module RenderJsonCrudObjectConcern
             case read_object[:crud_type]
             when "index"
                 @object = return_index_object(read_object)
-                        # → return_executed_crud_object_concern.rb
+                    # → return_executed_crud_object_concern.rb
             when "show"
-                @object = return_show_object(read_object)
-                        # → return_executed_crud_object_concern.rb
+                @object = read_object
+                    # → return_executed_crud_object_concern.rb
             end
         render json: {
             status: 200,
@@ -32,7 +32,7 @@ module RenderJsonCrudObjectConcern
     #render_json JSONデータとしてレンダリングする
     def create_and_save_object_to_render(created_data)
         @object = return_created_object(created_data)
-                # → return_executed_crud_object_concern.rb
+            # → return_executed_crud_object_concern.rb
         render json: {
             status: :created,
             created_object: @object,
@@ -45,7 +45,7 @@ module RenderJsonCrudObjectConcern
     #render_json JSONデータとしてレンダリングする
     def edit_object_to_render(edit_data)
         @object = return_edit_object(edit_data)
-                # → return_executed_crud_object_concern.rb
+            # → return_executed_crud_object_concern.rb
         render json: {
             status: 200,
             object_for_edit: @object,
@@ -57,7 +57,7 @@ module RenderJsonCrudObjectConcern
     #render_json JSONデータとしてレンダリングする
     def update_object_to_render(updated_data)
         @object = return_updated_object(updated_data)
-                # → return_executed_crud_object_concern.rb
+            # → return_executed_crud_object_concern.rb
         render json: {
             status: :ok,
             updated_object: @object,

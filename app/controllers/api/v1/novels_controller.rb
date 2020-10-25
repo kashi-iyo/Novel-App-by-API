@@ -9,13 +9,18 @@ class Api::V1::NovelsController < ApplicationController
 
     #Read Novelオブジェクトを1件取得
     def show
-        read_object_to_render(@novel_series, @novel_in_series, "Novels#show")
+        crud_object(
+            object: @novel_in_series,
+            data_type: "novel",
+            crud_type: "show"
+        )
+            # → application_controller.rb
     end
 
 
     #Create 引数に渡されるデータに基づいて、新規のオブジェクトをCreate・Saveする
     def create
-        helpers.pass_object_to_crud(
+        pass_object_to_crud(
             object: current_user.novels,
             params: novel_in_series_params,
             association_data: @novel_series,
@@ -26,7 +31,7 @@ class Api::V1::NovelsController < ApplicationController
 
     #Edit 引数に渡されるデータに基づいて、Edit用のオブジェクトを返す
     def edit
-        helpers.pass_object_to_crud(
+        pass_object_to_crud(
             object: @novel_in_series,
             data_type: "novel",
             crud_type: "edit"
@@ -35,7 +40,7 @@ class Api::V1::NovelsController < ApplicationController
 
     #Update 引数に渡されるデータに基づいて、オブジェクトをUpdateする
     def update
-        helpers.pass_object_to_crud(
+        pass_object_to_crud(
             object: @novel_in_series,
             params: novel_in_series_params,
             data_type: "novel",
@@ -45,7 +50,7 @@ class Api::V1::NovelsController < ApplicationController
 
     #Destroy 引数に渡されるデータに基づいて、オブジェクトをDestroyする
     def destroy
-        helpers.pass_object_to_crud(@novel_in_series, {}, {}, "series", "destroy")
+        pass_object_to_crud(@novel_in_series, {}, {}, "series", "destroy")
     end
 
 

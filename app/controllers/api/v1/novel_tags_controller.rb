@@ -9,12 +9,17 @@ class Api::V1::NovelTagsController < ApplicationController
             data_type: "series_tag",
             crud_type: "index"
         )
+            # → Applicationコントローラ
     end
 
     #Read NovelTagsに関連付けられているNovelSeries
     def show
-        novel_series = @tag.novel_series
-        read_object_to_render(novel_series, @tag, "NovelTags#show")
+        crud_object(
+            object: @tag,
+            data_type: "series_tag",
+            crud_type: "show"
+        )
+            # → Applicationコントローラ
     end
 
     private

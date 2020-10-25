@@ -13,16 +13,11 @@ module ReturnExecutedCrudObjectConcern
         when "series"
             return {
                 series_count: object.count,
-                all_series: object,
-            }
-        when "NovelTags#show"
-            return {
-                tag: tag,
-                series_count: series.count,
-                all_series: series,
+                series: object,
             }
         when "series_tag"
             return {
+                tags_count: object.count,
                 series_tag: object
             }
         end
@@ -31,7 +26,7 @@ module ReturnExecutedCrudObjectConcern
     def return_show_object(show_object)
         object = show_object[:object]
         case show_object[:data_type]
-        when "series"
+        when "series", "series_tag"
             return {
                 series: object,
             }

@@ -14,7 +14,7 @@ module ReturnVariousDataConcern
         def default_series_data(data_for_series, data_type)
             case data_type
             #! data_for_series = Seriesデータ
-            when "series", "Novels#show", "NovelTags#show", "Users#show"
+            when "series", "Novels#show", "series_tag", "Users#show"
                 # Seriesのデータを返す
                 {
                     series_id: data_for_series.id,
@@ -30,20 +30,6 @@ module ReturnVariousDataConcern
                 data_for_series.novel.novel_series_id
             end
         end
-
-        # Seriesのオリジナルのデータフォーマット
-        def return_original_series_data(series, novel, tag, data_type)
-            case data_type
-            when "series", "NovelTags#show", "Users#show"
-                {
-                    series: series,
-                    novels: novel,
-                    tags: tag,
-                }
-            end
-        end
-
-
 
 
     #Novels
@@ -179,7 +165,7 @@ module ReturnVariousDataConcern
                 return {
                     tag_id: tag.id,
                     tag_name: tag.novel_tag_name,
-                    series_count: tag.novel_series.count,
+                    has_series_count: tag.novel_series.count,
                 }
             when "UserTags#index", "UserTags#show", "get_user_tags"
                 return {

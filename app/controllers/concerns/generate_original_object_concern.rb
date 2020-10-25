@@ -3,7 +3,7 @@ module GenerateOriginalObjectConcern
     extend ActiveSupport::Concern
 
     included do
-        helper_method :generate_original_series_object, :generate_original_novels_object_for_series, :generate_original_novel_content_object, :generate_original_favorites_object, :generate_original_comments_object, :generate_original_user_page_object
+        helper_method :generate_original_series_object, :generate_original_novels_object_for_series, :generate_original_novel_content_object, :generate_original_favorites_object, :generate_original_comments_object, :generate_original_user_page_object, :generate_original_tag_object
     end
 
 
@@ -12,27 +12,24 @@ module GenerateOriginalObjectConcern
     #Series
 
         #Seriesオブジェクト1件を生成
-        #! NovelSeries#index, NovelTags#showで扱う
-        #! one_series = NovelSeries1件
         def generate_original_series_object(series_data)
-            series = series_data[:object]
+            # Series1件
+            @series = series_data[:object]
             data_type = series_data[:data_type]
             crud_type = series_data[:crud_type]
-            # Series1件
-            @series = default_series_data(series, data_type)
-            # Novels全件
-            @novels = series.novels
+            # Novels全件（Seriesが所有する）
+            @novels = @series.novels
             # Favorites数の合計値
             @favorites = generate_original_favorites_object(@novels, data_type)
             # Comments数の合計値
             @comments = generate_original_comments_object(@novels, data_type)
             # Stag NovelTags全件
             @tags = loop_array_and_get_one_tag(
-                object: series.novel_tags,
+                object: @series.novel_tags,
                 data_type: data_type
             )
             case data_type
-            when "series","NovelTags#show", "Users#show"
+            when "series", "series_tag", "Users#show"
                 case crud_type
                 when "show"
                     if release?(series_data)
@@ -47,14 +44,15 @@ module GenerateOriginalObjectConcern
                     else
                         return return_unrelease_data()
                     end
+                when "index"
+                    {
+                        series: @series,
+                        novels_count: @novels.count,
+                        favorites_count: @favorites,
+                        comments_count: @comments,
+                        tags: @tags,
+                    }
                 end
-                {
-                    series: @series,
-                    novels_count: @novels.count,
-                    favorites_count: @favorites,
-                    comments_count: @comments,
-                    tags: @tags,
-                }
             end
         end
 
@@ -113,7 +111,7 @@ module GenerateOriginalObjectConcern
         # Favoritesオブジェクト
         def generate_original_favorites_object(data_for_favorites, data_type)
             case data_type
-            when "series", "NovelSeries#show", "Users#show"
+            when "series", "series_tag", "Users#show"
                 # Favorite 各Novelsが持つお気に入り数
                 count = loop_array_and_get_one_data_count(data_for_favorites, "call_favorites_count")
                 # Favorite数の合計値
@@ -139,7 +137,7 @@ module GenerateOriginalObjectConcern
         def generate_original_comments_object(data_for_comments, data_type)
             case data_type
             #! NovelSeriesから取得する場合
-            when "series", "NovelSeries#show", "Users#show"
+            when "series", "series_tag", "NovelSeries#show", "Users#show"
                 #Comment Novelの持つコメント数
                 count = loop_array_and_get_one_data_count(data_for_comments, "call_comments_count")
                 #Comment コメント総の合計値
@@ -151,6 +149,31 @@ module GenerateOriginalObjectConcern
             end
         end
 
+
+    # Utag(UserTags)
+    # Stag(NovelTags)
+    def generate_original_tag_object(tag_data)
+        tag = tag_data[:object]
+        data_type = tag_data[:data_type]
+        # crud_type = tag_data[:crud_type]
+        case data_type
+        when "series_tag"
+            series_object = loop_array_and_get_one_series(
+                object: tag.novel_series,
+                data_type: data_type,
+                crud_type: "index"
+                # Seriesオブジェクトは"index"で取得したい
+            )
+                    # → loop_array_concern.rb
+            tag_object = return_tag_data(tag, data_type)
+                    # → return_various_data_concern.rb
+            {
+                tag: tag_object,
+                series_count: series_object.count,
+                series: series_object,
+            }
+        end
+    end
 
 
     #User

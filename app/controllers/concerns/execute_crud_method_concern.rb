@@ -34,6 +34,10 @@ module ExecuteCrudMethodConcern
         case data_type
         when "series"
             one_data = generate_original_series_object(show_data)
+        when "series_tag"
+            one_data = generate_original_tag_object(show_data)
+        when "novel"
+            # one_data = 
         end
         read_object_to_render(
             object: one_data,

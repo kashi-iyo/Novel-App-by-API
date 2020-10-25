@@ -16,8 +16,6 @@ module ValidatesFeaturesConcern
             data[:association_data][:user_id] === current_user.id
         else
             data[:object][:user_id] === current_user.id
-        # else
-        #     data[:user_id] === current_user.id
         end
     end
 
