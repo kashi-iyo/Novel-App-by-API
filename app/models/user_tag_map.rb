@@ -6,10 +6,4 @@ class UserTagMap < ApplicationRecord
   validates :user_id, presence: true
   validates :user_tag_id, presence: true
 
-  MAX_TAGS_COUNT = 5
-  validate :tags_count_limit
-  private
-    def tags_count_limit
-      errors.add(:base, "追加できる趣味タグは #{MAX_TAGS_COUNT}個 までです。") if user.user_tag_maps.count >= MAX_TAGS_COUNT
-    end
 end

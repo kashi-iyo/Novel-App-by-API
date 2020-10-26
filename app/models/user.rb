@@ -46,15 +46,5 @@ class User < ApplicationRecord
         end
     end
 
-    # # 編集用の趣味タグデータを取得
-    # def edit_user_tags
-    #     tags = self.user_tags
-    #     @tags = tags.map do |tag|
-    #         [tag.user_tag_name]
-    #     end
-    #     user_tags = []
-    #     user_tags.push(@tags)
-    #     user_tags.flatten!
-    # end
 
 end
