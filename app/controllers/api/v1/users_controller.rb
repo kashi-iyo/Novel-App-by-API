@@ -1,4 +1,4 @@
-class UsersController < ApplicationController
+class Api::V1::UsersController < ApplicationController
 
     before_action :logged_in_user, only: [:edit, :update]
     before_action :set_user, only: [:show, :edit, :update]
@@ -16,12 +16,16 @@ class UsersController < ApplicationController
 
     #Read
     def show
-        read_object_to_render(@user, {}, "Users#show")
+        crud_object(
+            object: @user,
+            data_type: "user",
+            crud_type: "show",
+        )
     end
 
     #Edit
     def edit
-        helpers.pass_object_to_crud(
+        pass_object_to_crud(
             object: @user,
             association_data: @user.user_tags,
             data_type: "user",
@@ -31,7 +35,7 @@ class UsersController < ApplicationController
 
     #Update
     def update
-        helpers.pass_object_to_crud(
+        pass_object_to_crud(
             object: @user,
             params: update_user_params,
             association_data: @user_tags,
@@ -42,7 +46,7 @@ class UsersController < ApplicationController
 
     #Create
     def create
-        helpers.crud_object(
+        crud_object(
             object: User,
             params: user_params,
             data_type: "user",
