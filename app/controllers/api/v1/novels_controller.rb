@@ -5,7 +5,7 @@ class Api::V1::NovelsController < ApplicationController
     # novels Novelを1件取得（@novel_in_series）
     before_action :set_novel, only: [:show, :edit, :update, :destroy]
     # novels NovelSeriesを取得（@novel_series）
-    before_action :set_novel_series, only: [:show, :create]
+    before_action :set_novel_series, only: [:create]
 
     #Read Novelオブジェクトを1件取得
     def show

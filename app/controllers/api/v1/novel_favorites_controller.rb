@@ -6,17 +6,22 @@ class Api::V1::NovelFavoritesController < ApplicationController
 
     #Create お気に入りON
     def create
-        helpers.create_and_save_object(
+        create_and_save_object(
             object: current_user.novel_favorites,
             params: favorite_params,
             association_data: @novel_in_series,
             data_type: "favorites",
+            crud_type: "create"
         )
     end
 
     #Destroy お気に入りOFF
     def destroy
-        helpers.pass_object_to_crud(@novel_favorite, {}, {}, "favorites", "destroy")
+        pass_object_to_crud(
+            object: @novel_favorite,
+            data_type: "favorites",
+            crud_type: "destroy"
+        )
     end
 
     private

@@ -6,7 +6,7 @@ class Api::V1::CommentsController < ApplicationController
 
 
     def create
-        helpers.crud_object(
+        crud_object(
             object: current_user.comments,
             params: comment_params,
             association_data: @novel,
@@ -16,7 +16,7 @@ class Api::V1::CommentsController < ApplicationController
     end
 
     def destroy
-        helpers.pass_object_to_crud(
+        pass_object_to_crud(
             @comment,   #object
             {},         #params
             {},         #association_data
