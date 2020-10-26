@@ -11,7 +11,7 @@ module ValidatesFeaturesConcern
     def authorized?(data)
         data_type = data[:data_type]
         if data_type === "user"
-            data[:id] === current_user.id
+            data[:object][:id] === current_user.id
         elsif data_type === "novel_for_create"
             data[:association_data][:user_id] === current_user.id
         else

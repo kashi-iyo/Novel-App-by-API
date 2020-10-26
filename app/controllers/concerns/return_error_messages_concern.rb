@@ -46,7 +46,7 @@ module ReturnErrorMessagesConcern
     def failed_to_crud_object(new_object)
         render json: {
             status: :unprocessable_entity,
-            errors: new_object.errors.full_messages,
+            errors: new_object[:object].errors.full_messages,
         }
     end
 
