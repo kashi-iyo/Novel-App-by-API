@@ -3,30 +3,34 @@ class ApplicationController < ActionController::Base
     skip_before_action :verify_authenticity_token
 
 
+    # 各Controllerのindex/show用のオブジェクトを取得する
+    include IndexAndShowActionConcern
     # 渡す配列データをtypeに応じた繰り返し処理してくれるメソッド
     include LoopArrayConcern
     # 各モデルのデータを適切な形式に整理したデータ
     include ReturnVariousDataConcern
     # index / showで取得したいオリジナルのオブジェクトを生成する
     include GenerateOriginalObjectConcern
-    # CRUDを実行するメソッド
-    include ExecuteCrudMethodConcern
-    # CRUDが実行された後のオブジェクトを返す
-    include ReturnExecutedCrudObjectConcern
+
+    # 各ControllerのCreateを実行する
+    include CreateActionConcern
+    # 各ControllerのEdit用のオブジェクト取得する
+    include EditActionConcern
+    # 各ControllerのUpdateを実行する
+    include UpdateActionConcern
+    # 各ControllerのDestroyを実行する
+    include DestroyActionConcern
+
     # 認証系の機能
     include AuthenticationFeaturesConcern
     # 認可系の処理を行う
     include ValidatesFeaturesConcern
     # エラーメッセージJSONデータでレンダリング
     include ReturnErrorMessagesConcern
-    # index/show/create/edit/udpate/destroy処理後のオブジェクトをJSONとしてレンダリングする
-    include RenderJsonCrudObjectConcern
 
-    #! 各コントローラのindex/show/editのオブジェクトの取得と、
-    #! create/update/destroyを実行するメソッドをここに定義する。
 
     #validates 認可のチェックを行う
-    def pass_object_to_crud(**crud_data)
+    def pass_object_to_crud(crud_data)
         if authorized?(crud_data)
             crud_object(crud_data)
         else
@@ -34,7 +38,7 @@ class ApplicationController < ActionController::Base
         end
     end
 
-    #! オブジェクトをCreate, Edit, Update, Destroyするそれぞれのメソッドへ渡す
+    #! オブジェクトをIndex, Show, Create, Edit, Update, Destroyするそれぞれのメソッドへ渡す
     def crud_object(crud_data)
         case crud_data[:crud_type]
         #Read
@@ -54,7 +58,7 @@ class ApplicationController < ActionController::Base
             execute_update_object(crud_data)
         # Destroy
         when "destroy"
-            execute_destroy_object(crud_data[:object])
+            execute_destroy_object(crud_data)
         end
     end
             # →execute_crud_method_concern.rb
