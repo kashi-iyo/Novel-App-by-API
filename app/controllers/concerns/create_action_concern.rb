@@ -12,6 +12,7 @@ module CreateActionConcern
     #Create オブジェクトをCreate・Save
     def execute_create_and_save_object(create_data)
         @data_type = create_data[:data_type]
+        @crud_type = create_data[:crud_type]
         @association = create_data[:association_data]
         # object.newを行う
         @new_object = create_data[:object].new(create_data[:params])
@@ -24,12 +25,13 @@ module CreateActionConcern
             @created_object = return_created_object(
                 object: @new_object,
                 association: @association,
-                data_type: data_type
+                data_type: @data_type
             )
                     # → return_executed_crud_object_concern.rb
             create_and_save_object_to_render(
                 object: @created_object,
-                data_type: @data_type
+                data_type: @data_type,
+                crud_type: @crud_type
             )
                     # → render_json_crud_object_concern.rb
         else
@@ -98,9 +100,10 @@ module CreateActionConcern
     def create_and_save_object_to_render(created_data)
         render json: {
             status: :created,
-            created_object: created_data[:object],
+            object: created_data[:object],
             successful: "正常に保存されました。",
-            keyword: created_data[:data_type],
+            data_type: created_data[:data_type],
+            crud_type: created_data[:crud_type]
         }
     end
 

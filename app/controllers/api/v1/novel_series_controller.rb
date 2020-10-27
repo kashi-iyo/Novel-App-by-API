@@ -9,8 +9,6 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     #Read NovelSeriesオブジェクト全件をJSONとしてレンダリング
     def index
-        # series = NovelSeries.all
-        # read_object_to_render(series, {}, "NovelSeries#index")
         crud_object(
             object: NovelSeries.all,
             data_type: "series",
@@ -82,7 +80,6 @@ class Api::V1::NovelSeriesController < ApplicationController
 
         #! パラメータに基づきNovelSeriesオブジェクトを取得
         def set_novel_series
-            # validates 欲しいNovelSeriesオブジェクトが存在するかどうかをチェック
             if NovelSeries.find_by(id: params[:id]).nil?
                 return_not_present_data()
             else

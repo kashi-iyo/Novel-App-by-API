@@ -37,18 +37,14 @@ module GenerateOriginalObjectConcern
             when "series", "series_tag", "user"
                 case crud_type
                 when "show"
-                    if release?(series_data)
-                        {
-                            series: @series,
-                            novels_count: @novels.count,
-                            favorites_count: @favorites,
-                            comments_count: @comments,
-                            tags: @tags,
-                            novels: @novels,
-                        }
-                    else
-                        return return_unrelease_data()
-                    end
+                    {
+                        series: @series,
+                        novels_count: @novels.count,
+                        favorites_count: @favorites,
+                        comments_count: @comments,
+                        tags: @tags,
+                        novels: @novels,
+                    }
                 when "index"
                     {
                         series: @series,
@@ -170,13 +166,13 @@ module GenerateOriginalObjectConcern
                     # → return_various_data_concern.rb
             {
                 tag: tag_object,
-                series_count: series_object.count,
                 series: series_object,
             }
         when "user_tag"
             if tag.users.nil?
                 return {messages: "ユーザーは存在しません。"}
             else
+                # ユーザーオブジェクト1件取得
                 users_object = loop_array_and_get_one_user(
                     object: tag.users,
                     data_type: data_type,
@@ -184,11 +180,11 @@ module GenerateOriginalObjectConcern
                     # Seriesオブジェクトは"index"で取得したい
                 )
                         # → loop_array_concern.rb
+                # タグオブジェクト生成
                 tag_object = return_tag_data(tag, data_type)
                         # → return_various_data_concern.rb
                 {
                     tag: tag_object,
-                    users_count: users_object.count,
                     users: users_object,
                 }
             end

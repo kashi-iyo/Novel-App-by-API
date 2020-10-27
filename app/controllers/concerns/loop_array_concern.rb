@@ -25,7 +25,7 @@ module LoopArrayConcern
                     # → generate_original_object_concern.rb
             # 非公開の場合
             elsif !series[:release]
-                {}
+                []
             end
         end
     end

@@ -75,13 +75,13 @@ module ReturnVariousDataConcern
                 return {
                     tag_id: tag.id,
                     tag_name: tag.novel_tag_name,
-                    has_series_count: tag.novel_series.count,
+                    has_data_count: tag.novel_series.count,
                 }
             when "user", "user_tag"
                 return {
                     tag_id: tag.id,
                     tag_name: tag.user_tag_name,
-                    has_users_count: tag.users.count,
+                    has_data_count: tag.users.count,
                 }
             #Stag SeriesTag編集用データ ["タグ1", "タグ2"]のような形で取得。(React側では配列として扱いたいため)
             when 'Series_edit'

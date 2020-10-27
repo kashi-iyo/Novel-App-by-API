@@ -4,20 +4,20 @@ module AuthenticationFeaturesConcern
 
 # auth 認証系の処理を行うメソッド
     included do
-        helper_method :login!, :logged_in?, :logged_in_user, :current_user, :return_session_data
+        helper_method :login!, :logged_in?, :logged_in_user, :current_user
     end
 
-    #! /// ログインさせる
+    # ログインさせる
     def login!
         session[:user_id] = @user.id
     end
 
-    #! /// ログインしているかどうかをbool値で返す
+    # ログインしているかどうかをbool値で返す
     def logged_in?
         !!session[:user_id]
     end
 
-    #! /// ユーザーがログインしていない場合の処理
+    # ユーザーがログインしていない場合の処理
     def logged_in_user
         unless logged_in?
             render json: {
@@ -27,19 +27,14 @@ module AuthenticationFeaturesConcern
         end
     end
 
-    #! /// 現在ログインしているユーザーを返す
+    # 現在ログインしているユーザーを返す
     def current_user
-        @current_user ||= User.find(session[:user_id]) if session[:user_id]
-    end
-
-    #! ユーザーデータを返す
-    def return_session_data(user_data, session_type)
-        if session_type === "logout"
-            reset_session
-            render json: { status: 200, logged_out: true }
+        if session[:user_id]
+            @current_user ||= User.find(session[:user_id])
         else
-            render json: { logged_in: true, user: user_data }
+            return bad_access(message: "ログインまたは、新規登録を行ってください。", action: "current_user")
         end
     end
+
 
 end

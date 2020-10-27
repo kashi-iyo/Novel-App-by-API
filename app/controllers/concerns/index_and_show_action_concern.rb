@@ -17,7 +17,7 @@ module IndexAndShowActionConcern
             status: 200,
             object: @object,
             data_type: index_data[:data_type],
-            crud_type: crud_type[:crud_type],
+            crud_type: index_data[:crud_type],
         )
                 # → render_json_crud_object_concern.rb
     end
@@ -74,12 +74,12 @@ module IndexAndShowActionConcern
 
 
     #Read index/showにて取得したオブジェクトをJSONとしてレンダリング
-    def render_json_crud_object(index_object)
+    def render_json_crud_object(json_object)
         render json: {
-            status: index_object[:status],
-            object: index_object[:object],
-            data_type: index_object[:data_type],
-            crud_type: index_object[:crud_type]
+            status: json_object[:status],
+            object: json_object[:object],
+            data_type: json_object[:data_type],
+            crud_type: json_object[:crud_type]
         }
     end
 

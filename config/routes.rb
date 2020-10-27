@@ -16,35 +16,12 @@ Rails.application.routes.draw do
         resources :comments, only: [:create, :destroy]
         # お気に入り
         resources :novel_favorites, only: [:create, :destroy]
-      end
-    end
-  # ===================================================
-
-  # タグ系=============================================
-    namespace :api do
-      namespace :v1 do
+        # タグ系
         resources :user_tags, only: [:index, :show]
         resources :novel_tags, only: [:index, :show]
       end
     end
-  # ==================================================
-
-  # コメント/お気に入り================================
-    # namespace :api do
-    #   namespace :v1 do
-    #     resources :novels do
-    #       # コメント
-    #       resources :comments, only: [:create, :destroy]
-    #       # お気に入り
-    #       resources :novel_favorites, only: [:create, :destroy]
-    #     end
-    #   end
-    # end
-    # =================================================
-
-  #ユーザー系====================================
-  # resources :users, only: [:create, :show, :edit, :update,  :index]
-  #=============================================
+  # ===================================================
 
   # 認証============================================
   post '/login', to: 'sessions#login'

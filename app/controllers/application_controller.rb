@@ -21,6 +21,9 @@ class ApplicationController < ActionController::Base
     # 各ControllerのDestroyを実行する
     include DestroyActionConcern
 
+    # SessionsControllerの処理を実行する
+    include SessionConcern
+
     # 認証系の機能
     include AuthenticationFeaturesConcern
     # 認可系の処理を行う
@@ -44,24 +47,29 @@ class ApplicationController < ActionController::Base
         #Read
         when "index"
             execute_get_index_object(crud_data)
+                # →index_and_show_action_concern.rb
         #Read
         when "show"
             execute_get_show_object(crud_data)
+                # →index_and_show_action_concern.rb
         # Create・Save
         when "create"
             execute_create_and_save_object(crud_data)
+                # →create_action_concern.rb
         # Edit
         when "edit"
             edit_object_to_render(crud_data)
+                # →edit_action_concern.rb
         # Update
         when "update"
             execute_update_object(crud_data)
+                # →update_action_concern.rb
         # Destroy
         when "destroy"
             execute_destroy_object(crud_data)
+                # →destroy_action_concern.rb
         end
     end
-            # →execute_crud_method_concern.rb
 
 
 end

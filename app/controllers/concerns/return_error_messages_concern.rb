@@ -15,12 +15,14 @@ module ReturnErrorMessagesConcern
     end
 
     #error 誤ったアクセスを行った場合に返す
-    def bad_access(messages, data_type)
-        case data_type
-        when "login"
-            render json: { status: 401, errors: messages}
+    def bad_access(access_data)
+        message = access_data[:message]
+        action = access_data[:action]
+        case action
+        when "login", "logout", "current_user"
+            render json: { status: :unauthorized, errors: message}
         when "is_logged_in?"
-            render json: { logged_in: false, message: messages }
+            render json: { logged_in: false, message: message}
         end
     end
 
@@ -29,7 +31,6 @@ module ReturnErrorMessagesConcern
         render json: {
             head: :no_content,
             errors: "データが存在しないため、アクセスできません。",
-            keyword: "not_present"
         }
     end
 
@@ -38,7 +39,6 @@ module ReturnErrorMessagesConcern
         render json: {
             status: :forbidden,
             messages: "現在この作品は非公開となっています。",
-            keyword: "unrelease"
         }
     end
 
