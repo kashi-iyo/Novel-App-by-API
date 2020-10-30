@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_25_032006) do
+ActiveRecord::Schema.define(version: 2020_10_29_131020) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -76,6 +76,16 @@ ActiveRecord::Schema.define(version: 2020_10_25_032006) do
     t.index ["user_id"], name: "index_novels_on_user_id"
   end
 
+  create_table "relationships", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "follow_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["follow_id"], name: "index_relationships_on_follow_id"
+    t.index ["user_id", "follow_id"], name: "index_relationships_on_user_id_and_follow_id", unique: true
+    t.index ["user_id"], name: "index_relationships_on_user_id"
+  end
+
   create_table "user_tag_maps", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "user_tag_id"
@@ -111,6 +121,8 @@ ActiveRecord::Schema.define(version: 2020_10_25_032006) do
   add_foreign_key "novel_tag_maps", "novel_tags"
   add_foreign_key "novels", "novel_series"
   add_foreign_key "novels", "users"
+  add_foreign_key "relationships", "users"
+  add_foreign_key "relationships", "users", column: "follow_id"
   add_foreign_key "user_tag_maps", "user_tags"
   add_foreign_key "user_tag_maps", "users"
 end

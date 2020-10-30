@@ -15,6 +15,12 @@ class User < ApplicationRecord
     has_many :favorited_novels, through: :novel_favorites, source: :novel
     # コメント
     has_many :comments, dependent: :destroy
+    # フォロー相手
+    has_many :relationships, foreign_key: "user_id", dependent: :destroy
+    has_many :followings, through: :relationships, source: :follow
+    # フォロワー
+    has_many :passive_relationships, class_name: "Relationship", foreign_key: "follow_id", dependent: :destroy
+    has_many :followers, through: :passive_relationships, source: :user
 
     # バリデーション
     validates :nickname, presence: true
@@ -46,5 +52,22 @@ class User < ApplicationRecord
         end
     end
 
+    # フォロー済みかどうか
+    def following?(other_user)
+        self.followings.include?(other_user)
+    end
+
+    # フォロー
+    def follow(other_user)
+        unless self === other_user
+            self.relationships.find_or_create_by(follow_id: other_user.id)
+        end
+    end
+
+    # フォロー解除
+    def unfollow(other_user)
+        relationship = self.relationships.find_by(follow_id: other_user.id)
+        relationship.destroy if relationship
+    end
 
 end
