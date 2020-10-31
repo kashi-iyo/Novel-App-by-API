@@ -22,7 +22,7 @@ module DestroyActionConcern
     def render_json_destroyed_object(crud_type)
         render json: {
             head: :no_content,
-            success: "正常に削除されました。",
+            successful: "正常に削除されました。",
             crud_type: crud_type
         }
     end
