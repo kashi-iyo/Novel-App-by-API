@@ -80,11 +80,9 @@ class Api::V1::NovelSeriesController < ApplicationController
 
         #! パラメータに基づきNovelSeriesオブジェクトを取得
         def set_novel_series
-            if NovelSeries.find_by(id: params[:id]).nil?
-                return_not_present_data()
-            else
-                @novel_series = NovelSeries.find_by(id: params[:id])
-            end
+            @novel_series = NovelSeries.find_by(id: params[:id])
+            check_existing?(@novel_series, "series")
+                # → validates_features_concern.rb
         end
 
 end

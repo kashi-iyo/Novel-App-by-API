@@ -50,7 +50,11 @@ class Api::V1::NovelsController < ApplicationController
 
     #Destroy 引数に渡されるデータに基づいて、オブジェクトをDestroyする
     def destroy
-        pass_object_to_crud(@novel_in_series, {}, {}, "series", "destroy")
+        pass_object_to_crud(
+            object: @novel_in_series,
+            data_type: "series",
+            crud_type: "destroy"
+        )
     end
 
 
@@ -58,24 +62,14 @@ class Api::V1::NovelsController < ApplicationController
 
         # NovelSeriesが所有するNovels1件を取得
         def set_novel
-            # validates データが存在するかどうかをチェック
-            if Novel.find_by(id: params[:id]).nil?
-                # error エラーのJSONデータをレンダリング
-                return_not_present_data()
-            else
-                @novel_in_series = Novel.find_by(id: params[:id])
-            end
+            @novel_in_series = Novel.find_by(id: params[:id])
+            check_existing?(@novel_in_series, "novel")
         end
 
         # novels パラメータに基づきNovelSeriesオブジェクトを取得
         def set_novel_series
-            # validates 欲しいNovelSeriesオブジェクトが存在するかどうかをチェック
-            if NovelSeries.find_by(id: params[:novel_series_id]).nil?
-                # error エラーのJSONデータをレンダリング
-                return_not_present_data()
-            else
-                @novel_series = NovelSeries.find_by(id: params[:novel_series_id])
-            end
+            @novel_series = NovelSeries.find_by(id: params[:novel_series_id])
+            check_existing?(@novel_series, "series")
         end
 
         # 小説のStrong Parameters

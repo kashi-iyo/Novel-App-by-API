@@ -24,9 +24,10 @@ class Api::V1::NovelTagsController < ApplicationController
 
     private
 
-        # パラメータに基づいたシリーズを取得
+        # パラメータに基づいたタグを取得
         def set_tag
             @tag = NovelTag.find_by(id: params[:id])
+            check_existing?(@tag, "tag")
         end
 
 end

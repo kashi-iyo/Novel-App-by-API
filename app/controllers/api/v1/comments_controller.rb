@@ -17,11 +17,9 @@ class Api::V1::CommentsController < ApplicationController
 
     def destroy
         pass_object_to_crud(
-            @comment,   #object
-            {},         #params
-            {},         #association_data
-            "comment",  #data_type
-            "destroy"   #crud_type
+            object: @comment,
+            data_type: "comment",
+            crud_type: "destroy"
         )
     end
 
@@ -32,19 +30,15 @@ class Api::V1::CommentsController < ApplicationController
     end
 
     def set_novel
-        if Novel.find_by(id: params[:novel_id]).nil?
-            return_not_present_data()
-        else
-            @novel = Novel.find_by(id: params[:novel_id])
-        end
+        @novel = Novel.find_by(id: params[:novel_id])
+        check_existing?(@novel, "novel")
+            # → validates_features_concern.rb
     end
 
     def set_comment
-        if Comment.find_by(id: params[:id], novel_id: params[:novel_id]).nil?
-            return_not_present_data()
-        else
-            @comment = Comment.find_by(id: params[:id], novel_id: params[:novel_id])
-        end
+        @comment = Comment.find_by(id: params[:id], novel_id: params[:novel_id])
+        check_existing?(@comment, "comment")
+            # → validates_features_concern.rb
     end
 
 end

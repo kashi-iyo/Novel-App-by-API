@@ -36,6 +36,7 @@ class SessionsController < ApplicationController
 
         def set_user
             @user = User.find_by(email: session_params[:email])
+            check_existing?(@user, "user")
         end
 
 end

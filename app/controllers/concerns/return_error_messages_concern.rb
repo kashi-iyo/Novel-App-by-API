@@ -3,7 +3,8 @@ module ReturnErrorMessagesConcern
     extend ActiveSupport::Concern
 
     included do
-        helper_method :return_not_present_data, :return_unrelease_data, :failed_to_crud_object, :already_existing_favorites
+        helper_method :return_not_present_data, :return_unrelease_data, :failed_to_crud_object,
+        :already_existing_object
     end
 
     #error dataのユーザーとログインユーザーが不一致な場合の処理
@@ -27,10 +28,24 @@ module ReturnErrorMessagesConcern
     end
 
     #errorデータが存在しない場合に返すJSONレスポンス
-    def return_not_present_data
+    def return_not_present_data(data_type)
+        case data_type
+        when "relationship", "user"
+            target = "ユーザー"
+        when "novel"
+            target = "小説"
+        when "series"
+            target = "作品"
+        when "comment"
+            target = "コメント"
+        when "favorite"
+            target = "お気に入りデータ"
+        when "tag"
+            target = "タグ"
+        end
         render json: {
             head: :no_content,
-            errors: "データが存在しないため、アクセスできません。",
+            errors: "対象の#{target}が存在しません。",
         }
     end
 
@@ -51,10 +66,10 @@ module ReturnErrorMessagesConcern
     end
 
     #error すでにお気に入りしている場合
-    def already_existing_favorites
+    def already_existing_object(object)
         render json: {
             status: :unprocessable_entity,
-            errors: "すでにお気に入り済みです。"
+            errors: object[:errors]
         }
     end
 
