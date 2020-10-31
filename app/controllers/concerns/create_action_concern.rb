@@ -14,28 +14,55 @@ module CreateActionConcern
         @data_type = create_data[:data_type]
         @crud_type = create_data[:crud_type]
         @association = create_data[:association_data]
-        # object.newを行う
-        @new_object = create_data[:object].new(create_data[:params])
+        return if check_already_existing_user_data(
+            association: @association,
+            data_type: @data_type
+        )
+        # objectのnew
+        @new_object = new_object(create_data)
+        # objectのsave前の処理
         before_save(
             object: @new_object,
             association: @association,
             data_type: @data_type
         )
-        if @new_object.save
-            @created_object = return_created_object(
-                object: @new_object,
-                association: @association,
-                data_type: @data_type
-            )
-                    # → return_executed_crud_object_concern.rb
-            create_and_save_object_to_render(
-                object: @created_object,
-                data_type: @data_type,
-                crud_type: @crud_type
-            )
-                    # → render_json_crud_object_concern.rb
+        # objectのsave
+        after_save(
+            object: @new_object,
+            association: @association,
+            data_type: @data_type
+        )
+    end
+
+    # お気に入り: お気に入り済みかどうか
+    # フォロー: フォロー済みかどうか
+    def check_already_existing_user_data(check)
+        @association = check[:association]
+        case check[:data_type]
+        #Favorites お気に入り済みかどうかのチェック
+        when "favorites"
+            if favorited_by?(@association)
+                # → validates_features_concern.rb
+                already_existing_object(errors: "すでにお気に入り済みです。")
+                        # → return_error_messages_concern.rb
+            end
+        #! Relationship フォロー済みかどうかのチェック
+        when "relationship"
+            if following?(@association)
+                already_existing_object(errors: "すでにフォローしています。")
+            end
+        end
+    end
+
+
+    # Createオブジェクトをnewする
+    def new_object(new_data)
+        obj = new_data[:object]
+        ass = new_data[:association_data]
+        if new_data[:data_type] === "relationship"
+            obj.find_or_create_by(follow_id: ass.id)
         else
-            return failed_to_crud_object(@new_object)
+            obj.new(new_data[:params])
         end
     end
 
@@ -52,13 +79,29 @@ module CreateActionConcern
         #Comment Novelとの関連付け
         when "comment"
             @before_save_object.novel_id = @association.id
-        #Favorites お気に入り済みかどうかのチェック
-        when "favorites"
-            if favorited_by?(@association)
-                return already_existing_favorites()
-                        # → return_error_messages_concern.rb
-            end
-                # → validates_features_concern.rb
+        end
+    end
+
+    #Create Save後
+    def after_save(save_object)
+        @new_object = save_object[:object]
+        @association = save_object[:association]
+        @data_type = save_object[:data_type]
+        if @new_object.save
+            @created_object = return_created_object(
+                object: @new_object,
+                association: @association,
+                data_type: @data_type
+            )
+                    # → return_executed_crud_object_concern.rb
+            create_and_save_object_to_render(
+                object: @created_object,
+                data_type: @data_type,
+                crud_type: @crud_type
+            )
+                    # → render_json_crud_object_concern.rb
+        else
+            return failed_to_crud_object(object: @new_object)
         end
     end
 
@@ -93,6 +136,8 @@ module CreateActionConcern
                 favorites_novel_id: object.novel_id,
                 favoriter: object.favoriter,
             }
+        when "relationship"
+            {}
         end
     end
 
