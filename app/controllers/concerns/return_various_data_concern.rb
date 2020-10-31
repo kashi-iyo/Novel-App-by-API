@@ -4,13 +4,22 @@ module ReturnVariousDataConcern
 
 #! 各モデルのデータフォーマット（適切な形式に修正）
     included do
-        helper_method :items_counter,
+        helper_method :return_novel_data,
+        :items_counter,
         :return_favorites_data,
         :return_comments_data,
         :return_tag_data,
         :return_user_data
     end
 
+    # Novels
+
+        def return_novel_data(novel_data)
+            case novel_data[:data_type]
+            when "novel"
+                novel_data[:object].id
+            end
+        end
 
     #! それぞれのデータをカウントする
 
@@ -56,8 +65,8 @@ module ReturnVariousDataConcern
                     comment_id: comment.id,
                     comment_user_id: comment.user_id,
                     comment_novel_id: comment.novel_id,
-                    comment_content: comment.content,
-                    comment_commenter: comment.commenter,
+                    content: comment.content,
+                    commenter: comment.commenter,
                 }
             end
         end
