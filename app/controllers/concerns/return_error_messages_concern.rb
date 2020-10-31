@@ -11,7 +11,7 @@ module ReturnErrorMessagesConcern
     def handle_unauthorized()
         render json: {
             status: :unauthorized,
-            messages: "アクセス権限がありません。",
+            errors: "アクセス権限がありません。",
         }
     end
 
@@ -23,7 +23,7 @@ module ReturnErrorMessagesConcern
         when "login", "logout", "current_user"
             render json: { status: :unauthorized, errors: message}
         when "is_logged_in?"
-            render json: { logged_in: false, message: message}
+            render json: { logged_in: false, errors: message}
         end
     end
 
@@ -53,7 +53,7 @@ module ReturnErrorMessagesConcern
     def return_unrelease_data
         render json: {
             status: :forbidden,
-            messages: "現在この作品は非公開となっています。",
+            errors: "現在この作品は非公開となっています。",
         }
     end
 
@@ -65,7 +65,7 @@ module ReturnErrorMessagesConcern
         }
     end
 
-    #error すでにお気に入りしている場合
+    #error 一意でなければならないデータが重複して保存される処理がされた場合
     def already_existing_object(object)
         render json: {
             status: :unprocessable_entity,
