@@ -15,18 +15,23 @@ module LoopArrayConcern
 
     # Series全件をループ処理
     def loop_array_and_get_one_series(series_data)
-        series_data[:object].map do |series|
-            # 公開されている場合
-            if !!series[:release]
-                generate_original_series_object(
-                    object: series,
-                    data_type: series_data[:data_type],
-                    crud_type: series_data[:crud_type]
-                )
-                    # → generate_original_object_concern.rb
-            # 非公開の場合
-            elsif !series[:release]
-                []
+        object = series_data[:object]
+        data_type = series_data[:data_type]
+        crud_type = series_data[:crud_type]
+        object.map do |series|
+            @series = generate_original_series_object(object: series, data_type: data_type, crud_type: crud_type)
+                # → generate_original_object_concern.rb
+            # 自身の作品の場合
+            if authorized?(object: series)
+                @series
+            else
+                # 公開されている場合
+                if !!series[:release]
+                    @series
+                # 非公開の場合
+                elsif !series[:release]
+                    next
+                end
             end
         end
     end
