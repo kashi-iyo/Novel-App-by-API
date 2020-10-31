@@ -25,12 +25,8 @@ class Api::V1::UserTagsController < ApplicationController
     private
 
     def set_user_tag
-        if UserTag.find_by(id: params[:id]).nil?
-            # error エラーのJSONデータをレンダリング
-            return_not_present_data()
-        else
-            @tag = UserTag.find_by(id: params[:id])
-        end
+        @tag = UserTag.find_by(id: params[:id])
+        check_existing?(@tag, "tag")
     end
 
 end

@@ -70,10 +70,7 @@ class Api::V1::UsersController < ApplicationController
         end
 
         def set_user
-            if User.find(params[:id]).nil?
-                return_not_present_data()
-            else
-                @user = User.find(params[:id])
-            end
+            @user = User.find(params[:id])
+            check_existing?(@user, "user")
         end
 end
