@@ -8,7 +8,8 @@ module GenerateOriginalObjectConcern
         :generate_original_favorites_object,
         :generate_original_comments_object,
         :generate_original_user_object,
-        :generate_original_tag_object
+        :generate_original_tag_object,
+        :generate_original_relationships_object
     end
 
 
@@ -115,13 +116,6 @@ module GenerateOriginalObjectConcern
                     favorites_count: @favorites_count,
                     favorites: loop_array_and_get_one_favorites(@favorites, data_type)
                 }
-            when "call_user_favorites_series"
-                # SeriesのIDを取得（ユーザーがお気に入りしたSeriesのid）
-                series_id = return_series_data(data_for_favorites, data_type)
-                # Series1件
-                series = NovelSeries.find_by(id: series_id)
-                # Series1件（新規の構造）を返す
-                return generate_original_series_object(series, "Users#show")
             end
         end
 
@@ -159,7 +153,7 @@ module GenerateOriginalObjectConcern
                 data_type: data_type,
                 crud_type: "index"
                 # Seriesオブジェクトは"index"で取得したい
-            )
+            ).compact
                     # → loop_array_concern.rb
             tag_object = return_tag_data(tag, data_type)
                     # → return_various_data_concern.rb
@@ -197,24 +191,66 @@ module GenerateOriginalObjectConcern
         def generate_original_user_object(user_data)
             user = user_data[:object]
             data_type = user_data[:data_type]
-            #User ユーザーデータ
-            @user = return_user_data(object: user, data_type: data_type)
-            #UTag そのユーザーが登録しているタグ全件
-            @user_tags = loop_array_and_get_one_tag(object: user.user_tags, data_type: data_type)
-            #Series ユーザーの投稿したSeries全件
-            @user_series = loop_array_and_get_one_series(object: user.novel_series, data_type: "series", crud_type: "index")
-            #Favorites ユーザーがお気に入りにしたSeries
-            series_data = loop_array_and_get_one_favorites(user.novel_favorites, data_type)
-            @user_favorites_series = loop_array_and_get_one_series(object: series_data, data_type: "series", crud_type: "index").uniq
-            return {
-                user: @user,
-                user_tags: @user_tags,
-                user_series_count: @user_series.count,
-                user_series: @user_series,
-                user_favorites_series_count: @user_favorites_series.count,
-                user_favorites_series: @user_favorites_series,
-                # お気に入りする小説は複数存在する。そうするとSeriesを取得した際に重複するので「.uniq」で、重複した配列を除く。
-            }
+            case data_type
+            when "user"
+                #User ユーザーデータ
+                @user = return_user_data(object: user, data_type: data_type)
+                #UTag そのユーザーが登録しているタグ全件
+                @user_tags = loop_array_and_get_one_tag(object: user.user_tags, data_type: data_type)
+                # ユーザーのフォロー/フォロワーデータ
+                @relationships = generate_original_relationships_object(object: user, data_type: data_type)
+                #Series ユーザーの投稿したSeries全件
+                @user_series = loop_array_and_get_one_series(object: user.novel_series, data_type: "series", crud_type: "index").compact
+                #Favorites ユーザーがお気に入りにしたSeries
+                series_data = loop_array_and_get_one_favorites(user.novel_favorites, data_type)
+                @user_favorites_series = loop_array_and_get_one_series(object: series_data, data_type: "series", crud_type: "index").compact.uniq
+                    # → お気に入りする小説は複数存在する。そうするとSeriesを取得した際に重複するので「.uniq」で、重複した配列を除く。
+                return {
+                    user: @user,
+                    user_tags: @user_tags,
+                    user_relationships: @relationships,
+                    user_series_count: @user_series.count,
+                    user_series: @user_series,
+                    user_favorites_series_count: @user_favorites_series.count,
+                    user_favorites_series: @user_favorites_series,
+                }
+            when "followings"
+                followings = loop_array_and_get_one_user(
+                    object: user.followings,
+                    data_type: data_type,
+                )
+                {
+                    user: user.nickname,
+                    users_count: followings.count,
+                    users: followings,
+                }
+            when "followers"
+                followers = loop_array_and_get_one_user(
+                    object: user.followers,
+                    data_type: data_type,
+                )
+                {
+                    user: user.nickname,
+                    users_count: followers.count,
+                    users: followers,
+                }
+            end
+        end
+
+        # フォロー/フォロワーオブジェクト
+        def generate_original_relationships_object(relationships_data)
+            followings = relationships_data[:object].followings
+            followers = relationships_data[:object].followers
+            is_on = followers.include?(current_user)
+            data_type = relationships_data[:data_type]
+            case data_type
+            when "user"
+                {
+                    followings_count: followings.count,
+                    followers_count: followers.count,
+                    following_status: is_on,
+                }
+            end
         end
 
 
