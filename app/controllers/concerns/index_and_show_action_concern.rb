@@ -25,7 +25,7 @@ module IndexAndShowActionConcern
     def return_index_object(index_data)
         case index_data[:data_type]
         when "series"
-            series_data = loop_array_and_get_one_series(index_data)
+            series_data = loop_array_and_get_one_series(index_data).compact
                         # → loop_array_concern.rb
             return {
                 series_count: series_data.count,
@@ -65,7 +65,7 @@ module IndexAndShowActionConcern
         when "novel"
             generate_original_novel_object(show_data)
                     # → generate_original_object_concern.rb
-        when "user"
+        when "user", "followings", "followers"
             generate_original_user_object(show_data)
                     # → generate_original_object_concern.rb
         end
