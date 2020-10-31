@@ -16,6 +16,8 @@ Rails.application.routes.draw do
       resources :novel_tags, only: [:index, :show]
       # フォロー
       resources :relationships, only: [:create, :destroy]
+      get "relationships/:id/followings", to: "relationships#followings"
+      get "relationships/:id/followers", to: "relationships#followers"
     end
   end
 
