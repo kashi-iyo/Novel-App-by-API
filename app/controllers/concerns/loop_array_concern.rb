@@ -4,6 +4,7 @@ module LoopArrayConcern
 
     included do
         helper_method :loop_array_and_get_one_series,
+        :loop_array_and_get_one_novel,
         :loop_array_and_get_one_favorites,
         :loop_array_and_get_one_tag,
         :loop_array_and_get_one_data_count,
@@ -30,10 +31,28 @@ module LoopArrayConcern
         end
     end
 
+    # Novels全件をループ処理
+    def loop_array_and_get_one_novel(novels_data)
+        novels_data[:object].map do |novel|
+            if !!novel[:release]
+                return_novel_data(
+                    object: novel,
+                    data_type: novels_data[:data_type]
+                )
+            elsif !novel[:release]
+                []
+            end
+        end
+    end
+
     # Favorites全件をループ処理
     def loop_array_and_get_one_favorites(favorites_data, data_type)
-        favorites_data.map do |favorites|
-            return_favorites_data(favorites, data_type)
+        if favorites_data === []
+            [{favorites_id: ""}]
+        else
+            favorites_data.map do |favorites|
+                return_favorites_data(favorites, data_type)
+            end
         end
     end
 
