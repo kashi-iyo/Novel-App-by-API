@@ -71,6 +71,11 @@ module GenerateOriginalObjectConcern
                 @series = @novel.novel_series
                 # Novels全件
                 @novels = @series.novels
+                #Novels 目次用のID群
+                @novels_ids = loop_array_and_get_one_novel(
+                    object: @novels,
+                    data_type: data_type,
+                )
                 # Favorites全件（このNovelをお気に入りにしたユーザー）
                 @favorites = generate_original_favorites_object(@novel, data_type)
                 # Comments全件（このNovelにコメントしたユーザー）
@@ -78,9 +83,10 @@ module GenerateOriginalObjectConcern
                 {
                     series: @series,
                     novel: @novel,
+                    novels_ids: @novels_ids,
                     novels_count: @novels.count,
-                    favorites: @favorites,
-                    comments: @comments,
+                    favorites_obj: @favorites,
+                    comments_obj: @comments,
                 }
             elsif !release?(novel_data)
                 return_unrelease_data()
@@ -105,17 +111,10 @@ module GenerateOriginalObjectConcern
                 # Favorite数の合計値
                 count = items_counter(data_for_favorites, "call_favorites_count")
                 @favorites_count = count.flatten.sum {|hash| hash[:favorites_count]}
-                if @favorites === []
-                    {
-                        favorites_count: @favorites_count,
-                        favorites_id: ""
-                    }
-                else
-                    {
-                        favorites_count: @favorites_count,
-                        favorites: loop_array_and_get_one_favorites(@favorites, data_type)
-                    }
-                end
+                {
+                    favorites_count: @favorites_count,
+                    favorites: loop_array_and_get_one_favorites(@favorites, data_type)
+                }
             when "call_user_favorites_series"
                 # SeriesのIDを取得（ユーザーがお気に入りしたSeriesのid）
                 series_id = return_series_data(data_for_favorites, data_type)
@@ -206,7 +205,7 @@ module GenerateOriginalObjectConcern
             @user_series = loop_array_and_get_one_series(object: user.novel_series, data_type: "series", crud_type: "index")
             #Favorites ユーザーがお気に入りにしたSeries
             series_data = loop_array_and_get_one_favorites(user.novel_favorites, data_type)
-            @user_favorites_series = loop_array_and_get_one_series(object: series_data, data_type: "series", crud_type: "index")
+            @user_favorites_series = loop_array_and_get_one_series(object: series_data, data_type: "series", crud_type: "index").uniq
             return {
                 user: @user,
                 user_tags: @user_tags,
@@ -214,6 +213,7 @@ module GenerateOriginalObjectConcern
                 user_series: @user_series,
                 user_favorites_series_count: @user_favorites_series.count,
                 user_favorites_series: @user_favorites_series,
+                # お気に入りする小説は複数存在する。そうするとSeriesを取得した際に重複するので「.uniq」で、重複した配列を除く。
             }
         end
 
