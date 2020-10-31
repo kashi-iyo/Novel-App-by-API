@@ -108,19 +108,24 @@ module ReturnVariousDataConcern
         # Users1件のデータフォーマット
         def return_user_data(user_data)
             @user = user_data[:object]
-            case user_data[:data_type]
+            data_type = user_data[:data_type]
+            case data_type
             when "user"
                 return {
                     user_id: @user.id,
                     nickname: @user.nickname,
                     profile: @user.profile,
                 }
-            when "user_tag"
+            when "user_tag", "followings", "followers"
+                @tags = loop_array_and_get_one_tag(
+                    object: @user.user_tags,
+                    data_type: "user"
+                )
                 return {
                     user_id: @user.id,
                     nickname: @user.nickname,
                     profile: @user.profile,
-                    tag: @user.user_tags,
+                    tag: @tags,
                 }
             end
         end
