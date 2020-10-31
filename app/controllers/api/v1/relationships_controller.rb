@@ -1,6 +1,7 @@
 class Api::V1::RelationshipsController < ApplicationController
 
     before_action :set_user, only: [:create]
+    before_action :for_users_followings_or_followers, only: [:followings, :followers]
     before_action :set_relationship, only: [:destroy]
 
     def create
@@ -21,6 +22,22 @@ class Api::V1::RelationshipsController < ApplicationController
         )
     end
 
+    def followings
+        crud_object(
+            object: @user2,
+            data_type: "followings",
+            crud_type: "show"
+        )
+    end
+
+    def followers
+        crud_object(
+            object: @user2,
+            data_type: "followers",
+            crud_type: "show"
+        )
+    end
+
     private
 
     def relationship_params
@@ -30,6 +47,11 @@ class Api::V1::RelationshipsController < ApplicationController
     def set_user
         @user = User.find(params[:relationship][:follow_id])
         check_existing?(@user, "relationship")
+    end
+
+    def for_users_followings_or_followers
+        @user2 = User.find(params[:id])
+        check_existing?(@user2, "user")
     end
 
     def set_relationship
