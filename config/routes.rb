@@ -9,6 +9,8 @@ Rails.application.routes.draw do
         # 小説
         resources :novels, only: [:show, :edit, :create, :update, :destroy]
       end
+      # selectタグで並び替えられたデータを取得
+      get "selected_series/:selected_params", to: "novel_series#selected_series"
       # ユーザー
       resources :users, only: [:create, :show, :edit, :update,  :index]
       # タグ系
