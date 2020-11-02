@@ -46,7 +46,7 @@ module GenerateOriginalObjectConcern
                         tags: @tags,
                         novels: @novels,
                     }
-                when "index"
+                when "index", "selected"
                     {
                         series: @series,
                         novels_count: @novels.count,

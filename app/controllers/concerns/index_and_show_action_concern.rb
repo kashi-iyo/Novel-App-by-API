@@ -26,7 +26,7 @@ module IndexAndShowActionConcern
         case index_data[:data_type]
         when "series"
             series_data = loop_array_and_get_one_series(index_data).compact
-                        # → loop_array_concern.rb
+                    # → loop_array_concern.rb
             return {
                 series_count: series_data.count,
                 series: series_data
@@ -77,6 +77,7 @@ module IndexAndShowActionConcern
     def render_json_crud_object(json_object)
         render json: {
             status: json_object[:status],
+            selection: json_object[:selection],
             object: json_object[:object],
             data_type: json_object[:data_type],
             crud_type: json_object[:crud_type]

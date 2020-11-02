@@ -4,6 +4,7 @@ module LoopArrayConcern
 
     included do
         helper_method :loop_array_and_get_one_series,
+        :sorting_series_by_select,
         :loop_array_and_get_one_novel,
         :loop_array_and_get_one_favorites,
         :loop_array_and_get_one_tag,
@@ -32,6 +33,32 @@ module LoopArrayConcern
                 elsif !series[:release]
                     next
                 end
+            end
+        end
+    end
+
+    # Seriesデータをソートする
+    def sorting_series_by_select(sort_data)
+        sort_data[:object].sort do |a, b|
+            case sort_data[:selection]
+            # 新着順
+            when "new"
+                b[:series][:created_at].to_i <=> a[:series][:created_at].to_i
+            # 古い順
+            when "old"
+                a[:series][:created_at].to_i <=> b[:series][:created_at].to_i
+            # お気に入り多い順
+            when "more_favo"
+                    b[:favorites_count] <=> a[:favorites_count]
+            # お気に入り少ない順
+            when "less_favo"
+                    a[:favorites_count] <=> b[:favorites_count]
+            # コメント多い順
+            when "more_comment"
+                    b[:comments_count] <=> a[:comments_count]
+            # コメント少ない順
+            when "less_comment"
+                    a[:comments_count] <=> b[:comments_count]
             end
         end
     end

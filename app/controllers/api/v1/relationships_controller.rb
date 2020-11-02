@@ -1,5 +1,6 @@
 class Api::V1::RelationshipsController < ApplicationController
 
+    before_action :logged_in_user, only: [:create, :destroy]
     before_action :set_user, only: [:create]
     before_action :for_users_followings_or_followers, only: [:followings, :followers]
     before_action :set_relationship, only: [:destroy]
