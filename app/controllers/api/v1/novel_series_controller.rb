@@ -10,7 +10,7 @@ class Api::V1::NovelSeriesController < ApplicationController
     #Read NovelSeriesオブジェクト全件をJSONとしてレンダリング
     def index
         crud_object(
-            object: NovelSeries.all,
+            object: NovelSeries.all.desc_order,
             data_type: "series",
             crud_type: "index"
         )
@@ -63,6 +63,17 @@ class Api::V1::NovelSeriesController < ApplicationController
             object: @novel_series,
             data_type: "series",
             crud_type: "destroy"
+        )
+    end
+
+    # selectタグで並び替え
+    def selected_series
+        selection = params[:selected_params]
+        crud_object(
+            object: NovelSeries.all,
+            selection: selection,
+            data_type: "series",
+            crud_type: "selected"
         )
     end
 
