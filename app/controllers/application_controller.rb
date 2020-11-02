@@ -20,6 +20,8 @@ class ApplicationController < ActionController::Base
     include UpdateActionConcern
     # 各ControllerのDestroyを実行する
     include DestroyActionConcern
+    # select検索されたオブジェクトを取得する
+    include SelectedActionConcern
 
     # SessionsControllerの処理を実行する
     include SessionConcern
@@ -68,6 +70,9 @@ class ApplicationController < ActionController::Base
         when "destroy"
             execute_destroy_object(crud_data)
                 # →destroy_action_concern.rb
+        # select
+        when "selected"
+            execute_selected_object(crud_data)
         end
     end
 
