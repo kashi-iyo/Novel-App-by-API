@@ -18,13 +18,7 @@ module ReturnErrorMessagesConcern
     #error 誤ったアクセスを行った場合に返す
     def bad_access(access_data)
         message = access_data[:message]
-        action = access_data[:action]
-        case action
-        when "login", "logout", "current_user"
-            render json: { status: :unauthorized, errors: message}
-        when "is_logged_in?"
-            render json: { logged_in: false, errors: message}
-        end
+        render json: { status: :unauthorized, errors: message}
     end
 
     #errorデータが存在しない場合に返すJSONレスポンス
