@@ -21,15 +21,23 @@ module LoopArrayConcern
         crud_type = series_data[:crud_type]
         object.map do |series|
             @series = generate_original_series_object(object: series, data_type: data_type, crud_type: crud_type)
-                # → generate_original_object_concern.rb
-            # 自身の作品の場合
-            if authorized?(object: series)
-                @series
-            else
+                    # → generate_original_object_concern.rb
+            # 非ログインの場合
+            if !logged_in?
                 # 公開されている場合
                 if !!series[:release]
                     @series
                 # 非公開の場合
+                elsif !series[:release]
+                    next
+                end
+            # ログインしている場合
+            elsif logged_in?
+                # ログインユーザー=作者の場合、非公開作品含め全て取得
+                if authorized?(object: series)
+                    @series
+                elsif !!series[:release]
+                    @series
                 elsif !series[:release]
                     next
                 end
