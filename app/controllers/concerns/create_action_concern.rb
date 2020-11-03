@@ -111,8 +111,11 @@ module CreateActionConcern
         data_type = created_object[:data_type]
         case data_type
         when "user"
-            login!
-            return object.id
+            login!(object)
+            return {
+                id: object.id,
+                nickname: object.nickname,
+            }
         when"series"
             object.save_tag(created_object[:association])
             return object.id
