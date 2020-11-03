@@ -43,7 +43,7 @@ module SessionConcern
         when "login"
             #auth パスワードチェック
             if user && user.authenticate(params)
-                login!
+                login!(user)
                 return return_session_data(user: user, action: action)
             else
                 return bad_access(message: "入力された内容に誤りがあります。", action: action)
@@ -63,8 +63,6 @@ module SessionConcern
         when "logout"
             reset_session
             render json: { status: 200, logged_out: true, user: user }
-        when "is_logged_in?"
-            render json: { logged_in: true, user: user }
         end
     end
 
