@@ -1,8 +1,7 @@
 class SessionsController < ApplicationController
 
-    before_action :logged_in?, only: [:login, :is_logged_in?, :logout]
     before_action :set_user, only: [:login]
-    before_action :current_user, only: [:is_logged_in?, :logout]
+    before_action :current_user, only: [:is_logged_in?]
 
     def login
         pass_object_for_sessions(
@@ -13,13 +12,13 @@ class SessionsController < ApplicationController
     end
 
     def is_logged_in?
-        pass_object_for_sessions(
-            object: {
-                user_id: @current_user.id,
-                nickname: @current_user.nickname
+        render json: {
+            logged_in: true,
+            user: {
+                id: current_user.id,
+                nickname: current_user.nickname,
             },
-            action: "is_logged_in?"
-        )
+        }
     end
 
     def logout
