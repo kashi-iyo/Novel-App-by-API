@@ -8,8 +8,8 @@ module AuthenticationFeaturesConcern
     end
 
     # ログインさせる
-    def login!
-        session[:user_id] = @user.id
+    def login!(user)
+        session[:user_id] = user.id
     end
 
     # ログインしているかどうかをbool値で返す
@@ -20,19 +20,19 @@ module AuthenticationFeaturesConcern
     # ユーザーがログインしていない場合の処理
     def logged_in_user
         unless logged_in?
-            render json: {
+            return bad_access(
                 status: :unauthorized,
-                messages: "ログインまたは、新規登録を行ってください。",
-            }
+                message: "ログインまたは、新規登録を行ってください。",
+            )
         end
     end
 
     # 現在ログインしているユーザーを返す
     def current_user
-        if session[:user_id]
+        if logged_in?
             @current_user ||= User.find(session[:user_id])
         else
-            return bad_access(message: "ログインまたは、新規登録を行ってください。", action: "current_user")
+            render json: {logged_in: false}
         end
     end
 
