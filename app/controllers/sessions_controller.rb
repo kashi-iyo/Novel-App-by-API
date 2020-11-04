@@ -9,6 +9,7 @@ class SessionsController < ApplicationController
             params: session_params[:password],
             action: "login"
         )
+            # → session_concern.rb
     end
 
     def is_logged_in?

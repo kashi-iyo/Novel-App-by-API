@@ -88,18 +88,19 @@ module CreateActionConcern
         @association = save_object[:association]
         @data_type = save_object[:data_type]
         if @new_object.save
+            # React側へ渡したいオブジェクトの形にする
             @created_object = return_created_object(
                 object: @new_object,
                 association: @association,
                 data_type: @data_type
             )
-                    # → return_executed_crud_object_concern.rb
+            # JSONとしてレンダリング
             create_and_save_object_to_render(
                 object: @created_object,
                 data_type: @data_type,
                 crud_type: @crud_type
             )
-                    # → render_json_crud_object_concern.rb
+        #error Save失敗
         else
             return failed_to_crud_object(object: @new_object)
         end

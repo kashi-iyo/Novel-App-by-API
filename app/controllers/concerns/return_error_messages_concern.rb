@@ -4,21 +4,14 @@ module ReturnErrorMessagesConcern
 
     included do
         helper_method :return_not_present_data, :return_unrelease_data, :failed_to_crud_object,
-        :already_existing_object
+        :already_existing_object, :unauthorized_errors
     end
 
-    #error dataのユーザーとログインユーザーが不一致な場合の処理
-    def handle_unauthorized()
-        render json: {
-            status: :unauthorized,
-            errors: "アクセス権限がありません。",
-        }
-    end
 
     #error 誤ったアクセスを行った場合に返す
-    def bad_access(access_data)
-        message = access_data[:message]
-        render json: { status: :unauthorized, errors: message}
+    def unauthorized_errors(unauthorized_data)
+        errors = unauthorized_data[:errors]
+        render json: { status: :unauthorized, errors: errors}
     end
 
     #errorデータが存在しない場合に返すJSONレスポンス

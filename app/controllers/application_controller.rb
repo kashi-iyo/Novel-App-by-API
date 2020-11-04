@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
         if authorized?(crud_data)
             crud_object(crud_data)
         else
-            return handle_unauthorized()
+            return unauthorized_errors(errors: "アクセス権限がありません")
         end
     end
 
