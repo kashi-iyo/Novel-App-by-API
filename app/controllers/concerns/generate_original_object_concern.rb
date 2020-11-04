@@ -196,14 +196,31 @@ module GenerateOriginalObjectConcern
                 #User ユーザーデータ
                 @user = return_user_data(object: user, data_type: data_type)
                 #UTag そのユーザーが登録しているタグ全件
-                @user_tags = loop_array_and_get_one_tag(object: user.user_tags, data_type: data_type)
+                @user_tags = loop_array_and_get_one_tag(
+                    object: user.user_tags,
+                    data_type: data_type
+                )
                 # ユーザーのフォロー/フォロワーデータ
-                @relationships = generate_original_relationships_object(object: user, data_type: data_type)
+                @relationships = generate_original_relationships_object(
+                    object: user,
+                    data_type: data_type
+                )
                 #Series ユーザーの投稿したSeries全件
-                @user_series = loop_array_and_get_one_series(object: user.novel_series, data_type: "series", crud_type: "index").compact
+                @user_series = loop_array_and_get_one_series(
+                    object: user.novel_series,
+                    data_type: "series",
+                    crud_type: "index"
+                ).compact
                 #Favorites ユーザーがお気に入りにしたSeries
-                series_data = loop_array_and_get_one_favorites(user.novel_favorites, data_type)
-                @user_favorites_series = loop_array_and_get_one_series(object: series_data, data_type: "series", crud_type: "index").compact.uniq
+                series_data = loop_array_and_get_one_favorites(
+                    object: user.novel_favorites,
+                    data_type: data_type
+                ).compact
+                @user_favorites_series = loop_array_and_get_one_series(
+                    object: series_data,
+                    data_type: "series",
+                    crud_type: "index"
+                ).compact.uniq
                     # → お気に入りする小説は複数存在する。そうするとSeriesを取得した際に重複するので「.uniq」で、重複した配列を除く。
                 return {
                     user: @user,
