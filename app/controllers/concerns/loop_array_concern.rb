@@ -86,12 +86,25 @@ module LoopArrayConcern
     end
 
     # Favorites全件をループ処理
-    def loop_array_and_get_one_favorites(favorites_data, data_type)
-        if favorites_data === []
-            [{favorites_id: ""}]
-        else
-            favorites_data.map do |favorites|
-                return_favorites_data(favorites, data_type)
+    def loop_array_and_get_one_favorites(favorites_data)
+        object = favorites_data[:object]
+        data_type = favorites_data[:data_type]
+        case data_type
+        when 'novel'
+            if object === []
+                {favorites_id: ""}
+            else
+                object.map do |obj|
+                    return_favorites_data(
+                        obj, data_type[:data_type]
+                    )
+                end
+            end
+        when "user"
+            object.map do |obj|
+                return_favorites_data(
+                    obj, data_type[:data_type]
+                )
             end
         end
     end
