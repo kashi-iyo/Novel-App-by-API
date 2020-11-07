@@ -39,6 +39,10 @@ class ApplicationController < ActionController::Base
         if authorized?(crud_data)
             crud_object(crud_data)
         else
+            case crud_data[:data_type]
+            when "relationship"
+                return unauthorized_errors(errors: "自分自身をフォローすることは出来ません。", error_type: "follow_myselfy")
+            end
             return unauthorized_errors(errors: "アクセス権限がありません")
         end
     end
