@@ -23,12 +23,17 @@ module ValidatesFeaturesConcern
     end
 
     #validates 存在をチェック
-    def check_existing?(data, data_type)
-        if data.present?
-            return data
-        else
-            return return_not_present_data(data_type)
-                # → return_error_messages_concern.rb
+    def check_existing?(check_data)
+        object = check_data[:object]
+        params = check_data[:params]
+        data_type = check_data[:data_type]
+        case data_type
+        when "relationship"
+            if object.find_by(id: params).nil?
+                return_not_present_data(data_type)
+            else
+                return object.find_by(id: params)
+            end
         end
     end
 
