@@ -11,7 +11,12 @@ module ReturnErrorMessagesConcern
     #error 誤ったアクセスを行った場合に返す
     def unauthorized_errors(unauthorized_data)
         errors = unauthorized_data[:errors]
-        render json: { status: :unauthorized, errors: errors}
+        error_type = unauthorized_data[:error_type]
+        render json: {
+            status: :unauthorized,
+            error_type: error_type,
+            errors: errors,
+            }
     end
 
     #errorデータが存在しない場合に返すJSONレスポンス
