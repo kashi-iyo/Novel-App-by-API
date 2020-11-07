@@ -101,7 +101,7 @@ module GenerateOriginalObjectConcern
         # Favoritesオブジェクト
         def generate_original_favorites_object(data_for_favorites, data_type)
             case data_type
-            when "series", "series_tag", "Users#show"
+            when "series", "series_tag"
                 # Favorite 各Novelsが持つお気に入り数
                 @count = loop_array_and_get_one_data_count(data_for_favorites, "call_favorites_count")
                 # Favorite数の合計値
@@ -125,7 +125,7 @@ module GenerateOriginalObjectConcern
         # Commentsオブジェクト生成
         def generate_original_comments_object(data_for_comments, data_type)
             case data_type
-            when "series", "series_tag", "NovelSeries#show", "Users#show"
+            when "series", "series_tag"
                 #Comment Novelの持つコメント数
                 @count = loop_array_and_get_one_data_count(data_for_comments, "call_comments_count")
                 #Comment コメント総の合計値
@@ -204,7 +204,7 @@ module GenerateOriginalObjectConcern
                 @relationships = generate_original_relationships_object(
                     object: user,
                     data_type: data_type
-                )
+                ).compact
                 #Series ユーザーの投稿したSeries全件
                 @user_series = loop_array_and_get_one_series(
                     object: user.novel_series,
@@ -215,7 +215,7 @@ module GenerateOriginalObjectConcern
                 series_data = loop_array_and_get_one_favorites(
                     object: user.novel_favorites,
                     data_type: data_type
-                ).compact
+                )
                 @user_favorites_series = loop_array_and_get_one_series(
                     object: series_data,
                     data_type: "series",
