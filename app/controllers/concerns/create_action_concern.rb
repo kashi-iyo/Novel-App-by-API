@@ -39,6 +39,13 @@ module CreateActionConcern
     def check_already_existing_user_data(check)
         @association = check[:association]
         case check[:data_type]
+        when "user"
+            if logged_in?
+                unauthorized_errors(
+                    errors: "すでにログインしています。不正なアクセスです。",
+                    error_type: "already_login"
+                )
+            end
         #Favorites お気に入り済みかどうかのチェック
         when "favorites"
             if favorited_by?(@association)
