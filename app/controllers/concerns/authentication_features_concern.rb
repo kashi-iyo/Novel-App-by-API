@@ -20,20 +20,16 @@ module AuthenticationFeaturesConcern
     # ユーザーがログインしていない場合の処理
     def logged_in_user
         unless logged_in?
-            return bad_access(
-                status: :unauthorized,
-                message: "ログインまたは、新規登録を行ってください。",
+            return unauthorized_errors(
+                errors: "この機能を使用するにはログインまたは、新規登録が必要です。",
+                error_type: "not_login"
             )
         end
     end
 
     # 現在ログインしているユーザーを返す
     def current_user
-        if logged_in?
-            @current_user ||= User.find(session[:user_id])
-        else
-            render json: {logged_in: false}
-        end
+        @current_user ||= User.find(session[:user_id]) if logged_in?
     end
 
 
