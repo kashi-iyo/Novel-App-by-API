@@ -38,17 +38,19 @@ module ReturnVariousDataConcern
 
 
         #Favorite1件のデータフォーマット
-        def return_favorites_data(favorites, favorites_type)
-            case favorites_type
+        def return_favorites_data(favorites_data)
+            object = favorites_data[:object]
+            data_type = favorites_data[:data_type]
+            case data_type
             when "novel"
                 return {
-                    favorites_id: favorites.id,
-                    favorites_user_id: favorites.user_id,
-                    favorites_novel_id: favorites.novel_id,
-                    favoriter: favorites.favoriter,
+                    favorites_id: object.id,
+                    favorites_user_id: object.user_id,
+                    favorites_novel_id: object.novel_id,
+                    favoriter: object.favoriter,
                 }
             when "user"
-                favorites.novel.novel_series
+                object.novel.novel_series
             end
         end
 
