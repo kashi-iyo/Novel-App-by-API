@@ -23,7 +23,7 @@ module LoopArrayConcern
             @series = generate_original_series_object(object: series, data_type: data_type, crud_type: crud_type)
                     # → generate_original_object_concern.rb
             # 非ログインの場合
-            if !logged_in?
+            if !current_user
                 # 公開されている場合
                 if !!series[:release]
                     @series
@@ -32,14 +32,16 @@ module LoopArrayConcern
                     next
                 end
             # ログインしている場合
-            elsif logged_in?
+            elsif !!current_user
                 # ログインユーザー=作者の場合、非公開作品含め全て取得
                 if authorized?(object: series)
                     @series
-                elsif !!series[:release]
-                    @series
-                elsif !series[:release]
-                    next
+                else
+                    if !!series[:release]
+                        @series
+                    elsif !series[:release]
+                        next
+                    end
                 end
             end
         end
@@ -57,16 +59,16 @@ module LoopArrayConcern
                 a[:series][:created_at].to_i <=> b[:series][:created_at].to_i
             # お気に入り多い順
             when "more_favo"
-                    b[:favorites_count] <=> a[:favorites_count]
+                b[:favorites_count] <=> a[:favorites_count]
             # お気に入り少ない順
             when "less_favo"
-                    a[:favorites_count] <=> b[:favorites_count]
+                a[:favorites_count] <=> b[:favorites_count]
             # コメント多い順
             when "more_comment"
-                    b[:comments_count] <=> a[:comments_count]
+                b[:comments_count] <=> a[:comments_count]
             # コメント少ない順
             when "less_comment"
-                    a[:comments_count] <=> b[:comments_count]
+                a[:comments_count] <=> b[:comments_count]
             end
         end
     end
@@ -96,14 +98,16 @@ module LoopArrayConcern
             else
                 object.map do |obj|
                     return_favorites_data(
-                        obj, data_type[:data_type]
+                        object: obj,
+                        data_type: data_type
                     )
                 end
             end
         when "user"
             object.map do |obj|
                 return_favorites_data(
-                    obj, data_type[:data_type]
+                    object: obj,
+                    data_type: data_type
                 )
             end
         end
