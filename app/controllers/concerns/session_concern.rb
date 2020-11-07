@@ -22,14 +22,26 @@ module SessionConcern
 
     #auth ログイン中の挙動
     def logging_case(session_data)
+        user = session_data[:user]
         action = session_data[:action]
         case action
         #error ログインしているのにログインしようとする
         when "login"
-            return unauthorized_errors(errors: "すでにログインしています。")
+            return unauthorized_errors(errors: "すでにログインしています。", error_type: "already_login")
+        when "is_logged_in?"
+            return return_session_data(
+                action: action,
+                logged_in: true,
+                user: {id: user.id, nickname: user.nickname}
+            )
         # ログアウトする
         when "logout"
-            return return_session_data(action: action)
+            reset_session
+            return return_session_data(
+                action: action,
+                logged_in: false,
+                successful: "正常にログアウト出来ました。"
+            )
         end
     end
 
@@ -44,16 +56,20 @@ module SessionConcern
             if user && user.authenticate(params)
                 login!(user)
                 return return_session_data(
-                    user: {
-                        id: user.id,
-                        nickname: user.nickname,
-                    },
-                    action: action
+                    action: action,
+                    logged_in: true,
+                    successful: "正常にログイン出来ました。",
+                    user: { id: user.id, nickname: user.nickname }
                 )
             #error パスワードチェック失敗
             else
-                return unauthorized_errors(errors: "入力された内容に誤りがあります。")
+                return unauthorized_errors(errors: "メールアドレス、もしくはパスワードが間違っています。再度入力をし直してください。", error_type: "authenticate_password")
             end
+        when "is_logged_in?"
+            return_session_data(
+                action: action,
+                logged_in: false
+            )
         #error ログインしてないのにログアウトしようとする場合
         when "logout"
             return unauthorized_errors(errors: "不正なアクセスです。")
@@ -62,22 +78,13 @@ module SessionConcern
 
     #auth ユーザーデータをJSONデータで返す
     def return_session_data(session_data)
-        user = session_data[:user]
-        action = session_data[:action]
-        case action
-        when "login"
-            render json: {
-                status: 200,
-                logged_in: true,
-                successful: "ログインに成功しました。",
-                object: user
-            }
-        when "logout"
-            reset_session
-            render json: { status: 200, logged_out: true, successful: "ログアウトしました。" }
-        end
+        render json: {
+            status: 200,
+            action: session_data[:action],
+            logged_in: session_data[:logged_in],
+            successful: session_data[:successful],
+            object: session_data[:user]
+        }
     end
-
-
 
 end
