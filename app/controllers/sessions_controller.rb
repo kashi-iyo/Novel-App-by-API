@@ -13,13 +13,10 @@ class SessionsController < ApplicationController
     end
 
     def is_logged_in?
-        render json: {
-            logged_in: true,
-            user: {
-                id: current_user.id,
-                nickname: current_user.nickname,
-            },
-        }
+        pass_object_for_sessions(
+            object: current_user,
+            action: "is_logged_in?"
+        )
     end
 
     def logout
@@ -36,7 +33,6 @@ class SessionsController < ApplicationController
 
         def set_user
             @user = User.find_by(email: session_params[:email])
-            check_existing?(@user, "user")
         end
 
 end
