@@ -46,13 +46,18 @@ class Api::V1::RelationshipsController < ApplicationController
     end
 
     def set_user
-        @user = User.find(params[:relationship][:follow_id])
-        check_existing?(@user, "relationship")
+        @user = check_existing?(
+            object: User,
+            params: params[:relationship][:follow_id],
+            data_type: "relationship"
+        )
+            # → validates_features_concern.rb
     end
 
     def for_users_followings_or_followers
         @user2 = User.find(params[:id])
         check_existing?(@user2, "user")
+            # → validates_features_concern.rb
     end
 
     def set_relationship
