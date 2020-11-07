@@ -7,6 +7,7 @@ module SelectedActionConcern
         :render_json_selected_object
     end
 
+    # 指定されたselectタグに基づいてオブジェクトを返す
     def execute_selected_object(selected_data)
         @object = return_selected_object(selected_data)
         render_json_selected_object(
@@ -33,6 +34,7 @@ module SelectedActionConcern
         end
     end
 
+    # selectの値を返す
     def set_selected_value(selection)
         case selection
         when "new"
