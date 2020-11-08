@@ -26,8 +26,11 @@ class Api::V1::NovelTagsController < ApplicationController
 
         # パラメータに基づいたタグを取得
         def set_tag
-            @tag = NovelTag.find_by(id: params[:id])
-            check_existing?(@tag, "tag")
+            @tag = check_existing?(
+                object: NovelTag,
+                params: params[:id],
+                data_type: "tag")
+                # → validates_features_concern.rb
         end
 
 end

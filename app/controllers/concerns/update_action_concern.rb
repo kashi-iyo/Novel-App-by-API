@@ -57,7 +57,7 @@ module UpdateActionConcern
         render json: {
             status: :ok,
             object: updated_data[:object],
-            successful: "編集が完了しました。",
+            successful: "正常に編集が完了しました。",
             data_type: updated_data[:data_type],
             crud_type: updated_data[:crud_type]
         }

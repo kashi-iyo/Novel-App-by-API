@@ -30,14 +30,19 @@ class Api::V1::CommentsController < ApplicationController
     end
 
     def set_novel
-        @novel = Novel.find_by(id: params[:novel_id])
-        check_existing?(@novel, "novel")
+        @novel = check_existing?(
+            object: Novel,
+            params: params[:novel_id],
+            data_type: "novel")
             # → validates_features_concern.rb
     end
 
     def set_comment
-        @comment = Comment.find_by(id: params[:id], novel_id: params[:novel_id])
-        check_existing?(@comment, "comment")
+        @comment = check_existing?(
+            object: Comment,
+            params: params[:id],
+            params2: params[:novel_id],
+            data_type: "comment")
             # → validates_features_concern.rb
     end
 

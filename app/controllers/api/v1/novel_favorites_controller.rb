@@ -9,7 +9,7 @@ class Api::V1::NovelFavoritesController < ApplicationController
         crud_object(
             object: current_user.novel_favorites,
             params: favorite_params,
-            association_data: @novel_in_series,
+            association_data: @novel,
             data_type: "favorites",
             crud_type: "create"
         )
@@ -35,14 +35,19 @@ class Api::V1::NovelFavoritesController < ApplicationController
 
         # シリーズが所有する小説1話分を取得
         def set_novel
-            @novel_in_series = Novel.find_by(id: params[:novel_id])
-            check_existing?(@novel_in_series, "novel")
+            @novel = check_existing?(
+                object: Novel,
+                params: params[:novel_id],
+                data_type: "novel")
                 # → validates_features_concern.rb
         end
 
         def set_favorites
-            @novel_favorite = NovelFavorite.find_by(novel_id: params[:novel_id], user_id: params[:id])
-            check_existing?(@novel_favorite, "favorite")
+            @novel_favorite = check_existing?(
+                object: NovelFavorite,
+                params: params[:novel_id],
+                params2: params[:id],
+                data_type: "favorite")
                 # → validates_features_concern.rb
         end
 

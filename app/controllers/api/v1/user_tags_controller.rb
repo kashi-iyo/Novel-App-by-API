@@ -25,8 +25,11 @@ class Api::V1::UserTagsController < ApplicationController
     private
 
     def set_user_tag
-        @tag = UserTag.find_by(id: params[:id])
-        check_existing?(@tag, "tag")
+        @tag = check_existing?(
+            object: UserTag,
+            params: params[:id],
+            data_type: "tag")
+            # → validates_features_concern.rb
     end
 
 end

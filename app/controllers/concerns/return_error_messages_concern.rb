@@ -37,6 +37,7 @@ module ReturnErrorMessagesConcern
         end
         render json: {
             head: :no_content,
+            data_type: data_type,
             errors: "対象の#{target}が存在しません。",
         }
     end

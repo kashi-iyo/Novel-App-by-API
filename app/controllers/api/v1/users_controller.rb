@@ -70,7 +70,10 @@ class Api::V1::UsersController < ApplicationController
         end
 
         def set_user
-            @user = User.find(params[:id])
-            check_existing?(@user, "user")
+            @user = check_existing?(
+                object: User,
+                params: params[:id],
+                data_type: "user")
+                # → validates_features_concern.rb
         end
 end

@@ -22,19 +22,23 @@ module ValidatesFeaturesConcern
         end
     end
 
-    #validates 存在をチェック
+    #validates パラメータに基づいたデータの存在をチェック
     def check_existing?(check_data)
         object = check_data[:object]
         params = check_data[:params]
+        params2 = check_data[:params2]
         data_type = check_data[:data_type]
         case data_type
+        when "user", "novel", "series", "tag"
+            return object.find_by(id: params) unless object.find_by(id: params).nil?
         when "relationship"
-            if object.find_by(id: params).nil?
-                return_not_present_data(data_type)
-            else
-                return object.find_by(id: params)
-            end
+            return object.find_by(follow_id: params) unless object.find_by(follow_id: params).nil?
+        when "comment"
+            return object.find_by(id: params, novel_id: params2) unless object.find_by(id: params, novel_id: params2).nil?
+        when "favorite"
+            return object.find_by(novel_id: params, user_id: params2) unless object.find_by(novel_id: params, user_id: params2).nil?
         end
+        return_not_present_data(data_type)
     end
 
     #validates releaseが真かどうか確認
