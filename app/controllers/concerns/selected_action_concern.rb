@@ -31,6 +31,15 @@ module SelectedActionConcern
                 ),
                     # → loop_array_concern.rb
             }
+        when "series_tag"
+            series_data = generate_original_tag_object(selected_data)
+            return {
+                selected_value: set_selected_value(selection),
+                tag: series_data[:tag],
+                series: sorting_series_by_select(
+                    object: series_data[:series], selection: selection
+                ),
+            }
         end
     end
 
