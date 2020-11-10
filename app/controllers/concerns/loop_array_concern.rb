@@ -48,6 +48,7 @@ module LoopArrayConcern
     end
 
     # Seriesデータをソートする
+    # お気に入りやコメントなどは、新着順にする
     def sorting_series_by_select(sort_data)
         sort_data[:object].sort do |a, b|
             case sort_data[:selection]
@@ -59,16 +60,16 @@ module LoopArrayConcern
                 a[:series][:created_at].to_i <=> b[:series][:created_at].to_i
             # お気に入り多い順
             when "more_favo"
-                b[:favorites_count] <=> a[:favorites_count]
+                [b[:favorites_count], b[:series][:created_at].to_i] <=> [a[:favorites_count], a[:series][:created_at].to_i]
             # お気に入り少ない順
             when "less_favo"
-                a[:favorites_count] <=> b[:favorites_count]
+                [a[:favorites_count], b[:series][:created_at].to_i] <=> [b[:favorites_count], a[:series][:created_at].to_i]
             # コメント多い順
             when "more_comment"
-                b[:comments_count] <=> a[:comments_count]
+                [b[:comments_count], b[:series][:created_at].to_i] <=> [a[:comments_count], a[:series][:created_at].to_i]
             # コメント少ない順
             when "less_comment"
-                a[:comments_count] <=> b[:comments_count]
+                [a[:comments_count], b[:series][:created_at].to_i] <=> [b[:comments_count], a[:series][:created_at].to_i]
             end
         end
     end
@@ -92,18 +93,7 @@ module LoopArrayConcern
         object = favorites_data[:object]
         data_type = favorites_data[:data_type]
         case data_type
-        when 'novel'
-            if object === []
-                {favorites_id: ""}
-            else
-                object.map do |obj|
-                    return_favorites_data(
-                        object: obj,
-                        data_type: data_type
-                    )
-                end
-            end
-        when "user"
+        when 'novel', "user"
             object.map do |obj|
                 return_favorites_data(
                     object: obj,

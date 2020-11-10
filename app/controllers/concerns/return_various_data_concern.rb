@@ -43,12 +43,7 @@ module ReturnVariousDataConcern
             data_type = favorites_data[:data_type]
             case data_type
             when "novel"
-                return {
-                    favorites_id: object.id,
-                    favorites_user_id: object.user_id,
-                    favorites_novel_id: object.novel_id,
-                    favoriter: object.favoriter,
-                }
+                object.user
             when "user"
                 object.novel.novel_series
             end
@@ -123,11 +118,17 @@ module ReturnVariousDataConcern
                     object: @user.user_tags,
                     data_type: "user"
                 )
+                # ユーザーのフォロー/フォロワーデータ
+                @relationships = generate_original_relationships_object(
+                    object: @user,
+                    data_type: "user"
+                ).compact
                 return {
                     user_id: @user.id,
                     nickname: @user.nickname,
                     profile: @user.profile,
                     tag: @tags,
+                    relationships: @relationships
                 }
             end
         end
