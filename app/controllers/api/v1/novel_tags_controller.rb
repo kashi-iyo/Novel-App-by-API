@@ -1,6 +1,6 @@
 class Api::V1::NovelTagsController < ApplicationController
 
-    before_action :set_tag, only: [:show]
+    before_action :set_tag, only: [:show, :selected_series]
 
     #Read NovelTagsフィード
     def index
@@ -20,6 +20,15 @@ class Api::V1::NovelTagsController < ApplicationController
             crud_type: "show"
         )
             # → Applicationコントローラ
+    end
+
+    def selected_series
+        crud_object(
+            object: @tag,
+            selection: params[:selected_params],
+            data_type: "series_tag",
+            crud_type: "selected"
+        )
     end
 
     private
