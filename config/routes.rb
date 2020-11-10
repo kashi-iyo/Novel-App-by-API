@@ -16,6 +16,8 @@ Rails.application.routes.draw do
       # タグ系
       resources :user_tags, only: [:index, :show]
       resources :novel_tags, only: [:index, :show]
+      # シリーズタグで絞り込みされた後にselectで並び替えられたデータを取得
+      get "novel_tags/:id/:selected_params", to: "novel_tags#selected_series"
       # フォロー
       resources :relationships, only: [:create, :destroy]
       get "relationships/:id/followings", to: "relationships#followings"
