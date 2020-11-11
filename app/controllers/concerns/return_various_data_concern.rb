@@ -107,7 +107,7 @@ module ReturnVariousDataConcern
             @user = user_data[:object]
             data_type = user_data[:data_type]
             case data_type
-            when "user"
+            when "user", "novel"
                 return {
                     user_id: @user.id,
                     nickname: @user.nickname,
