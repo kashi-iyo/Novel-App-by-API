@@ -106,22 +106,23 @@ module GenerateOriginalObjectConcern
                 @count = loop_array_and_get_one_data_count(data_for_favorites, "call_favorites_count")
                 # Favorite数の合計値
                 return @count.flatten.sum {|hash| hash[:favorites_count]}
+            # 1件の小説が獲得したお気に入りを取得
             when "novel"
-                # Favorite全件
+                # Favoriteデータ全件
                 @favorites = data_for_favorites.novel_favorites
-                # Favorite数の合計値
+                # Favorite数の合計値を算出
                 count = items_counter(data_for_favorites, "call_favorites_count")
                 @favorites_count = count.flatten.sum {|hash| hash[:favorites_count]}
-                # お気に入りにしたユーザー
-                @user = loop_array_and_get_one_favorites(
+                # お気に入りにしたユーザー全て取得
+                user = loop_array_and_get_one_favorites(
                     object: @favorites,
                     data_type: data_type)
-                # ログインユーザーがお気に入りしているかどうか
-                isOn = @user.include?(current_user)
+                # お気に入りにしたユーザーに、ログインユーザーは含まれているかどうかをチェック
+                @isOn = user.include?(current_user)
                 {
-                    favorites_status: isOn,
+                    favorites_status: @isOn,
                     favorites_count: @favorites_count,
-                    favorites_user: @user
+                    favorites_user: @favorites
                 }
             end
         end
