@@ -9,6 +9,7 @@ class NovelSeries < ApplicationRecord
   has_many :novels, dependent: :destroy
   has_many :novel_tag_maps, dependent: :destroy
   has_many :novel_tags, through: :novel_tag_maps
+  belongs_to :owner, class_name: "User", foreign_key: :user_id
 
   # バリデーション
   validates :series_title, presence: true
