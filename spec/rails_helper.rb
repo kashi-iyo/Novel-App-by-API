@@ -62,4 +62,5 @@ RSpec.configure do |config|
   config.include AuthenticateHelper, type: :request
   config.include ReturnJsonCreatedObject, type: :request
   config.include UserRequestSpecsHelpers, type: :request
+  config.include ReturnJsonShowObject, type: :request
 end
