@@ -1,16 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe "Users", type: :request do
-  # 認証済みユーザーの場合==============================
-  context "認証済みユーザーの場合" do
-    before do
-      @user = FactoryBot.create(:user)
-    end
+
+  context "認証が不必要な場合" do
     # Users-Show
-    describe "GET api/v1/user" do
+    describe "GET api/v1/user/:id" do
       before do
-        get "/api/v1/users"
-        @json = JSON.parse(response.body)
+        @user = FactoryBot.create(:user, nickname: "users_show")
+      end
+      before do
+        get "/api/v1/users/#{@user.id}"
       end
       it "正常なレスポンスを返すこと" do
         expect(response).to be_success
@@ -18,27 +17,9 @@ RSpec.describe "Users", type: :request do
       it "200を返すこと" do
         expect(response.status).to eq 200
       end
-    end
-  end
-  # 認証済みユーザーの場合==============================
-
-  # 認証済みユーザーでない場合==============================
-  context "認証済みユーザーでない場合" do
-    before do
-      @user = FactoryBot.create(:user)
-    end
-
-    # Users-Show
-    describe "GET api/v1/user" do
-      before do
-        get "/api/v1/users"
-        @json = JSON.parse(response.body)
-      end
-      it "正常なレスポンスを返すこと" do
-        expect(response).to be_success
-      end
-      it "200を返すこと" do
-        expect(response.status).to eq 200
+      it "nicknameの一致" do
+        json = JSON.parse(response.body)
+        expect(@user.nickname).to eq json["object"]["user"]["nickname"]
       end
     end
 
@@ -55,12 +36,8 @@ RSpec.describe "Users", type: :request do
         end
         it "成功時のJSONレスポンスを返すこと" do
           request_post(@params)
-          expect(JSON.parse(response.body)).to eq(created_object({
-              id: User.find_by(email: @email).id,
-              nickname: @nickname,
-              data_type: "user"
-            })
-          )
+          json = JSON.parse(response.body)
+          expect(@nickname).to eq json["object"]["nickname"]
         end
         it "ユーザーを登録&ログインすること" do
           expect_change_count(request_post(@params), User)
@@ -78,7 +55,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "パラメータ不正のJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Email can't be blank", "Email is invalid"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Email can't be blank", "Email is invalid"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -94,7 +73,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "パラメータ不正のJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Email is invalid"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Email is invalid"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -110,7 +91,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "パラメータ不足エラーのJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Nickname can't be blank"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Nickname can't be blank"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -126,7 +109,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "account_id不足エラーのJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Account can't be blank"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Account can't be blank"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -142,7 +127,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "password不足エラーのJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Password can't be blank"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Password can't be blank"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -161,7 +148,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "email重複エラーのJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Email has already been taken"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Email has already been taken"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -177,7 +166,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "nickname重複エラーのJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Nickname has already been taken"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Nickname has already been taken"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -193,7 +184,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "account_id重複エラーのJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Account has already been taken"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Account has already been taken"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -212,7 +205,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "パラメータ不正のJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Nickname is too long (maximum is 30 characters)"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Nickname is too long (maximum is 30 characters)"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -228,7 +223,9 @@ RSpec.describe "Users", type: :request do
             expect_http_status(@params, 200)
           end
           it "パラメータ不正のJSONレスポンスを返す" do
-            expect_error_response(@params, {errors: ["Account is too long (maximum is 15 characters)"]})
+            request_post(@params)
+            json = JSON.parse(response.body)
+            expect(["Account is too long (maximum is 15 characters)"]).to eq json["errors"]
           end
           it "ユーザーを登録しない" do
             expect_not_change_count(request_post(@params), User)
@@ -236,11 +233,65 @@ RSpec.describe "Users", type: :request do
           end
         end
       end
-
     end
-    # 認証済みユーザーでない場合==============================
 
+    describe "PUT /api/v1/users/:id" do
+      before do
+        @before_user = FactoryBot.create(:user)
+        @updated_user = FactoryBot.attributes_for(:updated_user)
+        put "/api/v1/users/#{@before_user.id}",
+        params: {user: {
+          nickname: @updated_user["nickname"],
+          profile: @updated_user["profile"]}}
+      end
+      it "200を返すこと" do
+        expect(response.status).to eq 200
+      end
+      it "認証が必要であるというレスポンスを返すこと" do
+        json = JSON.parse(response.body)
+        expect("この機能を使用するにはログインまたは、新規登録が必要です。").to eq json["errors"]
+      end
+    end
   end
 
+  context "認証が必要な場合" do
+    # ログインする
+    before do
+      @credentials = {
+          email: "authorization@example.com",
+          password: "password",
+          password_confirmation: "password"}
+        @before_user = FactoryBot.create(:user, @credentials)
+        post "/login", params: {user: @credentials}
+    end
+
+    describe "PUT /api/v1/users/:id" do
+      before do
+        @updated_user = FactoryBot.attributes_for(:updated_user)
+        put "/api/v1/users/#{@before_user.id}", params: {user: @updated_user}
+      end
+      it "200を返すこと" do
+        expect(response.status).to eq 200
+      end
+      it "正常なレスポンスを返すこと" do
+        json = JSON.parse(response.body)
+        expect("正常に編集が完了しました。").to eq json["successful"]
+      end
+    end
+
+    describe "DELETE /api/v1/users/:id" do
+      before do
+        @delete_user = FactoryBot.attributes_for(:delete_user)
+        delete "/api/v1/users/#{@before_user.id}", params: {user: @delete_user}
+      end
+      it "200を返すこと" do
+        expect(response.status).to eq 200
+      end
+      it "正常なレスポンスを返すこと" do
+        json = JSON.parse(response.body)
+        expect("正常に削除されました。").to eq json["successful"]
+      end
+    end
+  end
 
 end
