@@ -22,20 +22,4 @@ module UserRequestSpecsHelpers
         expect(response).to have_http_status(status)
     end
 
-    # 不正のJSONレスポンスを返すことを判定
-    def expect_error_response(params, errors)
-        request_post(params)
-        expect(JSON.parse(response.body)).to eq(not_created_object(errors))
-    end
-
-    # DBに登録することを判定
-    def expect_change_count(response_data, class_data)
-        expect { response_data }.to change(class_data, :count).by(0)
-    end
-
-    # DBに登録しないことを判定
-    def expect_not_change_count(response_data, class_data)
-        expect { response_data }.to change(class_data, :count).by(0)
-    end
-
 end

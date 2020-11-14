@@ -3,7 +3,6 @@ module AuthenticateHelper
     # extend ActiveSupport::Concern
 
     def is_logged_in?
-        # !cookies[:user_id].nil?
         !session[:user_id].nil?
     end
 
