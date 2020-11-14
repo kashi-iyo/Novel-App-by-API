@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe "Users", type: :request do
 
-  context "認証が不必要な場合" do
-    # Users-Show
+  context "認証が不要な場合" do
+    # ユーザーぺーじ
     describe "GET api/v1/user/:id" do
       before do
         @user = FactoryBot.create(:user, nickname: "users_show")
@@ -23,7 +23,7 @@ RSpec.describe "Users", type: :request do
       end
     end
 
-    # Users-Create
+    # ユーザーの作成
     describe "POST /api/v1/users" do
       context "全てのパラメータが揃っている場合" do
         before do
@@ -40,201 +40,192 @@ RSpec.describe "Users", type: :request do
           expect(@nickname).to eq json["object"]["nickname"]
         end
         it "ユーザーを登録&ログインすること" do
-          expect_change_count(request_post(@params), User)
+          expect { request_post(@params) }.to change(User, :count).by(1)
           expect(is_logged_in?).to be_truthy
         end
       end
 
       #パラメータに不足がある場合=====================
-      context "パラメータに不足がある場合" do
-        context "emailパラメータが不足している場合" do
-          before do
-            @params = return_user_params({permit: { email: nil }})
+        context "パラメータに不足がある場合" do
+          context "emailパラメータが不足している場合" do
+            before do
+              @params = return_user_params({permit: { email: nil }})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "パラメータ不正のJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Email can't be blank", "Email is invalid"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "パラメータ不正のJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Email can't be blank", "Email is invalid"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
-          end
-        end
 
-        context "emailパラメータが不正な場合" do
-          before do
-            @params = return_user_params({permit: { email: "aaaaaaaaa" }})
+          context "emailパラメータが不正な場合" do
+            before do
+              @params = return_user_params({permit: { email: "aaaaaaaaa" }})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "パラメータ不正のJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Email is invalid"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "パラメータ不正のJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Email is invalid"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
-          end
-        end
 
-        context "nicknameパラメータが不足している場合" do
-          before do
-            @params = return_user_params({permit: { nickname: nil }})
+          context "nicknameパラメータが不足している場合" do
+            before do
+              @params = return_user_params({permit: { nickname: nil }})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "パラメータ不足エラーのJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Nickname can't be blank"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "パラメータ不足エラーのJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Nickname can't be blank"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
-          end
-        end
 
-        context "account_idパラメータが不足している場合" do
-          before do
-            @params = return_user_params({permit: { account_id: nil }})
+          context "account_idパラメータが不足している場合" do
+            before do
+              @params = return_user_params({permit: { account_id: nil }})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "account_id不足エラーのJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Account can't be blank"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "account_id不足エラーのJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Account can't be blank"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
-          end
-        end
 
-        context "passwordが不足している場合" do
-          before do
-            @params = return_user_params({permit: { password: nil }})
-          end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "password不足エラーのJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Password can't be blank"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
+          context "passwordが不足している場合" do
+            before do
+              @params = return_user_params({permit: { password: nil }})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "password不足エラーのJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Password can't be blank"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
         end
-      end
 
       #パラメータに重複がある場合=====================
-      context "パラメータに重複がある場合" do
-        context "emailがすでに登録されている場合" do
-          before do
-            @params = return_duplicate_params({email: "tester_user@example.com"})
+        context "パラメータに重複がある場合" do
+          context "emailがすでに登録されている場合" do
+            before do
+              @params = return_duplicate_params({email: "tester_user@example.com"})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "email重複エラーのJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Email has already been taken"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "email重複エラーのJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Email has already been taken"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
-          end
-        end
 
-        context "nicknameがすでに登録されている場合" do
-          before do
-            @params = return_duplicate_params({nickname: "duplicate_user"})
+          context "nicknameがすでに登録されている場合" do
+            before do
+              @params = return_duplicate_params({nickname: "duplicate_user"})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "nickname重複エラーのJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Nickname has already been taken"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "nickname重複エラーのJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Nickname has already been taken"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
-          end
-        end
 
-        context "account_idがすでに登録されている場合" do
-          before do
-            @params = return_duplicate_params({account_id: "duplicate_ac"})
-          end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "account_id重複エラーのJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Account has already been taken"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
+          context "account_idがすでに登録されている場合" do
+            before do
+              @params = return_duplicate_params({account_id: "duplicate_ac"})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "account_id重複エラーのJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Account has already been taken"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
         end
-      end
 
       #パラメータの文字数制限に引っかかる場合
-      context "パラメータが文字数制限に引っかかる場合" do
-        context "nickname文字数が30文字以上の場合" do
-          before do
-            @params = return_user_params({permit: { nickname: "nickname" * 31 }})
+        context "パラメータが文字数制限に引っかかる場合" do
+          context "nickname文字数が30文字以上の場合" do
+            before do
+              @params = return_user_params({permit: { nickname: "nickname" * 31 }})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "パラメータ不正のJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Nickname is too long (maximum is 30 characters)"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "パラメータ不正のJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Nickname is too long (maximum is 30 characters)"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
-          end
-        end
 
-        context "account_id文字数が15文字以上の場合" do
-          before do
-            @params = return_user_params({permit: { account_id: "account_id" * 16 }})
-          end
-          it "200を返す" do
-            expect_http_status(@params, 200)
-          end
-          it "パラメータ不正のJSONレスポンスを返す" do
-            request_post(@params)
-            json = JSON.parse(response.body)
-            expect(["Account is too long (maximum is 15 characters)"]).to eq json["errors"]
-          end
-          it "ユーザーを登録しない" do
-            expect_not_change_count(request_post(@params), User)
-            expect(is_logged_in?).to be_falsey
+          context "account_id文字数が15文字以上の場合" do
+            before do
+              @params = return_user_params({permit: { account_id: "account_id" * 16 }})
+            end
+            it "200を返す" do
+              expect_http_status(@params, 200)
+            end
+            it "パラメータ不正のJSONレスポンスを返す" do
+              request_post(@params)
+              json = JSON.parse(response.body)
+              expect(["Account is too long (maximum is 15 characters)"]).to eq json["errors"]
+            end
+            it "ユーザーを登録しない" do
+              expect { request_post(@params) }.to change(User, :count).by(0)
+            end
           end
         end
-      end
     end
 
+    # ユーザーの更新
     describe "PUT /api/v1/users/:id" do
       before do
         @before_user = FactoryBot.create(:user)
@@ -265,6 +256,7 @@ RSpec.describe "Users", type: :request do
         post "/login", params: {user: @credentials}
     end
 
+    # ユーザーの更新
     describe "PUT /api/v1/users/:id" do
       before do
         @updated_user = FactoryBot.attributes_for(:updated_user)
@@ -279,6 +271,7 @@ RSpec.describe "Users", type: :request do
       end
     end
 
+    # ユーザーの削除
     describe "DELETE /api/v1/users/:id" do
       before do
         @delete_user = FactoryBot.attributes_for(:delete_user)
