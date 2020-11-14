@@ -1,7 +1,7 @@
 class Api::V1::UsersController < ApplicationController
 
     before_action :logged_in_user, only: [:edit, :update]
-    before_action :set_user, only: [:show, :edit, :update]
+    before_action :set_user, only: [:show, :edit, :update, :destroy]
     before_action :set_user_tags, only: [:update]
 
     #Read
@@ -51,6 +51,15 @@ class Api::V1::UsersController < ApplicationController
             params: user_params,
             data_type: "user",
             crud_type: "create"
+        )
+    end
+
+    #Destroy NovelSeriesを削除
+    def destroy
+        pass_object_to_crud(
+            object: @user,
+            data_type: "user",
+            crud_type: "destroy"
         )
     end
 

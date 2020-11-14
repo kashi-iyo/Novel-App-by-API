@@ -12,7 +12,7 @@ Rails.application.routes.draw do
       # selectタグで並び替えられたデータを取得
       get "selected_series/:selected_params", to: "novel_series#selected_series"
       # ユーザー
-      resources :users, only: [:create, :show, :edit, :update,  :index]
+      resources :users, only: [:create, :show, :edit, :update, :index, :destroy]
       # タグ系
       resources :user_tags, only: [:index, :show]
       resources :novel_tags, only: [:index, :show]
