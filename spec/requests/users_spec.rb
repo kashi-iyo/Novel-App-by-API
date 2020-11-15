@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "Users", type: :request do
 
-  context "認証が不要な場合" do
+  context "ログインしていない場合" do
     # ユーザーぺーじ
     describe "GET api/v1/user/:id" do
       before do
@@ -245,7 +245,7 @@ RSpec.describe "Users", type: :request do
     end
   end
 
-  context "認証が必要な場合" do
+  context "ログインしている場合" do
     # ログインする
     before do
       @credentials = {

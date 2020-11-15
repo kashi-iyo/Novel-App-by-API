@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
             when "relationship"
                 return unauthorized_errors(errors: "自分自身をフォローすることは出来ません。", error_type: "follow_myselfy")
             end
-            return unauthorized_errors(errors: "アクセス権限がありません", error_type: data_type)
+            return unauthorized_errors(errors: "アクセス権限がありません。", error_type: data_type)
         end
     end
 
