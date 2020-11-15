@@ -10,15 +10,17 @@ module ValidatesFeaturesConcern
     #validates ログイン中のユーザーとdataのユーザーが一致するかをbool値で返す
     def authorized?(data)
         data_type = data[:data_type]
-        @id = current_user.id
-        if data_type === "user"
-            data[:object][:id] === @id
-        elsif data_type === "novel_for_create"
-            data[:association_data][:user_id] === @id
-        elsif data_type === "relationship"
-            data[:association_data][:id] != @id
-        else
-            data[:object][:user_id] === @id
+        if !!current_user
+            @id = current_user.id
+            if data_type === "user"
+                data[:object][:id] === @id
+            elsif data_type === "novel_for_create"
+                data[:association_data][:user_id] === @id
+            elsif data_type === "relationship"
+                data[:association_data][:id] != @id
+            else
+                data[:object][:user_id] === @id
+            end
         end
     end
 
@@ -44,7 +46,14 @@ module ValidatesFeaturesConcern
     #validates releaseが真かどうか確認
     def release?(data)
         release = data[:object][:release]
-        !!release || !release && authorized?(data)
+        if !!release || !release && authorized?(data)
+            return data[:object]
+        else
+            return unauthorized_errors(
+                errors: "アクセス権限がありません。",
+                error_type: "series"
+            )
+        end
     end
 
     #validates ユーザーがその小説をお気に入りしているかどうかをチェック
