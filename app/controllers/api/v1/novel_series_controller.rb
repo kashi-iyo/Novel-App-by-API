@@ -4,6 +4,8 @@ class Api::V1::NovelSeriesController < ApplicationController
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
     # novels パラメータの基づいたシリーズ取得(@novel_series / @errorsを返す)
     before_action :set_series, only: [:show, :edit, :update, :destroy]
+    # 公開・非公開のチェック
+    before_action :check_release, only: [:show]
     # novels パラメータに基づいたタグのデータを取得(@novel_tags)
     before_action :set_series_tags, only: [:create, :update]
 
@@ -86,7 +88,7 @@ class Api::V1::NovelSeriesController < ApplicationController
 
         #! NovelSeriesオブジェクト作成時に一緒に送られてくるNovelTagのデータを取得
         def set_series_tags
-            @novel_tags = params[:novel_series][:novel_tag_name].split(",") unless params[:novel_series][:novel_tag_name].nil?
+            @novel_tags = params[:novel_series][:novel_tag_name].split(",")
         end
 
         #! パラメータに基づきNovelSeriesオブジェクトを取得
@@ -96,6 +98,14 @@ class Api::V1::NovelSeriesController < ApplicationController
                 params: params[:id],
                 data_type: "series")
                 # → validates_features_concern.rb
+        end
+
+        # 公開されているか非公開かをチェック
+        def check_release
+            @series = release?({
+                object: @series,
+                data_type: "series"
+            })
         end
 
 end
