@@ -4,6 +4,7 @@ class Api::V1::NovelsController < ApplicationController
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
     # novels Novelを1件取得（@novel）
     before_action :set_novel, only: [:show, :edit, :update, :destroy]
+    before_action :check_release, only: [:show]
     # novels NovelSeriesを取得（@series）
     before_action :set_series, only: [:create]
 
@@ -67,6 +68,14 @@ class Api::V1::NovelsController < ApplicationController
                 params: params[:id],
                 data_type: "novel")
                 # → validates_features_concern.rb
+        end
+
+        # 公開されているか非公開かをチェック
+        def check_release
+            @novel = release?({
+                object: @novel,
+                data_type: "novel"
+            })
         end
 
         # novels パラメータに基づきNovelSeriesオブジェクトを取得
