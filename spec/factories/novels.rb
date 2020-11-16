@@ -4,10 +4,10 @@ FactoryBot.define do
     novel_title { "タイトル" }
     novel_description { "あらすじ" }
     novel_content { "内容" }
-    author { "田中" }
     release { false }
     novel_series  # novel_seriesにアソシエーション
     user { novel_series.owner } # userにアソシエーション
+    author { user }
 
     trait :is_release do
       release { true }
