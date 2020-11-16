@@ -180,13 +180,7 @@ RSpec.describe "NovelSeries", type: :request do
   # 認証済みユーザーの場合
   context "認証済みユーザーの場合" do
     before do
-      @credentials = {
-        nickname: "ログインユーザー",
-        email: "authorization@example.com",
-        password: "password",
-        password_confirmation: "password"}
-      @user = FactoryBot.create(:user, @credentials)
-      post "/login", params: {user: @credentials}
+      login()
     end
 
     # シリーズ詳細ページ
