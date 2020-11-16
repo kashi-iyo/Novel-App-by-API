@@ -64,4 +64,5 @@ RSpec.configure do |config|
   config.include UserRequestSpecsHelpers, type: :request
   config.include ReturnJsonShowObject, type: :request
   config.include NovelSeriesSpecsHelpers, type: :request
+  config.include NovelsRequestSpecsHelpers, type: :request
 end
