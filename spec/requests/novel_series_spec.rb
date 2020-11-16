@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "NovelSeries", type: :request do
+
   # シリーズ全件（認証有無関係ない）
   describe "GET api/v1/novel_series" do
     context "シリーズが公開されている場合" do
@@ -39,6 +40,144 @@ RSpec.describe "NovelSeries", type: :request do
     end
   end
 
+  # selectで並び替えされたシリーズ全件（認証有無関係ない）
+  describe "GET /api/v1/selected_series/:selected_params" do
+    context "シリーズが公開されている場合" do
+      context "新着順になっている場合" do
+        before do
+          @series = FactoryBot.create_list(:novel_series, 5, :is_release)
+          # 新着のデータを作成
+          @new_series = FactoryBot.create(:novel_series, :is_release)
+          get "/api/v1/selected_series/new"
+        end
+        it "200を返すこと" do
+          expect(response.status).to eq 200
+        end
+        it "6つのシリーズを返すこと" do
+          json = JSON.parse(response.body)
+          expect(json["object"]["series_count"]).to eq 6
+        end
+        it "最初に最新のシリーズが来ること" do
+          json = JSON.parse(response.body)["object"]["series"].first
+          expect(@new_series.id).to eq json["series"]["id"]
+        end
+      end
+      context "古い順になっている場合" do
+        before do
+          # 古いシリーズ作成
+          @old_series = FactoryBot.create(:novel_series, :is_release)
+          @series = FactoryBot.create_list(:novel_series, 5, :is_release)
+          get "/api/v1/selected_series/old"
+        end
+        it "200を返すこと" do
+          expect(response.status).to eq 200
+        end
+        it "6つのシリーズを返すこと" do
+          json = JSON.parse(response.body)
+          expect(json["object"]["series_count"]).to eq 6
+        end
+        it "最初に古いシリーズが来ること" do
+          json = JSON.parse(response.body)["object"]["series"].first
+          expect(@old_series.id).to eq json["series"]["id"]
+        end
+      end
+      context "お気に入りが多い順になっている場合" do
+        before do
+          @series = FactoryBot.create_list(:novel_series, 5, :is_release)
+          # お気に入り付きのシリーズを作成
+          return_series_having_favorites({count: 1, type: "favorites"})
+          get "/api/v1/selected_series/more_favo"
+        end
+        it "200を返すこと" do
+          expect(response.status).to eq 200
+        end
+        it "6つのシリーズを返すこと" do
+          json = JSON.parse(response.body)
+          expect(json["object"]["series_count"]).to eq 6
+        end
+        it "最初にお気に入りが多いシリーズが来ること" do
+          json = JSON.parse(response.body)["object"]["series"].first
+          expect(@series_having_items[0].id).to eq json["series"]["id"]
+        end
+      end
+      context "お気に入りが少ない順になっている場合" do
+        before do
+          @series = FactoryBot.create(:novel_series, :is_release)
+          # お気に入り付きのシリーズを作成
+          return_series_having_favorites({count: 5, type: "favorites"})
+          get "/api/v1/selected_series/less_favo"
+        end
+        it "200を返すこと" do
+          expect(response.status).to eq 200
+        end
+        it "6つのシリーズを返すこと" do
+          json = JSON.parse(response.body)
+          expect(json["object"]["series_count"]).to eq 6
+        end
+        it "最初にお気に入りが多いシリーズが来ること" do
+          json = JSON.parse(response.body)["object"]["series"].first
+          expect(@series.id).to eq json["series"]["id"]
+        end
+      end
+      context "コメントが多い順になっている場合" do
+        before do
+          @series = FactoryBot.create_list(:novel_series, 5, :is_release)
+          # コメント付きのシリーズを作成
+          return_series_having_favorites({count: 1, type: "comments"})
+          get "/api/v1/selected_series/more_comment"
+        end
+        it "200を返すこと" do
+          expect(response.status).to eq 200
+        end
+        it "6つのシリーズを返すこと" do
+          json = JSON.parse(response.body)
+          expect(json["object"]["series_count"]).to eq 6
+        end
+        it "最初にコメントが多いシリーズが来ること" do
+          json = JSON.parse(response.body)["object"]["series"].first
+          expect(@series_having_items[0].id).to eq json["series"]["id"]
+        end
+      end
+      context "コメントが少ない順になっている場合" do
+        before do
+          @series = FactoryBot.create(:novel_series, :is_release)
+          # コメント付きのシリーズを作成
+          return_series_having_favorites({count: 5, type: "comments"})
+          get "/api/v1/selected_series/less_comment"
+        end
+        it "200を返すこと" do
+          expect(response.status).to eq 200
+        end
+        it "6つのシリーズを返すこと" do
+          json = JSON.parse(response.body)
+          expect(json["object"]["series_count"]).to eq 6
+        end
+        it "最初にコメントが少ないシリーズが来ること" do
+          json = JSON.parse(response.body)["object"]["series"].first
+          expect(@series.id).to eq json["series"]["id"]
+        end
+      end
+    end
+    context "シリーズが非公開の場合" do
+      before do
+        @series = FactoryBot.create_list(:novel_series, 5)
+        get root_path
+      end
+      it "200を返すこと" do
+        expect(response.status).to eq 200
+      end
+      it "返すシリーズが0であること" do
+        json = JSON.parse(response.body)
+        expect(json["object"]["series_count"]).to eq 0
+      end
+      it "シリーズの配列数が0であること" do
+        json = JSON.parse(response.body)
+        expect(json["object"]["series"].length).to eq 0
+      end
+    end
+  end
+
+  # 認証済みユーザーの場合
   context "認証済みユーザーの場合" do
     before do
       @credentials = {
@@ -215,7 +354,6 @@ RSpec.describe "NovelSeries", type: :request do
         end
         it "不正なJSONレスポンスを返すこと" do
           json = JSON.parse(response.body)
-          puts "#{json}"
           expect("アクセス権限がありません。").to eq json["errors"]
         end
       end
