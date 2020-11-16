@@ -67,31 +67,27 @@ module GenerateOriginalObjectConcern
             # Novels1件
             @novel = novel_data[:object]
             data_type = novel_data[:data_type]
-            if release?(novel_data)
-                # Series1件（Novelに紐付けされた）
-                @series = @novel.novel_series
-                # Novels全件
-                @novels = @series.novels
-                #Novels 目次用のID群
-                @novels_ids = loop_array_and_get_one_novel(
-                    object: @novels,
-                    data_type: data_type,
-                )
-                # Favorites全件（このNovelをお気に入りにしたユーザー）
-                @favorites = generate_original_favorites_object(@novel, data_type)
-                # Comments全件（このNovelにコメントしたユーザー）
-                @comments = generate_original_comments_object(@novel, data_type)
-                {
-                    series: @series,
-                    novel: @novel,
-                    novels_ids: @novels_ids,
-                    novels_count: @novels.count,
-                    favorites_obj: @favorites,
-                    comments_obj: @comments,
-                }
-            elsif !release?(novel_data)
-                return_unrelease_data()
-            end
+            # Series1件（Novelに紐付けされた）
+            @series = @novel.novel_series
+            # Novels全件
+            @novels = @series.novels
+            #Novels 目次用のID群
+            @novels_ids = loop_array_and_get_one_novel(
+                object: @novels,
+                data_type: data_type,
+            )
+            # Favorites全件（このNovelをお気に入りにしたユーザー）
+            @favorites = generate_original_favorites_object(@novel, data_type)
+            # Comments全件（このNovelにコメントしたユーザー）
+            @comments = generate_original_comments_object(@novel, data_type)
+            {
+                series: @series,
+                novel: @novel,
+                novels_ids: @novels_ids,
+                novels_count: @novels.count,
+                favorites_obj: @favorites,
+                comments_obj: @comments,
+            }
         end
 
 
