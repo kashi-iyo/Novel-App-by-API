@@ -51,7 +51,7 @@ module ValidatesFeaturesConcern
         else
             return unauthorized_errors(
                 errors: "アクセス権限がありません。",
-                error_type: "series"
+                error_type: data[:data_type]
             )
         end
     end
