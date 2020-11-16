@@ -54,22 +54,22 @@ module LoopArrayConcern
             case sort_data[:selection]
             # 新着順
             when "new"
-                b[:series][:created_at].to_i <=> a[:series][:created_at].to_i
+                b[:series][:created_at] <=> a[:series][:created_at]
             # 古い順
             when "old"
-                a[:series][:created_at].to_i <=> b[:series][:created_at].to_i
+                a[:series][:created_at] <=> b[:series][:created_at]
             # お気に入り多い順
             when "more_favo"
-                [b[:favorites_count], b[:series][:created_at].to_i] <=> [a[:favorites_count], a[:series][:created_at].to_i]
+                [b[:favorites_count], b[:series][:created_at]] <=> [a[:favorites_count], a[:series][:created_at]]
             # お気に入り少ない順
             when "less_favo"
-                [a[:favorites_count], b[:series][:created_at].to_i] <=> [b[:favorites_count], a[:series][:created_at].to_i]
+                [a[:favorites_count], b[:series][:created_at]] <=> [b[:favorites_count], a[:series][:created_at]]
             # コメント多い順
             when "more_comment"
-                [b[:comments_count], b[:series][:created_at].to_i] <=> [a[:comments_count], a[:series][:created_at].to_i]
+                [b[:comments_count], b[:series][:created_at]] <=> [a[:comments_count], a[:series][:created_at]]
             # コメント少ない順
             when "less_comment"
-                [a[:comments_count], b[:series][:created_at].to_i] <=> [b[:comments_count], a[:series][:created_at].to_i]
+                [a[:comments_count], b[:series][:created_at]] <=> [b[:comments_count], a[:series][:created_at]]
             end
         end
     end
