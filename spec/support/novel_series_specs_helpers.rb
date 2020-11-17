@@ -13,6 +13,8 @@ module NovelSeriesSpecsHelpers
     end
 
     # シリーズにお気に入りやコメントなどのデータを追加する
+    # count => 作成したいシリーズの数を入力
+    # type => commentsかfavoritesかを指定
     def return_series_having_favorites(pass_data)
         # データが追加される小説に紐付けさせるためのシリーズを作成
         @series_having_items = FactoryBot.create_list(
