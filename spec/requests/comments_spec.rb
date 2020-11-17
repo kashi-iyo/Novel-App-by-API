@@ -13,6 +13,7 @@ RSpec.describe "Comments", type: :request do
       @comment_params = FactoryBot.attributes_for(:comment, user: @user, novel: @novel)
     end
 
+    # コメント作成
     describe "POST /api/v1/novels/:novel_id/comments" do
       before do
         post "/api/v1/novels/#{@novel.id}/comments", params: {comment: @comment_params}
@@ -26,6 +27,7 @@ RSpec.describe "Comments", type: :request do
       end
     end
 
+    # コメント削除
     describe "DELETE /api/v1/novels/:novel_id/comments/:id" do
       before do
         comment = FactoryBot.create(:comment, novel: @novel, user: @user)
@@ -49,6 +51,7 @@ RSpec.describe "Comments", type: :request do
       delete "/logout"
     end
 
+    # コメント作成
     describe "POST /api/v1/novels/:novel_id/comments" do
       before do
         # コメントパラメータ
@@ -64,6 +67,7 @@ RSpec.describe "Comments", type: :request do
       end
     end
 
+    # コメント削除
     describe "DELETE /api/v1/novels/:novel_id/comments/:id" do
       before do
         comment = FactoryBot.create(:comment, novel: @novel, user: @user)
