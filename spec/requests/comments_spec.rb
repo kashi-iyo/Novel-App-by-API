@@ -16,14 +16,13 @@ RSpec.describe "Comments", type: :request do
     # コメント作成
     describe "POST /api/v1/novels/:novel_id/comments" do
       before do
-        post "/api/v1/novels/#{@novel.id}/comments", params: {comment: @comment_params}
+        request_post_comment(@novel, @comment_params)
       end
       it "200を返すこと" do
         expect(response.status).to eq 200
       end
       it "正常なJSONレスポンスを返すこと" do
-        json = JSON.parse(response.body)
-        expect("正常に保存されました。").to eq json["successful"]
+        expect_save_ok(response)
       end
     end
 
@@ -37,8 +36,7 @@ RSpec.describe "Comments", type: :request do
         expect(response.status).to eq 200
       end
       it "正常なJSONレスポンスを返すこと" do
-        json = JSON.parse(response.body)
-        expect("正常に削除されました。").to eq json["successful"]
+        expect_delete_ok(response)
       end
     end
   end
@@ -56,14 +54,13 @@ RSpec.describe "Comments", type: :request do
       before do
         # コメントパラメータ
         @comment_params = FactoryBot.attributes_for(:comment, user: @user, novel: @novel)
-        post "/api/v1/novels/#{@novel.id}/comments", params: {comment: @comment_params}
+        request_post_comment(@novel, @comment_params)
       end
       it "200を返すこと" do
         expect(response.status).to eq 200
       end
       it "不正なJSONレスポンスを返すこと" do
-        json = JSON.parse(response.body)
-        expect("この機能を使用するにはログインまたは、新規登録が必要です。").to eq json["errors"]
+        expect_need_auth(response)
       end
     end
 
@@ -71,14 +68,13 @@ RSpec.describe "Comments", type: :request do
     describe "DELETE /api/v1/novels/:novel_id/comments/:id" do
       before do
         comment = FactoryBot.create(:comment, novel: @novel, user: @user)
-        delete "/api/v1/novels/#{@novel.id}/comments/#{comment.id}"
+        request_delete_comment(@novel, comment)
       end
       it "200を返すこと" do
         expect(response.status).to eq 200
       end
       it "不正なJSONレスポンスを返すこと" do
-        json = JSON.parse(response.body)
-        expect("この機能を使用するにはログインまたは、新規登録が必要です。").to eq json["errors"]
+        expect_need_auth(response)
       end
     end
   end
