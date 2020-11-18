@@ -66,4 +66,8 @@ RSpec.configure do |config|
   config.include NovelSeriesSpecsHelpers, type: :request
   config.include NovelsRequestSpecsHelpers, type: :request
   config.include NovelTagSpecsHelpers, type: :request
+  config.include RelationshipRequestSpecsHelpers, type: :request
+  config.include ExpectHelpers, type: :request
+  config.include CommentRequestSpecsHelpers, type: :request
+  config.include NovelFavoritesRequestSpecsHelpers, type: :request
 end
