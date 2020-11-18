@@ -33,7 +33,7 @@ module UpdateActionConcern
             )
                     # → render_json_crud_object_concern.rb
         else
-            return failed_to_crud_object(@new_object)
+            return failed_to_crud_object(object: @new_object)
         end
     end
 
