@@ -1,0 +1,18 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/rails/Novel-App-by-API
+# permissions:
+#   - object: /var/www/
+#     pattern: "**"
+#     mode: 775
+hooks:
+  AfterInstall:
+    - location: scripts/bundle_install.sh
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: scripts/start_server.sh
+      timeout: 300
+      runas: root
