@@ -1,1 +1,1 @@
-systemctl restart nginx
+# sudo systemctl start nginx
