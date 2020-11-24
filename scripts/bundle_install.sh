@@ -1,4 +1,6 @@
 #!/bin/bash
+pwd
+echo $DB_NAME
 cd /var/www/rails/Novel-App-by-API
 pwd
 echo $DB_NAME
