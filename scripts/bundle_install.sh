@@ -1,5 +1,6 @@
 #!/bin/bash
 pwd
+cat /etc/environment
 echo $DB_NAME
 cd /var/www/rails/Novel-App-by-API
 pwd
