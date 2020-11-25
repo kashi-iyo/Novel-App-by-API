@@ -1,14 +1,13 @@
 #!/bin/bash
 
-str1="データベース名"
-
+# master.keyの環境変数を反映
 source /etc/environment
+
+# bundleコマンドを反映
 source ~/.bash_profile
 
-echo $str1$DB_NAME
 cd /var/www/rails/Novel-App-by-API
-bundle -v
 
-# RAILS_ENV=production bundle
-# RAILS_ENV=production bundle exec rake db:migrate
-# RAILS_ENV=production bundle exec rake assets:precompile
+RAILS_ENV=production bundle
+RAILS_ENV=production bundle exec rake db:migrate
+RAILS_ENV=production bundle exec rake assets:precompile
