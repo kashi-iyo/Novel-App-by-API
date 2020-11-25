@@ -11,6 +11,8 @@ sudo systemctl restart nginx
 
 # bundleコマンドを反映
 source ~/.bash_profile
+# RAILS_MASTER_KEY反映
+source etc/environment
 
 bundler -v
 echo $RAILS_MASTER_KEY
