@@ -1,5 +1,11 @@
 #!/bin/bash
 
 cd /var/www/rails/Novel-App-by-API
+
+# bundleコマンドを反映
+source ~/.bash_profile
+
+sudo chown -R ec2-user /var/www/rails/Novel-App-by-API
+
 sudo systemctl restart nginx
 bundle exec unicorn_rails -c /var/www/rails/Novel-App-by-API/config/unicorn.conf.rb -D -E production
