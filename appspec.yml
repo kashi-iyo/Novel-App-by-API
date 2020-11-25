@@ -9,10 +9,6 @@ hooks:
       timeout: 300
       runas: ec2-user
   AfterInstall:
-    - location: scripts/bundle_install.sh
-      timeout: 300
-      runas: ec2-user
-  ApplicationStart:
-    - location: scripts/start_server.sh
+    - location: scripts/setup.sh
       timeout: 300
       runas: ec2-user
