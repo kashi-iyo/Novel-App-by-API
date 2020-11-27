@@ -1,7 +1,7 @@
 class SessionsController < ApplicationController
 
     before_action :set_user, only: [:login]
-    before_action :current_user, only: [:is_logged_in?]
+    before_action :current_user, only: [:is_logged_in?, :logout]
 
     def login
         pass_object_for_sessions(
