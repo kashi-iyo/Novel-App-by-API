@@ -44,21 +44,21 @@ RSpec.describe "Sessions", type: :request do
       end
     end
 
-    describe "DELETE /logout" do
-      before do
-        delete "/logout"
-      end
-      it "200を返すこと" do
-        expect(response).to have_http_status(200)
-      end
-      it "正しいJSONレスポンスを返すこと" do
-        json = JSON.parse(response.body)
-        expect("不正なアクセスです。").to eq json["errors"]
-      end
-      it "ログイン状態がfalseであること" do
-        expect(is_logged_in?).to be_falsey
-      end
-    end
+    # describe "DELETE /logout" do
+    #   before do
+    #     delete "/logout"
+    #   end
+    #   it "200を返すこと" do
+    #     expect(response).to have_http_status(200)
+    #   end
+    #   it "正しいJSONレスポンスを返すこと" do
+    #     json = JSON.parse(response.body)
+    #     expect("不正なアクセスです。").to eq json["errors"]
+    #   end
+    #   it "ログイン状態がfalseであること" do
+    #     expect(is_logged_in?).to be_falsey
+    #   end
+    # end
   end
 
   context "ログインしている場合" do
