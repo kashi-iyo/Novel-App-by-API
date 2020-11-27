@@ -20,10 +20,12 @@ class SessionsController < ApplicationController
     end
 
     def logout
-        pass_object_for_sessions(
-            object: current_user,
-            action: "logout"
-        )
+        # pass_object_for_sessions(
+        #     object: current_user,
+        #     action: "logout"
+        # )
+        reset_session
+        render json: { status: 200, logged_in: false, successful: "正常にログアウト出来ました。" }
     end
 
     private
