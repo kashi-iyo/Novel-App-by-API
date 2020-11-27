@@ -21,6 +21,7 @@ class SessionsController < ApplicationController
 
     def logout
         pass_object_for_sessions(
+            object: current_user,
             action: "logout"
         )
     end
