@@ -12,11 +12,11 @@ module SessionConcern
         params = session_data[:params]
         action = session_data[:action]
         # ログイン中&ログインユーザーが存在する場合
-        if logged_in? && current_user
-            logging_case(user: user, action: action)
+        if logged_in?
+            return logging_case(user: user, action: action)
         # 非ログインの場合
-        else
-            not_logging_case(user: user, params: params, action: action)
+        elsif !logged_in?
+            return not_logging_case(user: user, params: params, action: action)
         end
     end
 
@@ -27,9 +27,9 @@ module SessionConcern
         case action
         #error ログインしているのにログインしようとする
         when "login"
-            return unauthorized_errors(errors: "すでにログインしています。", error_type: "already_login")
+            unauthorized_errors(errors: "すでにログインしています。", error_type: "already_login")
         when "is_logged_in?"
-            return return_session_data(
+            return_session_data(
                 action: action,
                 logged_in: true,
                 user: {id: user.id, nickname: user.nickname}
@@ -37,7 +37,7 @@ module SessionConcern
         # ログアウトする
         when "logout"
             reset_session
-            return return_session_data(
+            return_session_data(
                 action: action,
                 logged_in: false,
                 successful: "正常にログアウト出来ました。"
@@ -55,7 +55,7 @@ module SessionConcern
             # パスワードチェック
             if user && user.authenticate(params)
                 login!(user)
-                return return_session_data(
+                return_session_data(
                     action: action,
                     logged_in: true,
                     successful: "正常にログイン出来ました。",
@@ -63,7 +63,7 @@ module SessionConcern
                 )
             #error パスワードチェック失敗
             else
-                return unauthorized_errors(errors: "メールアドレス、もしくはパスワードが間違っています。再度入力をし直してください。", error_type: "authenticate_password")
+                unauthorized_errors(errors: "メールアドレス、もしくはパスワードが間違っています。再度入力をし直してください。", error_type: "authenticate_password")
             end
         when "is_logged_in?"
             return_session_data(
@@ -72,7 +72,7 @@ module SessionConcern
             )
         #error ログインしてないのにログアウトしようとする場合
         when "logout"
-            return unauthorized_errors(errors: "不正なアクセスです。")
+            unauthorized_errors(errors: "不正なアクセスです。")
         end
     end
 

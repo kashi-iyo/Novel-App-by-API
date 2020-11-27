@@ -112,6 +112,7 @@ RSpec.describe "Sessions", type: :request do
       end
       it "正しいJSONレスポンスを返すこと" do
         json = JSON.parse(response.body)
+        puts "#{json}"
         expect(false).to eq json["logged_in"]
       end
       it "ログイン状態がfalseであること" do
