@@ -19,6 +19,12 @@ module NovelAppApi
       routing_specs: false
     end
 
+    config.action_dispatch.default_headers = {
+      'Access-Control-Allow-Credentials' => 'true',
+      'Access-Control-Allow-Origin' => 'http://novel-app-client.s3-website-ap-northeast-1.amazonaws.com',
+      'Access-Control-Request-Method' => '*'
+  }
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
