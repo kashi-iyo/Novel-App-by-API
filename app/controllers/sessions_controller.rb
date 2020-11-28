@@ -1,6 +1,5 @@
 class SessionsController < ApplicationController
 
-    before_action :current_user, only: [:is_logged_in?]
     before_action :set_user, only: [:login, :is_logged_in?, :logout]
     # before_action :set_current_user, only: [:is_logged_in?, :logout]
 

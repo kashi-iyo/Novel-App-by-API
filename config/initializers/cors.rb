@@ -10,7 +10,7 @@
 # end
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
     allow do
-        origins 'http://novel-app-client.s3-website-ap-northeast-1.amazonaws.com'
+        origins 'http://novel-app-client.s3-website-ap-northeast-1.amazonaws.com', 'http://localhost:3001'
 
         resource '*',
             headers: :any,
