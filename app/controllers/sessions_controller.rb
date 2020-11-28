@@ -1,10 +1,10 @@
 class SessionsController < ApplicationController
 
-    before_action :set_user, only: [:login]
-    before_action :current_user, only: [:is_logged_in?, :logout]
+    before_action :set_user, only: [:login, :is_logged_in?, :logout]
+    # before_action :set_current_user, only: [:is_logged_in?, :logout]
 
     def login
-        pass_object_for_sessions(
+        run_sessions(
             object: @user,
             params: session_params[:password],
             action: "login"
@@ -13,19 +13,17 @@ class SessionsController < ApplicationController
     end
 
     def is_logged_in?
-        pass_object_for_sessions(
+        run_sessions(
             object: current_user,
-            action: "is_logged_in?"
+            action: "logged_in"
         )
     end
 
     def logout
-        # pass_object_for_sessions(
-        #     object: current_user,
-        #     action: "logout"
-        # )
-        reset_session
-        render json: { status: 200, logged_in: false, successful: "正常にログアウト出来ました。" }
+        run_sessions(
+            object: current_user,
+            action: "logout"
+        )
     end
 
     private
@@ -34,8 +32,10 @@ class SessionsController < ApplicationController
             params.require(:user).permit(:email, :password)
         end
 
+        # ユーザーデータの取得
         def set_user
-            @user = User.find_by(email: session_params[:email])
+            # ログイン状態のチェック
+            check_sessions(request.fullpath)
         end
 
 end
