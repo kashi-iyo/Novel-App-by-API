@@ -8,7 +8,7 @@
 #             credentials: true
 #     end
 # end
-Rails.application.config.middleware.insert_before ActionDispatch::Static, Rack::Cors do
+Rails.application.config.middleware.insert_before 0, Rack::Cors do
     allow do
         origins 'http://novel-app-client.s3-website-ap-northeast-1.amazonaws.com'
 
