@@ -33,9 +33,6 @@ class ApplicationController < ActionController::Base
     # エラーメッセージJSONデータでレンダリング
     include ReturnErrorMessagesConcern
 
-
-    before_action :current_user
-
     #validates 認可のチェックを行う
     def pass_object_to_crud(crud_data)
         if authorized?(crud_data)
