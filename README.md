@@ -13,6 +13,8 @@
 # App URL
 https://novelife.site
 
+※現在は停止しています。
+
 <br>
 
 # Usage
