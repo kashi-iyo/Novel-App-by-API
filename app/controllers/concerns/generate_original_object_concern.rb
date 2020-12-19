@@ -18,6 +18,9 @@ module GenerateOriginalObjectConcern
     #Series
 
         #Seriesオブジェクト1件を生成
+        # generate_original_favorites_object()：以下で定義
+        # generate_original_comments_object()：以下で定義
+        # loop_array_and_get_one_tag()：loop_array_concern.rb内に定義
         def generate_original_series_object(series_data)
             # Series1件
             @series = series_data[:object]
@@ -63,6 +66,9 @@ module GenerateOriginalObjectConcern
     #Novels
 
         #Novelsオブジェクト1件を生成
+        # loop_array_and_get_one_novel()：loop_array_concern.rb内に定義
+        # generate_original_favorites_object()：以下で定義
+        # generate_original_comments_object()：以下で定義
         def generate_original_novel_object(novel_data)
             # Novels1件
             @novel = novel_data[:object]
@@ -95,6 +101,9 @@ module GenerateOriginalObjectConcern
     #Favorite
 
         # Favoritesオブジェクト
+        # loop_array_and_get_one_data_count()：loop_array_concern.rb内に定義
+        # loop_array_and_get_one_favorites()：loop_array_concern.rb内に定義
+        # items_counter()：return_various_data_concern.rb内に定義
         def generate_original_favorites_object(data_for_favorites, data_type)
             case data_type
             when "series", "series_tag"
@@ -127,6 +136,8 @@ module GenerateOriginalObjectConcern
     #Comment
 
         # Commentsオブジェクト生成
+        # loop_array_and_get_one_data_count()：loop_array_concern.rb内に定義
+        # loop_array_and_get_one_comment()：loop_array_concern.rb内に定義
         def generate_original_comments_object(data_for_comments, data_type)
             case data_type
             when "series", "series_tag"
@@ -147,6 +158,9 @@ module GenerateOriginalObjectConcern
 
     # Utag(UserTags)
     # Stag(NovelTags)
+    # loop_array_and_get_one_series()：loop_array_concern.rb内に定義
+    # loop_array_and_get_one_user()：loop_array_concern.rb内に定義
+    # return_tag_data()：return_various_data_concern.rb内に定義
     def generate_original_tag_object(tag_data)
         tag = tag_data[:object]
         data_type = tag_data[:data_type]
@@ -158,9 +172,7 @@ module GenerateOriginalObjectConcern
                 crud_type: "index"
                 # Seriesオブジェクトは"index"で取得したい
             ).compact
-                    # → loop_array_concern.rb
             tag_object = return_tag_data(tag, data_type)
-                    # → return_various_data_concern.rb
             {
                 tag: tag_object,
                 series: series_object,
@@ -176,7 +188,6 @@ module GenerateOriginalObjectConcern
                     crud_type: "index"
                     # Seriesオブジェクトは"index"で取得したい
                 )
-                        # → loop_array_concern.rb
                 # タグオブジェクト生成
                 tag_object = return_tag_data(tag, data_type)
                         # → return_various_data_concern.rb
@@ -192,6 +203,12 @@ module GenerateOriginalObjectConcern
     #User
 
         # User1件
+        # return_user_data()：return_various_data_concern.rb内に定義
+        # generate_original_relationships_object()：以下で定義
+        # loop_array_and_get_one_tag()：loop_array_concern.rb内に定義
+        # loop_array_and_get_one_user()：loop_array_concern.rb内に定義
+        # loop_array_and_get_one_series()：loop_array_concern.rb内に定義
+        # loop_array_and_get_one_favorites()：loop_array_concern.rb内に定義
         def generate_original_user_object(user_data)
             user = user_data[:object]
             data_type = user_data[:data_type]

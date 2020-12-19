@@ -25,6 +25,7 @@ module ValidatesFeaturesConcern
     end
 
     #validates パラメータに基づいたデータの存在をチェック
+    # return_not_present_data()：return_error_messages_concern.rb内に定義
     def check_existing?(check_data)
         object = check_data[:object]
         params = check_data[:params]
@@ -44,6 +45,8 @@ module ValidatesFeaturesConcern
     end
 
     #validates releaseが真かどうか確認
+    # authorized?()：このファイル上部で定義
+    # unauthorized_errors()：return_error_messages_concern.rb内に定義
     def release?(data)
         release = data[:object][:release]
         if !!release || !release && authorized?(data)

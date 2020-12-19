@@ -9,10 +9,10 @@ module DestroyActionConcern
 
 
     #Destroy オブジェクトをDestroy
+    # failed_to_crud_object()：return_error_messages_concern.rb内に定義
     def execute_destroy_object(object)
         if object[:object].destroy
             render_json_destroyed_object(object)
-                    # → render_json_crud_object_concern.rb
         else
             return failed_to_crud_object(object)
         end

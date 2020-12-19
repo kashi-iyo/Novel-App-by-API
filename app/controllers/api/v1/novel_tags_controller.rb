@@ -2,6 +2,8 @@ class Api::V1::NovelTagsController < ApplicationController
 
     before_action :set_tag, only: [:show, :selected_series]
 
+    # crud_objecgt()メソッド：application_controller.rb内に定義
+
     #Read NovelTagsフィード
     def index
         crud_object(
@@ -9,7 +11,6 @@ class Api::V1::NovelTagsController < ApplicationController
             data_type: "series_tag",
             crud_type: "index"
         )
-            # → Applicationコントローラ
     end
 
     #Read NovelTagsに関連付けられているNovelSeries
@@ -19,7 +20,6 @@ class Api::V1::NovelTagsController < ApplicationController
             data_type: "series_tag",
             crud_type: "show"
         )
-            # → Applicationコントローラ
     end
 
     def selected_series
@@ -32,6 +32,8 @@ class Api::V1::NovelTagsController < ApplicationController
     end
 
     private
+
+    # check_existing?()メソッド：validates_features_concern.rb内に定義
 
         # パラメータに基づいたタグを取得
         def set_tag

@@ -9,24 +9,29 @@ module CreateActionConcern
         :create_and_save_object_to_render
     end
 
+
     #Create オブジェクトをCreate・Save
     def execute_create_and_save_object(create_data)
         @data_type = create_data[:data_type]
         @crud_type = create_data[:crud_type]
         @association = create_data[:association_data]
+        # check_already_existing_user_data()メソッド：以下で定義
         return if check_already_existing_user_data(
             association: @association,
             data_type: @data_type
         )
         # objectのnew
+        # new_object()：以下で定義
         @new_object = new_object(create_data)
         # objectのsave前の処理
+        # before_save()：以下で定義
         before_save(
             object: @new_object,
             association: @association,
             data_type: @data_type
         )
         # objectのsave
+        # after_save()：以下で定義
         after_save(
             object: @new_object,
             association: @association,
@@ -34,8 +39,11 @@ module CreateActionConcern
         )
     end
 
+    # ユーザー：ログイン済みかどうか
     # お気に入り: お気に入り済みかどうか
     # フォロー: フォロー済みかどうか
+    # unauthorized_errprs()メソッド：return_error_messages_concern.rb内に定義
+    # already_existing_object()メソッド： return_error_messages_concern.rb内に定義
     def check_already_existing_user_data(check)
         @association = check[:association]
         case check[:data_type]
@@ -49,9 +57,7 @@ module CreateActionConcern
         #Favorites お気に入り済みかどうかのチェック
         when "favorites"
             if favorited_by?(@association)
-                # → validates_features_concern.rb
                 already_existing_object(errors: "すでにお気に入り済みです。")
-                        # → return_error_messages_concern.rb
             end
         #! Relationship フォロー済みかどうかのチェック
         when "relationship"
@@ -90,6 +96,9 @@ module CreateActionConcern
     end
 
     #Create Save後
+    # failed_to_crud_object()：return_error_messages_concern.rb内に定義
+    # return_created_object()：以下で定義
+    # create_and_save_object_to_render()：以下で定義
     def after_save(save_object)
         @new_object = save_object[:object]
         @association = save_object[:association]
@@ -114,6 +123,8 @@ module CreateActionConcern
     end
 
     #Create・Saveされたオブジェクトを返す
+    # login!()：authentication_features_concern.rb内に定義
+    # save_tag()：novel_series.rb内に定義
     def return_created_object(created_object)
         object = created_object[:object]
         data_type = created_object[:data_type]

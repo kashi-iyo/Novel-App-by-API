@@ -1,8 +1,13 @@
 class Api::V1::NovelFavoritesController < ApplicationController
 
+    # logged_in_user()メソッド：authentication_features_concern.rb内に定義
+
     before_action :logged_in_user, only: [:create, :destroy]
     before_action :set_novel, only: [:create]
     before_action :set_favorites, only: [:destroy]
+
+    # crud_objecgt()メソッド：application_controller.rb内に定義
+    # pass_object_to_crud()メソッド：application_controller.rb内に定義
 
     #Create お気に入りON
     def create
@@ -28,6 +33,8 @@ class Api::V1::NovelFavoritesController < ApplicationController
 
     private
 
+    # check_existing?()メソッド：validates_features_concern.rb内に定義
+
         # お気に入りのStrong Parameters
         def favorite_params
             params.require(:novel_favorite).permit(:novel_id, :user_id, :favoriter)
@@ -39,7 +46,6 @@ class Api::V1::NovelFavoritesController < ApplicationController
                 object: Novel,
                 params: params[:novel_id],
                 data_type: "novel")
-                # → validates_features_concern.rb
         end
 
         def set_favorites
@@ -48,7 +54,6 @@ class Api::V1::NovelFavoritesController < ApplicationController
                 params: params[:novel_id],
                 params2: params[:id],
                 data_type: "favorite")
-                # → validates_features_concern.rb
         end
 
 end

@@ -9,6 +9,9 @@ module UpdateActionConcern
     end
 
     #Update オブジェクトをUpdate
+    # save_tag()：models/novel_series.rb内に定義
+    # save_user_tag()：models/user.rb内に定義
+    # failed_to_crud_object()：return_error_messages_concern.rb内に定義
     def execute_update_object(updated_data)
         @new_object = updated_data[:object]
         @data_type = updated_data[:data_type]
@@ -25,13 +28,11 @@ module UpdateActionConcern
                 object: @new_object,
                 data_type: @data_type
             )
-                    # → return_executed_crud_object_concern.rb
             render_json_updated_object(
                 object: @updated_object,
                 data_type: @data_type,
                 crud_type: @crud_type
             )
-                    # → render_json_crud_object_concern.rb
         else
             return failed_to_crud_object(object: @new_object)
         end
