@@ -8,6 +8,8 @@ module SelectedActionConcern
     end
 
     # 指定されたselectタグに基づいてオブジェクトを返す
+    # return_selected_object()：以下で定義
+    # render_json_selected_object()：以下で定義
     def execute_selected_object(selected_data)
         @object = return_selected_object(selected_data)
         render_json_selected_object(
@@ -18,6 +20,11 @@ module SelectedActionConcern
         )
     end
 
+    # セレクトによって並び替えられたシリーズを取得
+    # set_selected_value()：以下で定義
+    # loop_array_and_get_one_series()：loop_array_concern.rb内に定義
+    # sorting_series_by_select()：loop_array_concern.rb内に定義
+    # generate_original_tag_object()：generate_original_object_concern.rb内に定義
     def return_selected_object(selected_data)
         selection = selected_data[:selection]
         case selected_data[:data_type]
@@ -29,7 +36,6 @@ module SelectedActionConcern
                 series: sorting_series_by_select(
                     object: series_data, selection: selection
                 ),
-                    # → loop_array_concern.rb
             }
         when "series_tag"
             series_data = generate_original_tag_object(selected_data)

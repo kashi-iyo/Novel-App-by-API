@@ -15,13 +15,14 @@ module LoopArrayConcern
 
 
     # Series全件をループ処理
+    # generate_original_series_object()：generate_original_object_concern.rb内に定義
+    # authorized?()：validates_features_concern.rb内に定義
     def loop_array_and_get_one_series(series_data)
         object = series_data[:object]
         data_type = series_data[:data_type]
         crud_type = series_data[:crud_type]
         object.map do |series|
             @series = generate_original_series_object(object: series, data_type: data_type, crud_type: crud_type)
-                    # → generate_original_object_concern.rb
             # 非ログインの場合
             if !current_user
                 # 公開されている場合
@@ -34,6 +35,7 @@ module LoopArrayConcern
             # ログインしている場合
             elsif !!current_user
                 # ログインユーザー=作者の場合、非公開作品含め全て取得
+
                 if authorized?(object: series)
                     @series
                 else
@@ -75,13 +77,16 @@ module LoopArrayConcern
     end
 
     # Novels全件をループ処理
+    # return_novel_data()：return_various_data_concern.rb内に定義
     def loop_array_and_get_one_novel(novels_data)
         novels_data[:object].map do |novel|
+            # 公開ステータスがtrueなら
             if !!novel[:release]
                 return_novel_data(
                     object: novel,
                     data_type: novels_data[:data_type]
                 )
+            # 公開ステータスがfalseなら
             elsif !novel[:release]
                 []
             end
@@ -89,6 +94,7 @@ module LoopArrayConcern
     end
 
     # Favorites全件をループ処理
+    # return_favorites_data()：return_various_data_concern.rb内に定義
     def loop_array_and_get_one_favorites(favorites_data)
         object = favorites_data[:object]
         data_type = favorites_data[:data_type]
@@ -104,6 +110,7 @@ module LoopArrayConcern
     end
 
     # Comments全件をループ処理
+    # return_comments_data()：return_various_data_concern()内に定義
     def loop_array_and_get_one_comment(comment_data, data_type)
         comment_data.map do |comment|
             return_comments_data(comment, data_type)
@@ -112,14 +119,15 @@ module LoopArrayConcern
 
     # Utag UserTags全件 or
     # Stag SeriesTags全件をループ処理
+    # return_tag_data()：return_various_data_concern.rb内に定義
     def loop_array_and_get_one_tag(tag_data)
         tag_data[:object].map do |tag|
             return_tag_data(tag, tag_data[:data_type])
-                # → return_various_data_concern.rb
         end
     end
 
     # User全件をループ処理
+    # return_user_data()：return_various_data_concern.rb内に定義
     def loop_array_and_get_one_user(user_data)
         user_data[:object].map do |user|
             return_user_data(
@@ -131,10 +139,10 @@ module LoopArrayConcern
     end
 
     # 渡されたデータの数をループ処理
+    # items_counter()：return_various_data_concern.rb内に定義
     def loop_array_and_get_one_data_count(data, data_type)
         data.map do |d|
             items_counter(d, data_type)
-                # → return_various_data_concern.rb
         end
     end
 

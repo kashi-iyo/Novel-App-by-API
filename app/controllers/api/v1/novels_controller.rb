@@ -1,5 +1,7 @@
 class Api::V1::NovelsController < ApplicationController
 
+    # logged_in_user()メソッド：authentication_features_concern.rb内に定義
+
     # auth ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
     # novels Novelを1件取得（@novel）
@@ -8,6 +10,9 @@ class Api::V1::NovelsController < ApplicationController
     # novels NovelSeriesを取得（@series）
     before_action :set_series, only: [:create]
 
+
+    # crud_objecgt()メソッド：application_controller.rb内に定義
+
     #Read Novelオブジェクトを1件取得
     def show
         crud_object(
@@ -15,7 +20,6 @@ class Api::V1::NovelsController < ApplicationController
             data_type: "novel",
             crud_type: "show"
         )
-            # → application_controller.rb
     end
 
 
@@ -61,13 +65,15 @@ class Api::V1::NovelsController < ApplicationController
 
     private
 
+        # check_existing?()メソッド：validates_features_concern.rb内に定義
+        # release?()メソッド：validates_features_concern.rb内に定義
+
         # NovelSeriesが所有するNovels1件を取得
         def set_novel
             @novel = check_existing?(
                 object: Novel,
                 params: params[:id],
                 data_type: "novel")
-                # → validates_features_concern.rb
         end
 
         # 公開されているか非公開かをチェック
@@ -84,7 +90,6 @@ class Api::V1::NovelsController < ApplicationController
                 object: NovelSeries,
                 params: params[:novel_series_id],
                 data_type: "series")
-                # → validates_features_concern.rb
         end
 
         # 小説のStrong Parameters

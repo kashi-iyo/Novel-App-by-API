@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
     include ReturnErrorMessagesConcern
 
     #validates 認可のチェックを行う
+    # unauthorized_errors()：return_error_messages_concern.rb内に定義
     def pass_object_to_crud(crud_data)
         if authorized?(crud_data)
             crud_object(crud_data)
@@ -53,30 +54,31 @@ class ApplicationController < ActionController::Base
         #Read
         when "index"
             execute_get_index_object(crud_data)
-                # →index_and_show_action_concern.rb
+                # →index_and_show_action_concern.rb内に定義
         #Read
         when "show"
             execute_get_show_object(crud_data)
-                # →index_and_show_action_concern.rb
+                # →index_and_show_action_concern.rb内に定義
         # Create・Save
         when "create"
             execute_create_and_save_object(crud_data)
-                # →create_action_concern.rb
+                # →create_action_concern.rb内に定義
         # Edit
         when "edit"
             edit_object_to_render(crud_data)
-                # →edit_action_concern.rb
+                # →edit_action_concern.rb内に定義
         # Update
         when "update"
             execute_update_object(crud_data)
-                # →update_action_concern.rb
+                # →update_action_concern.rb内に定義
         # Destroy
         when "destroy"
             execute_destroy_object(crud_data)
-                # →destroy_action_concern.rb
+                # →destroy_action_concern.rb内に定義
         # select
         when "selected"
             execute_selected_object(crud_data)
+                # →selected_action_concern.rb内に定義
         end
     end
 

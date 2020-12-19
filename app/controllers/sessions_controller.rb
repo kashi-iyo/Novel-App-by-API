@@ -2,13 +2,14 @@ class SessionsController < ApplicationController
 
     before_action :set_user, only: [:login, :logout, :is_logged_in?]
 
+    # run_sessions()：session_concern.rb内に定義
+
     def login
         run_sessions(
             object: @user,
             params: session_params[:password],
             action: "login"
         )
-            # → session_concern.rb
     end
 
     def is_logged_in?
@@ -26,6 +27,8 @@ class SessionsController < ApplicationController
     end
 
     private
+
+    # check_sessions()：authentication_features_concern.rb内に定義
 
         def session_params
             params.require(:user).permit(:email, :password)

@@ -103,6 +103,8 @@ module ReturnVariousDataConcern
     #User
 
         # Users1件のデータフォーマット
+        # loop_array_and_get_one_tag()：loop_array_concern.rb内に定義
+        # generate_original_relationships_object()：generate_original_object_concern.rb内に定義
         def return_user_data(user_data)
             @user = user_data[:object]
             data_type = user_data[:data_type]

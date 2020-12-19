@@ -7,6 +7,7 @@ module EditActionConcern
     end
 
     #Edit用のオブジェクトをJSONデータとしてレンダリングする
+    # return_edit_object()：以下で定義
     def edit_object_to_render(edit_data)
         @object = return_edit_object(edit_data)
         render json: {
@@ -18,6 +19,7 @@ module EditActionConcern
     end
 
     # Editしたいオブジェクト
+    # loop_array_and_get_one_tag()：loop_array_concern.rb内に定義
     def return_edit_object(edit_data)
         object = edit_data[:object]
         association = edit_data[:association_data]

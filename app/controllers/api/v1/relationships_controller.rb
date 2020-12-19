@@ -1,9 +1,15 @@
 class Api::V1::RelationshipsController < ApplicationController
 
+    # logged_in_user()メソッド：authentication_features_concern.rb内に定義
+
     before_action :logged_in_user, only: [:create, :destroy]
     before_action :set_user, only: [:create]
     before_action :for_users_followings_or_followers, only: [:followings, :followers]
     before_action :set_relationship, only: [:destroy]
+
+
+    # crud_objecgt()メソッド：application_controller.rb内に定義
+    # pass_object_to_crud()メソッド：application_controller.rb内に定義
 
     def create
         pass_object_to_crud(
@@ -41,33 +47,32 @@ class Api::V1::RelationshipsController < ApplicationController
 
     private
 
-    def relationship_params
-        params.require(:relationship).permit(:follow_id)
-    end
+    # check_existing?()メソッド：validates_features_concern.rb内に定義
 
-    def set_user
-        @user = check_existing?(
-            object: User,
-            params: params[:relationship][:follow_id],
-            data_type: "user")
-            # → validates_features_concern.rb
-    end
+        def relationship_params
+            params.require(:relationship).permit(:follow_id)
+        end
 
-    # フォローユーザー／フォロワーデータを取得するため
-    def for_users_followings_or_followers
-        @user2 = check_existing?(
-            object: User,
-            params: params[:id],
-            data_type: "user")
-            # → validates_features_concern.rb
-    end
+        def set_user
+            @user = check_existing?(
+                object: User,
+                params: params[:relationship][:follow_id],
+                data_type: "user")
+        end
 
-    def set_relationship
-        @relationship = check_existing?(
-            object: current_user.relationships,
-            params: params[:id],
-            data_type: "relationship")
-            # → validates_features_concern.rb
-    end
+        # あるユーザーのフォローユーザー／フォロワーデータを取得するため
+        def for_users_followings_or_followers
+            @user2 = check_existing?(
+                object: User,
+                params: params[:id],
+                data_type: "user")
+        end
+
+        def set_relationship
+            @relationship = check_existing?(
+                object: current_user.relationships,
+                params: params[:id],
+                data_type: "relationship")
+        end
 
 end

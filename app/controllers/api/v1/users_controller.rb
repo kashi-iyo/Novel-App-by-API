@@ -1,8 +1,13 @@
 class Api::V1::UsersController < ApplicationController
 
+    # logged_in_user()メソッド：authentication_features_concern.rb内に定義
+
     before_action :logged_in_user, only: [:edit, :update]
     before_action :set_user, only: [:show, :edit, :update, :destroy]
     before_action :set_user_tags, only: [:update]
+
+    # crud_objecgt()メソッド：application_controller.rb内に定義
+    # pass_object_to_crud()メソッド：application_controller.rb内に定義
 
     #Read
     def index
@@ -65,6 +70,8 @@ class Api::V1::UsersController < ApplicationController
 
     private
 
+        # check_existing?()メソッド：validates_features_concern.rb内に定義
+
         def user_params
             params.require(:user).permit(:nickname, :account_id, :email, :password, :password_confirmation)
         end
@@ -83,6 +90,5 @@ class Api::V1::UsersController < ApplicationController
                 object: User,
                 params: params[:id],
                 data_type: "user")
-                # → validates_features_concern.rb
         end
 end

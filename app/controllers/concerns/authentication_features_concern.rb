@@ -7,6 +7,10 @@ module AuthenticationFeaturesConcern
         helper_method :login!, :logged_in?, :logged_in_user, :current_user, :check_sessions
     end
 
+
+    # unauthorized_errprs()メソッド：return_error_messages_concern.rb内に定義
+    # return_session_data()メソッド：session_concern.rb内に定義
+
     # ログインさせる
     def login!(user)
         session[:user_id] = user.id

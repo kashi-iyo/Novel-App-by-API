@@ -1,5 +1,7 @@
 class Api::V1::NovelSeriesController < ApplicationController
 
+    # logged_in_user()メソッド：authentication_features_concern.rb内に定義
+
     # auth ログインしているかどうかの確認
     before_action :logged_in_user, only: [:create, :edit, :update, :destroy]
     # novels パラメータの基づいたシリーズ取得(@novel_series / @errorsを返す)
@@ -8,6 +10,10 @@ class Api::V1::NovelSeriesController < ApplicationController
     before_action :check_release, only: [:show]
     # novels パラメータに基づいたタグのデータを取得(@novel_tags)
     before_action :set_series_tags, only: [:create, :update]
+
+
+    # crud_objecgt()メソッド：application_controller.rb内に定義
+    # pass_object_to_crud()メソッド：application_controller.rb内に定義
 
     #Read NovelSeriesオブジェクト全件をJSONとしてレンダリング
     def index
@@ -81,6 +87,9 @@ class Api::V1::NovelSeriesController < ApplicationController
 
     private
 
+        # check_existing?()メソッド：validates_features_concern.rb内に定義
+        # release?()メソッド：validates_features_concern.rb内に定義
+
         #! NovelSeriesオブジェクト作成用のStrong Parameters
         def series_params
             params.require(:novel_series).permit(:series_title, :series_description, :author, :release)
@@ -97,7 +106,6 @@ class Api::V1::NovelSeriesController < ApplicationController
                 object: NovelSeries,
                 params: params[:id],
                 data_type: "series")
-                # → validates_features_concern.rb
         end
 
         # 公開されているか非公開かをチェック

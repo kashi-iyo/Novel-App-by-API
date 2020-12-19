@@ -6,6 +6,8 @@ module SessionConcern
         helper_method :run_sessions, :return_session_data
     end
 
+    # ログイン/ログイン保持チェック/ログアウトを実行
+    # return_session_data()：以下で定義
     def run_sessions(session_data)
         action = session_data[:action]
         user = session_data[:object]
